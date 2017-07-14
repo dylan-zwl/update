@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:UpdateItem="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/include_func_title"/>
+    </LinearLayout>
+
+    <com.tapc.update.ui.view.UpdateItem
+        android:id="@+id/update_app"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        UpdateItem:btn_tx="@string/update"
+        UpdateItem:title="@string/update_app_title">
+
+    </com.tapc.update.ui.view.UpdateItem>
+
+    <com.tapc.update.ui.view.UpdateItem
+        android:id="@+id/update_mcu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        UpdateItem:btn_tx="@string/update"
+        UpdateItem:title="@string/update_mcu_title">
+
+    </com.tapc.update.ui.view.UpdateItem>
+</LinearLayout>

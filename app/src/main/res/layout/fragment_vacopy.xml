@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:UpdateItem="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/include_func_title"/>
+    </LinearLayout>
+
+    <com.tapc.update.ui.view.UpdateItem
+        android:id="@+id/va_from_path"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        UpdateItem:is_show_btn="false"
+        UpdateItem:title="@string/va_from_path">
+
+    </com.tapc.update.ui.view.UpdateItem>
+
+    <com.tapc.update.ui.view.UpdateItem
+        android:id="@+id/va_target_path"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        UpdateItem:is_show_btn="false"
+        UpdateItem:title="@string/va_target_path">
+
+    </com.tapc.update.ui.view.UpdateItem>
+
+    <com.tapc.update.ui.view.UpdateItem
+        android:id="@+id/va_file_manager"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        UpdateItem:btn_tx="@string/va_file_manager_btn"
+        UpdateItem:title="@string/va_file_manager">
+
+    </com.tapc.update.ui.view.UpdateItem>
+
+    <com.tapc.update.ui.view.UpdateItem
+        android:id="@+id/va_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        UpdateItem:btn_tx="@string/va_check_btn"
+        UpdateItem:title="@string/va_check">
+
+    </com.tapc.update.ui.view.UpdateItem>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/bg_vaplayer"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="512">
+
+            <ListView
+                android:id="@+id/va_play_lv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="20dp">
+            </ListView>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/bg_va_list_line"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="232"
+            android:paddingBottom="40dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:paddingTop="40dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <SurfaceView
+                    android:id="@+id/va_play_sv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#B3B3B3">
+                </SurfaceView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_vertical">
+
+                    <Button
+                        android:id="@+id/va_play_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:background="@drawable/btn_va_play_n"/>
+
+                    <TextView
+                        android:id="@+id/va_play_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="00:00:00"
+                        android:textColor="@color/tx_nomal1"/>
+
+                    <SeekBar
+                        android:id="@+id/va_play_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:progressDrawable="@drawable/skbar_style_va_play"
+                        android:thumb="@drawable/skbar_tb_va_play"/>
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

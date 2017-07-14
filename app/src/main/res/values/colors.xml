@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <!--文字-->
+    <color name="tx_nomal1">#FFFFFF</color>
+    <color name="tx_nomal2">#3DFFFFFF</color>
+    <color name="tx_nomal3">#414142</color>
+    <color name="tx_nomal4">#00CDB1</color>
+</resources>

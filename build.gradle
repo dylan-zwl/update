@@ -1,0 +1,40 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+
+        //ButterKnife 添加库
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+
+    allprojects {
+        repositories {
+            jcenter()
+        }
+
+//某些输入文件使用或覆盖了已过时的 API。显示错误
+//    gradle.projectsEvaluated {
+//        tasks.withType(JavaCompile) {
+//            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+//        }
+//    }
+
+        //添加以下代码，使classes-full-debug.jar包编译先于android.jar
+        gradle.projectsEvaluated {
+            tasks.withType(JavaCompile) {
+                options.compilerArgs.add('-Xbootclasspath/p:app\\src\\libs\\classes-full-3188.jar')
+//            options.compilerArgs.add('-Xbootclasspath/p:app\\src\\libs\\classes-full-8935.jar')
+            }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

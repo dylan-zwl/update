@@ -1,0 +1,35 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- 功能按钮 -->
+    <style name="setting_left_item_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">25sp</item>
+        <item name="android:background">@android:color/holo_blue_dark</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:button">@null</item>
+    </style>
+
+    <declare-styleable name="FunctionItem">
+        <attr name="ic" format="reference"></attr>
+        <attr name="name" format="string"></attr>
+    </declare-styleable>
+
+
+    <declare-styleable name="UpdateItem">
+        <attr name="title" format="string"></attr>
+        <attr name="btn_tx" format="string"></attr>
+        <attr name="is_show_btn" format="boolean"></attr>
+    </declare-styleable>
+</resources>
