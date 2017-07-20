@@ -1,217 +1,236 @@
 package com.tapc.update.ui.fragment.uninstall;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
+import android.content.pm.IPackageDeleteObserver;
+import android.os.Handler;
+import android.os.RemoteException;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.tapc.update.R;
+import com.tapc.update.ui.adpater.BaseAppAdpater;
 import com.tapc.update.ui.entity.AppInfoEntity;
+import com.tapc.update.ui.fragment.BaseFragment;
+import com.tapc.update.ui.view.CustomTextView;
+import com.tapc.update.utils.AppUtil;
+import com.tapc.update.utils.IntentUtil;
+import com.tapc.update.utils.ShowInforUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class UninstallAppFragment extends Fragment {
-    @BindView(R.id.uninstall_app_grid)
-    GridView mUninstallGrid;
+public class UninstallAppFragment extends BaseFragment {
+    @BindView(R.id.uninstall_app_lv)
+    ListView mUninstallAppLv;
+    @BindView(R.id.uninstall_all_chk)
+    CheckBox mAllCheck;
+    @BindView(R.id.show_system_app)
+    CheckBox mShowSystemApp;
 
-    private Context mContext;
-    //    private AppGridViewAdapter mAdapter;
-    private List<AppInfoEntity> mlistAppInfo;
-
-    private List<String> mListFilePath = new ArrayList<String>();
-    private List<String> mInternalApp = new ArrayList<String>();
-    private ProgressDialog mProgressDialog;
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_uninstall_app, container, false);
-        ButterKnife.bind(this, view);
-        initUI();
-        return view;
-    }
+    private Handler mHandler;
+    private BaseAppAdpater mAdapter;
+    private List<AppInfoEntity> mListApkInfor = new ArrayList<AppInfoEntity>();
+    private List<AppInfoEntity> mAllLstAppInfo;
+    private boolean isHasGetSystemApp = false;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public int getContentView() {
+        return R.layout.fragment_uninstall_app;
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mContext = activity;
+    public void initView() {
+        mHandler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mAllLstAppInfo = AppUtil.getAllAppInfo(mContext, false);
+                mListApkInfor = getShowListApp(mAllLstAppInfo, false);
+                if (mListApkInfor == null || mListApkInfor.isEmpty()) {
+                    return;
+                }
+                mAdapter = new BaseAppAdpater(mListApkInfor, new BaseAppAdpater.Listener() {
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        return initItemView(position, convertView);
+                    }
+                });
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mUninstallAppLv.setAdapter(mAdapter);
+                        notifyChanged();
+                    }
+                });
+            }
+        }).start();
+
+        mAllCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (mListApkInfor != null) {
+                    for (int index = 0; index < mListApkInfor.size(); index++) {
+                        mListApkInfor.get(index).setChecked(isChecked);
+                    }
+                    notifyChanged();
+                }
+            }
+        });
+
+        mShowSystemApp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (mAllLstAppInfo != null) {
+                    if (isChecked && isHasGetSystemApp == false) {
+                        isHasGetSystemApp = true;
+                        mAllLstAppInfo = AppUtil.getAllAppInfo(mContext, true);
+                    }
+                    mListApkInfor = getShowListApp(mAllLstAppInfo, isChecked);
+                }
+                if (mListApkInfor == null || mListApkInfor.isEmpty()) {
+                    return;
+                }
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.notifyDataSetChanged(mListApkInfor);
+                    }
+                });
+            }
+        });
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
+    private List<AppInfoEntity> getShowListApp(List<AppInfoEntity> list, boolean isShowSystemApp) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+
+        List<AppInfoEntity> showList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).isSystemApp() == false) {
+                showList.add(list.get(i));
+            }
+        }
+        if (isShowSystemApp) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).isSystemApp()) {
+                    showList.add(list.get(i));
+                }
+            }
+        }
+        return showList;
     }
 
-    private void initUI() {
-//        getThirdApplication();
+    private Runnable mUninstallAppRunnable = new Runnable() {
+        public void run() {
+            for (int index = 0; index < mListApkInfor.size(); index++) {
+                uninstallApp(index, true);
+            }
+            notifyChanged();
+            startUpdate();
+        }
+    };
+
+    private void uninstallApp(final int index, boolean isNeedChecked) {
+        final AppInfoEntity appInfoEntity = mListApkInfor.get(index);
+        if (isNeedChecked && appInfoEntity.isChecked() == false) {
+            return;
+        }
+        appInfoEntity.setInstallStatus("");
+        incTask();
+
+        final String pkgName = appInfoEntity.getPkgName();
+        boolean result = AppUtil.unInstallApk(mContext, pkgName, new IPackageDeleteObserver.Stub() {
+            @Override
+            public void packageDeleted(String s, int i) throws RemoteException {
+                boolean isSuccess;
+                if (i == 1) {
+                    mListApkInfor.remove(appInfoEntity);
+                    notifyChanged();
+                    isSuccess = true;
+                } else {
+                    isSuccess = false;
+                }
+                ShowInforUtil.send(mContext, appInfoEntity.getAppLabel(), getString(R.string.uninstall), isSuccess, "");
+                decTask();
+                stopUpdate();
+            }
+        });
+        if (result == false) {
+            decTask();
+            stopUpdate();
+        }
     }
 
-//    private void getThirdApplication() {
-//        mlistAppInfo = new ArrayList<AppInfoEntity>();
-//        mlistAppInfo = AppUtil.getAllAppInfo(mContext);
-//        mAdapter = new AppGridViewAdapter(mContext, mlistAppInfo);
-//        mUninstallGrid.setAdapter(mAdapter);
-//        mAdapter.notifyDataSetChanged();
-//        mUninstallGrid.setOnItemClickListener(new OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
-//                AppUtil.unInstallApk(mContext, mlistAppInfo.get(position).getPkgName());
-//            }
-//        });
-//        mHandler.sendMessageDelayed(mHandler.obtainMessage(0), 1000);
-//
-//        getFiles("/system/preinstall", "apk", true);
-//        if (mListFilePath != null && mListFilePath.size() > 0) {
-//            getAppList();
-//        }
-//
-//        if (mProgressDialog == null) {
-//            mProgressDialog = new ProgressDialog(mContext);
-//            mProgressDialog.setMax(mlistAppInfo.size());
-//            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//            mProgressDialog.setCancelable(false);
-//            mProgressDialog.hide();
-//        }
-//    }
-//
-//    private Handler mHandler = new Handler() {
-//        @Override
-//        public void handleMessage(Message msg) {
-//            switch (msg.what) {
-//                case 0:
-//                    checkRemoveApp();
-//                    mHandler.sendMessageDelayed(mHandler.obtainMessage(0), 1000);
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
-//    };
-//
-//    private void checkRemoveApp() {
-//        for (int i = 0; i < mlistAppInfo.size(); i++) {
-//            if (isAppHasRemove(mContext, mlistAppInfo.get(i).getPkgName())) {
-//                mlistAppInfo.remove(i);
-//            }
-//        }
-//        mAdapter.notifyDataSetChanged();
-//    }
-//
-//    private boolean isAppHasRemove(Context context, String packagename) {
-//        PackageInfo packageInfo;
-//        try {
-//            packageInfo = context.getPackageManager().getPackageInfo(packagename, 0);
-//        } catch (NameNotFoundException e) {
-//            packageInfo = null;
-//        }
-//        if (packageInfo == null) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
-//
-//    private void getFiles(String Path, String Extension, boolean IsIterative) // 搜索目录，扩展名，是否进入子文件夹
-//    {
-//        File[] files = new File(Path).listFiles();
-//        if (files != null) {
-//            for (int i = 0; i < files.length; i++) {
-//                File f = files[i];
-//                if (f.isFile()) {
-//                    if (f.getPath().substring(f.getPath().length() - Extension.length()).equals(Extension)) // 判断扩展名
-//                        mListFilePath.add(f.getPath());
-//                    if (!IsIterative)
-//                        break;
-//                } else if (f.isDirectory() && f.getPath().indexOf("/.") == -1) // 忽略点文件（隐藏文件/文件夹）
-//                    getFiles(f.getPath(), Extension, IsIterative);
-//            }
-//        }
-//    }
-//
-//    private void getAppList() {
-//        for (String apkPath : mListFilePath) {
-//            PackageManager pm = mContext.getPackageManager();
-//            PackageInfo info = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
-//            if (info != null) {
-//                ApplicationInfo appInfo = info.applicationInfo;
-//                Log.d("Internal App", "" + appInfo.packageName);
-//                mInternalApp.add(appInfo.packageName);
-//            }
-//        }
-//    }
-//
-//    private Handler progressHandler = new Handler() {
-//        public void handleMessage(Message msg) {
-//            if (msg.what == 255) {
-//                mProgressDialog.hide();
-//            } else {
-//                mProgressDialog.show();
-//                mProgressDialog.setProgress(msg.what);
-//            }
-//        }
-//
-//        ;
-//    };
-//
-//    private Runnable installAppRunnable = new Runnable() {
-//        public void run() {
-//            List<AppInfoEntity> listAppInfo = new ArrayList<AppInfoEntity>();
-//            listAppInfo.addAll(mlistAppInfo);
-//            progressHandler.sendEmptyMessage(0);
-//            if (listAppInfo != null && listAppInfo.size() > 0) {
-//                for (AppInfoEntity appInfoEntity : listAppInfo) {
-//                    boolean notUninstallApp = false;
-//
-//                    if (mInternalApp != null && mInternalApp.size() > 0) {
-//                        for (String pakName : mInternalApp) {
-//                            if (appInfoEntity.getPkgName().equals(pakName)) {
-//                                notUninstallApp = true;
-//                                break;
-//                            }
-//                        }
-//                    }
-////                    if (!notUninstallApp) {
-////                        AppUtil.unInstallApk(mContext, appInfoEntity.getPkgName(), packageDeleteObserver);
-////                        while (!packageDeleteObserver.getStatus()) {
-////                            SystemClock.sleep(200);
-////                        }
-////                    }
-//                    progressHandler.sendEmptyMessage(listAppInfo.indexOf(appInfoEntity) + 1);
-//                }
-//            }
-//            progressHandler.sendEmptyMessage(listAppInfo.size());
-//            SystemClock.sleep(2000);
-//            progressHandler.sendEmptyMessage(255);
-//        }
-//    };
-//
-//    @OnClick(R.id.a_key_uninstall)
-//    protected void unistallApp(View v) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-//        builder.setMessage(getString(R.string.a_key_uninstall_app)).setCancelable(false)
-//                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        new Thread(installAppRunnable).start();
-//                    }
-//                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int id) {
-//                dialog.cancel();
-//            }
-//        });
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
+    @OnClick(R.id.uninstall_all_app_btn)
+    void uninstallAllApp(View v) {
+        new Thread(mUninstallAppRunnable).start();
+    }
+
+    class ViewHolder {
+        @BindView(R.id.uninstall_chk)
+        CheckBox checkBox;
+        @BindView(R.id.uninstall_app_ic)
+        ImageView icon;
+        @BindView(R.id.uninstall_app_name)
+        CustomTextView name;
+        @BindView(R.id.open_app_btn)
+        Button openApp;
+        @BindView(R.id.uninstall_start_btn)
+        Button start;
+    }
+
+    private void notifyChanged() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private View initItemView(final int position, View convertView) {
+        ViewHolder viewHolder;
+        if (convertView == null) {
+            convertView = View.inflate(mContext, R.layout.item_uninstall_app, null);
+            viewHolder = new ViewHolder();
+            ButterKnife.bind(viewHolder, convertView);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+        final AppInfoEntity item = mListApkInfor.get(position);
+        viewHolder.checkBox.setChecked(item.isChecked());
+        viewHolder.icon.setImageDrawable(item.getAppIcon());
+        viewHolder.name.setText(item.getAppLabel());
+        viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mListApkInfor.get(position).setChecked(isChecked);
+            }
+        });
+        viewHolder.start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                uninstallApp(position, false);
+                notifyChanged();
+                startUpdate();
+            }
+        });
+        viewHolder.openApp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IntentUtil.startApp(mContext, mListApkInfor.get(position).getPkgName());
+            }
+        });
+        return convertView;
+    }
 }

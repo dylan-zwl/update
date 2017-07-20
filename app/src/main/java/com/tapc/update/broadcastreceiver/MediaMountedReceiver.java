@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.tapc.update.application.Config;
+import com.tapc.update.ui.activity.AutoUpdateActivity;
+import com.tapc.update.utils.IntentUtil;
 
 import java.io.File;
 
@@ -13,8 +15,9 @@ public class MediaMountedReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         if (action == Intent.ACTION_MEDIA_MOUNTED) {
-            Config.MOUNTED_PATH = intent.getDataString();
-//            IntentUtil.startActivity(context, MainActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK);
+            Config.MOUNTED_PATH = intent.getDataString() + "/";
+            IntentUtil.startActivity(context, AutoUpdateActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK | Intent
+                    .FLAG_ACTIVITY_CLEAR_TOP);
 //            SystemClock.sleep(1000);
 //            Config.initConfig();
 //            String udiskPath = Config.UDISK_FILE_PATH + Config.TAPC_FILE_PATH;

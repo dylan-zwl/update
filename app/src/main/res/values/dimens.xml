@@ -5,4 +5,5 @@
     <dimen name="tx_size3">28sp</dimen>
     <dimen name="tx_size4">24sp</dimen>
     <dimen name="tx_size5">20sp</dimen>
+    <dimen name="tx_title">72sp</dimen>
 </resources>

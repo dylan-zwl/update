@@ -1,5 +1,6 @@
 package com.tapc.update.ui.fragment.app;
 
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import com.tapc.update.ui.update.UpdateInfor;
 import com.tapc.update.ui.view.UpdateItem;
 import com.tapc.update.utils.AppUtil;
 import com.tapc.update.utils.FileUtil;
+import com.tapc.update.utils.ShowInforUtil;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -27,7 +29,7 @@ import butterknife.OnClick;
  * Created by Administrator on 2017/7/10.
  */
 
-public class UpdateAppFragment extends BaseFragment implements UpdateConttract.View {
+public class UpdateAppFragment extends BaseFragment {
     @BindView(R.id.func_name_tx)
     TextView mTitle;
     @BindView(R.id.func_start_btn)
@@ -38,9 +40,7 @@ public class UpdateAppFragment extends BaseFragment implements UpdateConttract.V
     @BindView(R.id.update_mcu)
     UpdateItem mUpdateItemMcu;
 
-    private String mSavePath = "tapc";
-    private String updateFile = "update_app";
-    private String updateOriginPath = "";
+    protected static String TAG;
     private String mUpdateFilePath;
     boolean isCopySuccessed = false;
 
@@ -54,41 +54,105 @@ public class UpdateAppFragment extends BaseFragment implements UpdateConttract.V
 
     @Override
     public void initView() {
+        TAG = getClass().getName();
         mTitle.setText(getString(R.string.func_app));
         mStartUpdate.setText(getString(R.string.a_key_update));
 
-        String appVersion = AppUtil.getVersionName(mContext, mContext.getPackageName());
+        initVersionShow();
+    }
+
+    private void initVersionShow() {
+        MachineController.getInstance().sendCtlVersionCmd(null);
+        SystemClock.sleep(200);
+        String appVersion = AppUtil.getVersionName(mContext, Config.APP_PACKGGE);
         String mcuVersion = MachineController.getInstance().getCtlVersionValue();
-        if (!TextUtils.isEmpty(appVersion)) {
-            mUpdateItemApp.setTitle(String.format(mContext.getString(R.string.update_app_title), appVersion));
+        if (TextUtils.isEmpty(appVersion)) {
+            appVersion = "";
         }
-        if (!TextUtils.isEmpty(mcuVersion)) {
-            mUpdateItemMcu.setTitle(String.format(mContext.getString(R.string.update_app_title), mcuVersion));
+        if (TextUtils.isEmpty(mcuVersion)) {
+            mcuVersion = "";
         }
+        mUpdateItemApp.setTitle(String.format(mContext.getString(R.string.update_app_title), appVersion));
+        mUpdateItemMcu.setTitle(String.format(mContext.getString(R.string.update_mcu_title), mcuVersion));
+
+        mAppPresenter = new AppPresenter(mContext, new UpdateConttract.View() {
+            @Override
+            public void updateProgress(int percent, String msg) {
+
+            }
+
+            @Override
+            public void updateCompleted(boolean isSuccess, String msg) {
+                decTask();
+                stopUpdate();
+                ShowInforUtil.send(mContext, "APP", getString(R.string.update), isSuccess, msg);
+            }
+        });
+
+        mMcuPresenter = new McuPresenter(mContext, new UpdateConttract.View() {
+            @Override
+            public void updateProgress(int percent, String msg) {
+                decTask();
+                updateProgressUi(percent);
+            }
+
+            @Override
+            public void updateCompleted(boolean isSuccess, String msg) {
+                decTask();
+                stopUpdate();
+                ShowInforUtil.send(mContext, "MCU", getString(R.string.update), isSuccess, msg);
+            }
+        });
     }
 
     @OnClick(R.id.func_start_btn)
     void start() {
-        startCopyUpdateFile();
-        appStartUpdate();
-        mcuStartUpdate();
+        startUpdateThead(mode.ALL);
     }
 
     @OnClick(R.id.update_app)
     void startUpdateApp() {
-        startCopyUpdateFile();
-        appStartUpdate();
+        startUpdateThead(mode.ONLY_APP);
     }
 
     @OnClick(R.id.update_mcu)
     void startUpdateMcu() {
-        startCopyUpdateFile();
-        mcuStartUpdate();
+        startUpdateThead(mode.ONLY_MCU);
+    }
+
+    private enum mode {
+        ALL,
+        ONLY_APP,
+        ONLY_MCU
+    }
+
+    private void startUpdateThead(final mode mode) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                startCopyUpdateFile();
+                switch (mode) {
+                    case ONLY_APP:
+                        appStartUpdate();
+                        break;
+                    case ONLY_MCU:
+                        mcuStartUpdate();
+                        break;
+                    case ALL:
+                        appStartUpdate();
+                        mcuStartUpdate();
+                        break;
+                }
+                startUpdate();
+            }
+        }).start();
     }
 
     private void startCopyUpdateFile() {
         if (isCopySuccessed == false) {
-            isCopySuccessed = copyUpdateFile();
+            String originFile = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + Config.UPDATE_APP_NAME + ".zip";
+            mUpdateFilePath = Config.IN_SD_FILE_PATH + "/" + Config.SAVEFILE_PATH + "/" + Config.UPDATE_APP_NAME;
+            isCopySuccessed = copyUpdateFile(originFile, mUpdateFilePath);
         }
     }
 
@@ -102,39 +166,19 @@ public class UpdateAppFragment extends BaseFragment implements UpdateConttract.V
                 return false;
             }
         });
-        if (!TextUtils.isEmpty(appFileName)) {
-            mAppPresenter = new AppPresenter(mContext, new UpdateConttract.View() {
-                @Override
-                public void updateProgress(int percent, String msg) {
-
-                }
-
-                @Override
-                public void updateCompleted(boolean isSuccess, String msg) {
-                    Log.d(TAG, "app update : " + isSuccess);
-                }
-
-                @Override
-                public void reboot() {
-
-                }
-            });
-            final UpdateInfor updateInfor = new UpdateInfor();
-            updateInfor.setFileType(UpdateInfor.FileType.APP);
-            updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
-            updateInfor.setFileName(appFileName);
-            updateInfor.setPath(mUpdateFilePath);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    mAppPresenter.update(updateInfor);
-                }
-            }).start();
-        } else {
-            Log.d(TAG, "没有升级文件");
-        }
+        final UpdateInfor updateInfor = new UpdateInfor();
+        updateInfor.setFileType(UpdateInfor.FileType.APP);
+        updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
+        updateInfor.setFileName(appFileName);
+        updateInfor.setPath(mUpdateFilePath);
+        incTask();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mAppPresenter.update(updateInfor);
+            }
+        }).start();
     }
-
 
     private void mcuStartUpdate() {
         String mcuFileName = getUpdateFile(mUpdateFilePath, new FilenameFilter() {
@@ -146,37 +190,18 @@ public class UpdateAppFragment extends BaseFragment implements UpdateConttract.V
                 return false;
             }
         });
-        if (!TextUtils.isEmpty(mcuFileName)) {
-            mMcuPresenter = new McuPresenter(mContext, new UpdateConttract.View() {
-                @Override
-                public void updateProgress(int percent, String msg) {
-
-                }
-
-                @Override
-                public void updateCompleted(boolean isSuccess, String msg) {
-                    Log.d(TAG, "mcu update : " + isSuccess);
-                }
-
-                @Override
-                public void reboot() {
-
-                }
-            });
-            final UpdateInfor updateInfor = new UpdateInfor();
-            updateInfor.setFileType(UpdateInfor.FileType.MCU);
-            updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
-            updateInfor.setPath(mUpdateFilePath);
-            updateInfor.setFileName(mcuFileName);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    mMcuPresenter.update(updateInfor);
-                }
-            }).start();
-        } else {
-            Log.d(TAG, "没有升级文件");
-        }
+        final UpdateInfor updateInfor = new UpdateInfor();
+        updateInfor.setFileType(UpdateInfor.FileType.MCU);
+        updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
+        updateInfor.setPath(mUpdateFilePath);
+        updateInfor.setFileName(mcuFileName);
+        incTask();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mMcuPresenter.update(updateInfor);
+            }
+        }).start();
     }
 
     private String getUpdateFile(String path, FilenameFilter filter) {
@@ -188,15 +213,12 @@ public class UpdateAppFragment extends BaseFragment implements UpdateConttract.V
         return null;
     }
 
-    private boolean copyUpdateFile() {
+    private boolean copyUpdateFile(String originFile, String savePath) {
         try {
-            String originFile = Config.MOUNTED_PATH + mSavePath + "/" + updateFile + ".zip";
-            if (!new File(originFile).exists()) {
+            if (TextUtils.isEmpty(originFile) || !new File(originFile).exists()) {
                 return false;
             }
-
-            mUpdateFilePath = Config.IN_SD_FILE_PATH + "/" + mSavePath + "/" + updateFile;
-            File saveFile = new File(mUpdateFilePath);
+            File saveFile = new File(savePath);
             if (saveFile.exists()) {
                 FileUtil.RecursionDeleteFile(saveFile);
             } else {
@@ -209,20 +231,5 @@ public class UpdateAppFragment extends BaseFragment implements UpdateConttract.V
             Log.d(TAG, "copy file : " + e.getMessage());
         }
         return false;
-    }
-
-    @Override
-    public void updateProgress(int percent, String msg) {
-
-    }
-
-    @Override
-    public void updateCompleted(boolean isSuccess, String msg) {
-
-    }
-
-    @Override
-    public void reboot() {
-
     }
 }

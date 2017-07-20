@@ -65,7 +65,7 @@ public class AppUtil {
             pm.installPackage(uri, observer, PackageManager.INSTALL_REPLACE_EXISTING, file.getAbsolutePath());
             return true;
         } catch (Exception e) {
-            Log.d(TAG, "install package fail");
+            Log.d(TAG, "install " + file.getName() + " fail");
         }
         return false;
     }
@@ -77,13 +77,15 @@ public class AppUtil {
         context.startActivity(intent);
     }
 
-    public static void unInstallApk(Context context, String pkgName, IPackageDeleteObserver.Stub observer) {
+    public static boolean unInstallApk(Context context, String pkgName, IPackageDeleteObserver.Stub observer) {
         try {
             PackageManager pm = context.getPackageManager();
             pm.deletePackage(pkgName, observer, 0);
+            return true;
         } catch (Exception e) {
-            Log.d(TAG, "delete package fail");
+            Log.d(TAG, "delete " + pkgName + " fail");
         }
+        return false;
     }
 
     public static void clearAppUserData(Context context, String pakageName, IPackageDataObserver.Stub observer) {
@@ -91,7 +93,7 @@ public class AppUtil {
             PackageManager pm = context.getPackageManager();
             pm.clearApplicationUserData(pakageName, observer);
         } catch (Exception e) {
-            Log.d(TAG, "clean data fail");
+            Log.d(TAG, "clean " + pakageName + " fail");
         }
     }
 
@@ -148,13 +150,25 @@ public class AppUtil {
         return false;
     }
 
-    public static ArrayList<AppInfoEntity> getAllAppInfo(Context context) {
+    public static ArrayList<AppInfoEntity> getAllAppInfo(Context context, boolean isShowSystemApp) {
         ArrayList<AppInfoEntity> mlistAppInfo = new ArrayList<AppInfoEntity>();
         PackageManager pm = context.getPackageManager();
         List<ApplicationInfo> appInfos = pm
                 .getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);
         for (ApplicationInfo applicationInfo : appInfos) {
             if (applicationInfo != null) {
+                boolean isSystemApp = false;
+                if ((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) <= 0) {
+                    isSystemApp = false;
+                } else {
+                    isSystemApp = true;
+                }
+
+                if (isShowSystemApp == false && isSystemApp) {
+                    continue;
+                }
+
+                AppInfoEntity appInfo = new AppInfoEntity();
                 String pakageName = applicationInfo.packageName;
                 String appLabel = (String) applicationInfo.loadLabel(pm);
                 Drawable icon = applicationInfo.loadIcon(pm);
@@ -162,17 +176,11 @@ public class AppUtil {
                 if (pakageName != null) {
                     launchIntent = context.getPackageManager().getLaunchIntentForPackage(pakageName);
                 }
-                AppInfoEntity appInfo = new AppInfoEntity();
-
                 appInfo.setAppLabel(appLabel);
                 appInfo.setPkgName(pakageName);
                 appInfo.setAppIcon(icon);
+                appInfo.setSystemApp(isSystemApp);
                 appInfo.setIntent(launchIntent);
-                if ((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) <= 0) {
-                    appInfo.setSystemApp(false);
-                } else {
-                    appInfo.setSystemApp(true);
-                }
                 mlistAppInfo.add(appInfo);
             }
         }

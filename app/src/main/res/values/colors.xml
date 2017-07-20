@@ -8,4 +8,5 @@
     <color name="tx_nomal2">#3DFFFFFF</color>
     <color name="tx_nomal3">#414142</color>
     <color name="tx_nomal4">#00CDB1</color>
+    <color name="tx_nomal5">@android:color/holo_red_light</color>
 </resources>

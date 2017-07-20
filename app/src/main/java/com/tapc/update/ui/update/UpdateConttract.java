@@ -9,8 +9,6 @@ public class UpdateConttract {
         void updateProgress(int percent, String msg);
 
         void updateCompleted(boolean isSuccess, String msg);
-
-        void reboot();
     }
 
     public interface AppPresenter {

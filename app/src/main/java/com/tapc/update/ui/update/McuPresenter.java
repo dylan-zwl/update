@@ -2,9 +2,11 @@ package com.tapc.update.ui.update;
 
 import android.content.Context;
 import android.os.Handler;
+import android.text.TextUtils;
 
 import com.tapc.platform.model.device.controller.IOUpdateController;
 import com.tapc.platform.model.device.controller.MachineController;
+import com.tapc.update.R;
 
 import java.io.File;
 
@@ -30,29 +32,32 @@ public class McuPresenter implements UpdateConttract.McuPresenter {
 
     @Override
     public void update(final UpdateInfor updateInfor) {
-        final File file = new File(updateInfor.getPath(), updateInfor.getFileName());
-        if (file.exists()) {
-            mController = MachineController.getInstance();
-            mController.updateMCU(file.getAbsolutePath(), new IOUpdateController.IOUpdateListener() {
-                @Override
-                public void onProgress(int process, String msg) {
-                    mView.updateProgress(process, msg);
-                }
+        String fileName = updateInfor.getFileName();
+        if (!TextUtils.isEmpty(fileName)) {
+            final File file = new File(updateInfor.getPath(), fileName);
+            if (file != null && file.exists()) {
+                mController = MachineController.getInstance();
+                mController.updateMCU(file.getAbsolutePath(), new IOUpdateController.IOUpdateListener() {
+                    @Override
+                    public void onProgress(int process, String msg) {
+                        mView.updateProgress(process, msg);
+                    }
 
-                @Override
-                public void successful(String msg) {
-                    stopUpdate(true, msg);
-                }
+                    @Override
+                    public void successful(String msg) {
+                        stopUpdate(true, msg);
+                    }
 
-                @Override
-                public void failed(String msg) {
-                    stopUpdate(false, msg);
-                }
-            });
-            mView.updateProgress(0, "");
-        } else {
-            stopUpdate(false, "文件不存在,请查看文件路径！");
+                    @Override
+                    public void failed(String msg) {
+                        stopUpdate(false, msg);
+                    }
+                });
+                mView.updateProgress(0, "");
+                return;
+            }
         }
+        stopUpdate(false, mContext.getString(R.string.no_file));
     }
 
     void stopUpdate(final boolean isSuccess, final String msg) {

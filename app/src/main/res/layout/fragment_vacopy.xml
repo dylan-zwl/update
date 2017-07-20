@@ -63,15 +63,15 @@
             android:layout_height="match_parent"
             android:layout_weight="512">
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/va_play_lv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="20dp">
-            </ListView>
+            </android.support.v7.widget.RecyclerView>
 
             <ImageView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/bg_va_list_line"/>
@@ -93,8 +93,7 @@
                 <SurfaceView
                     android:id="@+id/va_play_sv"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#B3B3B3">
+                    android:layout_height="match_parent">
                 </SurfaceView>
 
                 <LinearLayout
@@ -109,7 +108,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-                        android:background="@drawable/btn_va_play_n"/>
+                        android:background="@drawable/btn_va_play_y"/>
 
                     <TextView
                         android:id="@+id/va_play_time"

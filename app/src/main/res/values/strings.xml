@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">update</string>
     <!--功能-->
+    <string name="system_maintenance">系统维护</string>
     <string name="func_app">应用升级</string>
     <string name="func_os">OS升级</string>
     <string name="func_vacopy">VA安装</string>
@@ -27,18 +28,31 @@
     <string name="a_key_uninstall_app">一键删除</string>
     <string name="select_item_all">全选</string>
     <string name="show_system_app">显示系统软件</string>
-    <string name="app_start">启动</string>
+    <string name="app_open">启动</string>
     <string name="app_install">安装</string>
     <string name="app_install_again">重装</string>
     <string name="app_uninstall">卸载</string>
     <string name="app_installed">已安装</string>
     <string name="app_install_success">安装成功</string>
     <string name="app_install_fail">安装失败</string>
-    
+
     <!--信息栏-->
     <string name="menu_title">信息</string>
     <string name="menu_clear">清除</string>
     <string name="back">返回</string>
     <string name="exit">退出</string>
 
+    <!--infor-->
+    <string name="update_infor">更新</string>
+    <string name="copy">复制</string>
+    <string name="download">下载</string>
+    <string name="install">安装</string>
+    <string name="uninstall">卸载</string>
+    <string name="success">成功</string>
+    <string name="failed">失败</string>
+    <string name="no_file">没有文件</string>
+    <string name="copy_file_error">复制文件错误</string>
+    <string name="file_Illegal">文件不合法</string>
+    <string name="no_system_permission">无系统权限</string>
+    <string name="check_file">检测文件</string>
 </resources>

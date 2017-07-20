@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#3c3c3c">
+
+    <com.tapc.update.ui.widget.UpdateProgress
+        android:id="@+id/auto_update_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.tapc.update.ui.widget.UpdateProgress>
+
+    <com.tapc.update.ui.view.CustomTextView
+        android:id="@+id/customTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="60dp"
+        android:text="@string/system_maintenance"
+        android:textColor="@color/tx_nomal1"
+        android:textSize="@dimen/tx_title"/>
+
+    <LinearLayout
+        android:id="@+id/auto_update_exit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="60dp"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/btn_exit2"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_exit"/>
+
+        <com.tapc.update.ui.view.CustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="@string/exit"
+            android:textColor="@color/tx_nomal1"
+            android:textSize="@dimen/tx_size3"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="844dp"
+        android:layout_height="220dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="132dp"
+        android:background="@drawable/auto_update_msg"
+        android:paddingBottom="20dp"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:paddingTop="20dp">
+
+        <com.tapc.update.ui.view.CustomTextView
+            android:id="@+id/auto_update_infor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/tx_nomal1"
+            android:textSize="@dimen/tx_size3"/>
+    </ScrollView>
+</RelativeLayout>

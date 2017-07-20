@@ -21,11 +21,7 @@ public class BaseAppAdpater<T> extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if (mList.size() > 0) {
-            return mList.size();
-        } else {
-            return 0;
-        }
+        return (mList != null) ? mList.size() : 0;
     }
 
     @Override
@@ -44,6 +40,11 @@ public class BaseAppAdpater<T> extends BaseAdapter {
             convertView = mListener.getView(position, convertView, parent);
         }
         return convertView;
+    }
+
+    public void notifyDataSetChanged(List<T> list) {
+        mList = list;
+        notifyDataSetChanged();
     }
 
     public interface Listener {

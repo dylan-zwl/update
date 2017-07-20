@@ -52,4 +52,9 @@ public class UpdateItem extends RelativeLayout {
     public void setTitle(String title) {
         mTitle.setText(title);
     }
+
+    public void setRightTx(String tx) {
+        mRightTx.setText(tx);
+        mRightTx.setVisibility(VISIBLE);
+    }
 }

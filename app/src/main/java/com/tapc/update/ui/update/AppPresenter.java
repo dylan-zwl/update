@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
+import com.tapc.update.R;
 import com.tapc.update.utils.AppUtil;
 
 import java.io.File;
@@ -32,34 +33,37 @@ public class AppPresenter implements UpdateConttract.AppPresenter {
 
     @Override
     public void update(final UpdateInfor updateInfor) {
-        final File file = new File(updateInfor.getPath(), updateInfor.getFileName());
-        if (file.exists()) {
-            String installPackageName = updateInfor.getPackageName();
-            if (!TextUtils.isEmpty(installPackageName)) {
-                PackageManager pm = mContext.getPackageManager();
-                PackageInfo info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
-                if (info == null || !info.packageName.equals(installPackageName)) {
-                    stopUpdate(false, "请查看文件是否是正确升级软件！");
-                    return;
-                }
-            }
-            mView.updateProgress(-1, "正在升级，请勿操作!");
-            boolean result = AppUtil.installApk(mContext, file, new IPackageInstallObserver.Stub() {
-                @Override
-                public void packageInstalled(String s, int i) throws RemoteException {
-                    if (i == 1) {
-                        stopUpdate(true, "安装成功！");
-                    } else {
-                        stopUpdate(false, "安装失败！");
+        String fileName = updateInfor.getFileName();
+        if (!TextUtils.isEmpty(fileName)) {
+            final File file = new File(updateInfor.getPath(), fileName);
+            if (file != null && file.exists()) {
+                String installPackageName = updateInfor.getPackageName();
+                if (!TextUtils.isEmpty(installPackageName)) {
+                    PackageManager pm = mContext.getPackageManager();
+                    PackageInfo info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+                    if (info == null || !info.packageName.equals(installPackageName)) {
+                        stopUpdate(false, mContext.getString(R.string.file_Illegal));
+                        return;
                     }
                 }
-            });
-            if (result == false) {
-                stopUpdate(false, "无系统权限安装文件！");
+                mView.updateProgress(0, "");
+                boolean result = AppUtil.installApk(mContext, file, new IPackageInstallObserver.Stub() {
+                    @Override
+                    public void packageInstalled(String s, int i) throws RemoteException {
+                        if (i == 1) {
+                            stopUpdate(true, "");
+                        } else {
+                            stopUpdate(false, "");
+                        }
+                    }
+                });
+                if (result == false) {
+                    stopUpdate(false, mContext.getString(R.string.no_system_permission));
+                }
+                return;
             }
-        } else {
-            stopUpdate(false, "文件不存在,请查看文件路径！");
         }
+        stopUpdate(false, mContext.getString(R.string.no_file));
     }
 
     void stopUpdate(final boolean isSuccess, final String msg) {

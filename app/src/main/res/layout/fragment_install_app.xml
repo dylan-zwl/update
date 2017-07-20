@@ -55,6 +55,7 @@
         android:id="@+id/install_app_lv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="15dp"
         android:divider="@null">
     </ListView>
 </LinearLayout>

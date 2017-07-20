@@ -1,5 +1,7 @@
 package com.tapc.update.utils;
 
+import android.os.SystemClock;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,6 +22,20 @@ public class FileUtil {
         void onProgress(int progress);
 
         void finish(int error);
+    }
+
+    /*** 获取文件夹大小 ***/
+    static public long getFileSize(File file) throws Exception {
+        long size = 0;
+        File flist[] = file.listFiles();
+        for (int i = 0; i < flist.length; i++) {
+            if (flist[i].isDirectory()) {
+                size = size + getFileSize(flist[i]);
+            } else {
+                size = size + flist[i].length();
+            }
+        }
+        return size;
     }
 
     public static void copyFile(String oldPath, String newPath, ProgressCallback callback) {

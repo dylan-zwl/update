@@ -10,6 +10,8 @@ import com.jht.tapc.jni.KeyEvent;
 import com.tapc.platform.model.device.controller.MachineController;
 import com.tapc.update.service.MenuServie;
 import com.tapc.update.service.binder.LocalBinder;
+import com.tapc.update.ui.entity.MenuInfor;
+import com.tapc.update.ui.widget.UpdateProgress;
 import com.tapc.update.utils.IntentUtil;
 
 public class TapcApp extends Application {
@@ -54,11 +56,10 @@ public class TapcApp extends Application {
     };
 
     private void initMachineCtl() {
-//        SystemSettingsHelper.Init(this);
         MachineController controller = MachineController.getInstance();
         controller.setReceiveBroadcast(this);
         controller.initController();
-        controller.start();
+//        controller.start();
 
         mKeyboardEvent = new KeyEvent(null, 200);
         mKeyboardEvent.openUinput();
@@ -66,14 +67,20 @@ public class TapcApp extends Application {
         mKeyboardEvent.start();
     }
 
-//    public KeyEvent getKeyboardEvent() {
-//        return mKeyboardEvent;
-//    }
-//
-//    public BottomBar getBottomBar() {
-//        if (mMenuService != null) {
-//            return mMenuService.getBottomBar();
-//        }
-//        return null;
-//    }
+    public KeyEvent getKeyboardEvent() {
+        return mKeyboardEvent;
+    }
+
+    public UpdateProgress getUpdateProgress() {
+        if (mMenuService != null) {
+            return mMenuService.getUpdateProgress();
+        }
+        return null;
+    }
+
+    public void addInfor(MenuInfor.inforType type, String text) {
+        if (mMenuService != null) {
+            mMenuService.addInfor(type, text);
+        }
+    }
 }

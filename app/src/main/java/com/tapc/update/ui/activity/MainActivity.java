@@ -2,11 +2,12 @@ package com.tapc.update.ui.activity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.FrameLayout;
 
 import com.tapc.update.R;
@@ -15,16 +16,16 @@ import com.tapc.update.ui.fragment.install.InstallAppFragment;
 import com.tapc.update.ui.fragment.os.UpdateOsFragment;
 import com.tapc.update.ui.fragment.uninstall.UninstallAppFragment;
 import com.tapc.update.ui.fragment.vacopy.VaCopyFragment;
-import com.tapc.update.ui.update.AppPresenter;
-import com.tapc.update.ui.update.McuPresenter;
-import com.tapc.update.ui.update.UpdateConttract;
 import com.tapc.update.ui.view.FunctionItem;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends FragmentActivity implements UpdateConttract.View {
+public class MainActivity extends FragmentActivity {
     @BindView(R.id.func_app)
     FunctionItem mFuncItemApp;
     @BindView(R.id.func_os)
@@ -39,30 +40,34 @@ public class MainActivity extends FragmentActivity implements UpdateConttract.Vi
     FrameLayout mFragment;
 
     private Context mContext;
-    protected FragmentManager mFragmentManager;
-    AppPresenter appPresenter;
-    McuPresenter mcuPresenter;
-    private String mSavePath = "tapc";
-    private String updateFile = "update_file";
 
-    private UpdateAppFragment mUpdateAppFragment;
-    private UpdateOsFragment mUpdateOsFragment;
-    private VaCopyFragment mVaCopyFragment;
-    private InstallAppFragment mInstallAppFragment;
-    private UninstallAppFragment mUninstallAppFragment;
+    protected FragmentManager mFragmentManager;
+    private Map<Item, Fragment> mFragmentList;
+    private Fragment mCurrentfragment;
+
+//    private UpdateAppFragment mUpdateAppFragment;
+//    private UpdateOsFragment mUpdateOsFragment;
+//    private VaCopyFragment mVaCopyFragment;
+//    private InstallAppFragment mInstallAppFragment;
+//    private UninstallAppFragment mUninstallAppFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
-
         initView();
     }
 
     private void initView() {
         mFragmentManager = getSupportFragmentManager();
-        setCheckedFunc(Item.INSTALL);
+        mFragmentList = new HashMap<>();
+        mFragmentList.put(Item.APP, new UpdateAppFragment());
+        mFragmentList.put(Item.OS, new UpdateOsFragment());
+        mFragmentList.put(Item.VACOPY, new VaCopyFragment());
+        mFragmentList.put(Item.INSTALL, new InstallAppFragment());
+        mFragmentList.put(Item.UNINSTALL, new UninstallAppFragment());
+        setCheckedFunc(Item.VACOPY);
     }
 
     private enum Item {
@@ -98,7 +103,7 @@ public class MainActivity extends FragmentActivity implements UpdateConttract.Vi
         setCheckedFunc(Item.UNINSTALL);
     }
 
-    private void setCheckedFunc(Item item) {
+    private void setCheckedFunc(final Item item) {
         mFuncItemApp.setChecked(false);
         mFuncItemOs.setChecked(false);
         mFuncItemVacopy.setChecked(false);
@@ -106,64 +111,64 @@ public class MainActivity extends FragmentActivity implements UpdateConttract.Vi
         mFuncItemUninstall.setChecked(false);
         switch (item) {
             case APP:
-                if (mUpdateAppFragment == null) {
-                    mUpdateAppFragment = new UpdateAppFragment();
-                }
                 mFuncItemApp.setChecked(true);
-                replaceFragment(mUpdateAppFragment);
+//                replaceFragment(Fragment.instantiate(this, UpdateAppFragment.class.getName()));
                 break;
             case OS:
-                if (mUpdateOsFragment == null) {
-                    mUpdateOsFragment = new UpdateOsFragment();
-                }
                 mFuncItemOs.setChecked(true);
-                replaceFragment(mUpdateOsFragment);
+//                replaceFragment(Fragment.instantiate(this, UpdateOsFragment.class.getName()));
                 break;
             case VACOPY:
-                if (mVaCopyFragment == null) {
-                    mVaCopyFragment = new VaCopyFragment();
-                }
                 mFuncItemVacopy.setChecked(true);
-                replaceFragment(mVaCopyFragment);
+//                replaceFragment(Fragment.instantiate(this, VaCopyFragment.class.getName()));
                 break;
             case INSTALL:
-                if (mInstallAppFragment == null) {
-                    mInstallAppFragment = new InstallAppFragment();
-                }
                 mFuncItemInstall.setChecked(true);
-                replaceFragment(mInstallAppFragment);
+//                replaceFragment(Fragment.instantiate(this, InstallAppFragment.class.getName()));
                 break;
             case UNINSTALL:
-                if (mUninstallAppFragment == null) {
-                    mUninstallAppFragment = new UninstallAppFragment();
-                }
                 mFuncItemUninstall.setChecked(true);
-                replaceFragment(mUninstallAppFragment);
+//                replaceFragment(Fragment.instantiate(this, UninstallAppFragment.class.getName()));
                 break;
         }
+        replaceFragment(mFragmentList.get(item));
     }
 
+    //    private void replaceFragment(Fragment fragment) {
+//        FragmentTransaction ft = mFragmentManager.beginTransaction();
+//        ft.setTransition(FragmentTransaction.TRANSIT_ENTER_MASK);
+//        ft.replace(R.id.fragment, fragment);
+//        ft.commit();
+//    }
 
-    @Override
-    public void updateProgress(int percent, String msg) {
-        Log.d("Progress" + percent, "" + msg);
-    }
-
-    @Override
-    public void updateCompleted(boolean isSuccess, String msg) {
-        Log.d("Completed", "" + isSuccess + "  :  " + msg);
-    }
-
-    @Override
-    public void reboot() {
-
-    }
-
-
-    public void replaceFragment(Fragment fragment) {
+    private void replaceFragment(Fragment fragment) {
         FragmentTransaction ft = mFragmentManager.beginTransaction();
-        ft.setTransition(FragmentTransaction.TRANSIT_ENTER_MASK);
-        ft.replace(R.id.fragment, fragment);
+        if (mCurrentfragment != null) {
+            ft.hide(mCurrentfragment);
+        }
+        Fragment showFragment = mFragmentManager.findFragmentByTag(fragment.getClass().getName());
+        if (showFragment == null) {
+            showFragment = fragment;
+        }
+        if (!showFragment.isAdded()) {
+            ft.add(R.id.fragment, showFragment, fragment.getClass().getName());
+        } else {
+            ft.show(showFragment);
+        }
+        mCurrentfragment = showFragment;
         ft.commit();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_HOME:
+                return true;
+            case KeyEvent.KEYCODE_BACK:
+                return true;
+            default:
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
