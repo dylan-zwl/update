@@ -17,15 +17,12 @@ public class Config {
     public static String CACHE_FILE_PATH;
     public static String FILE_PATH;
 
-    /**
-     * 升级文件名字
-     */
-    public static final String UPDATE_APP_FILE_NAME = "tapc_platform.apk";
-    public static final String UPDATE_MCU_FILE_NAME = "ROM.bin";
-    public static final String APP_PACKGGE = "com.tapc.platform";
-    public static final String TAPC_FILE_PATH = "tapc/";
-
     public static String MOUNTED_PATH = "/mnt/external_sd/";
+    public static final String SAVEFILE_PATH = "tapc/";
+    public static final String UPDATE_APP_NAME = "update_app";
+    public static final String UPDATE_OS_NAME = "update.zip";
+    public static final String INSTALL_APP_PATH = "app/";
+    public static final String APP_PACKGGE = "com.tapc.platform";
 
     public static void initConfig() {
         if (new File("/dev/ttyS3").exists()) {
@@ -47,8 +44,7 @@ public class Config {
             CACHE_FILE_PATH = "/cache/";
             VA_FILE_PATH_USB = "/mnt/usb_storage/va/";
         }
-        FILE_PATH = UDISK_FILE_PATH + TAPC_FILE_PATH;
     }
 
-    public static String INSTALL_APP_FILE_PATH = "/mnt/external_sd/";
+
 }
