@@ -31,34 +31,33 @@ public class DownloadPresenter implements UpdateConttract.AppPresenter {
     @Override
     public void update(final UpdateInfor updateInfor) {
         String url = updateInfor.getFileUrl();
-        if (!TextUtils.isEmpty(url)) {
-            String savePath = updateInfor.getSavePath();
-            String fileName = updateInfor.getFileName();
-            File file = new File(savePath, fileName);
-            if (file != null && file.exists()) {
-                file.delete();
-            }
-
-            OkHttpUtils.get().url(url).build()
-                    .execute(new FileCallBack(savePath, fileName) {
-                        @Override
-                        public void onError(Call call, Exception e, int id) {
-                            stopUpdate(false, "下载文件失败:" + e.getMessage());
-                        }
-
-                        @Override
-                        public void onResponse(File response, int id) {
-                            stopUpdate(true, "正在启动升级,请勿操作或断电");
-                        }
-
-                        @Override
-                        public void inProgress(float progress, long total, int id) {
-                            mView.updateProgress((int) (progress * 100), "正在下载文件，请勿操作或断电");
-                        }
-                    });
-        } else {
-            stopUpdate(false, "下载地址不存在");
+        String savePath = updateInfor.getSavePath();
+        String fileName = updateInfor.getFileName();
+        File file = new File(savePath, fileName);
+        if (file != null && file.exists()) {
+            file.delete();
         }
+        if (TextUtils.isEmpty(url)) {
+            stopUpdate(false, "");
+            return;
+        }
+        OkHttpUtils.get().url(url).build()
+                .execute(new FileCallBack(savePath, fileName) {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        stopUpdate(false, e.getMessage());
+                    }
+
+                    @Override
+                    public void onResponse(File response, int id) {
+                        stopUpdate(true, "");
+                    }
+
+                    @Override
+                    public void inProgress(float progress, long total, int id) {
+                        mView.updateProgress((int) (progress * 100), "");
+                    }
+                });
     }
 
     void stopUpdate(final boolean isSuccess, final String msg) {
