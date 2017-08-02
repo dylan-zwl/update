@@ -4,16 +4,16 @@
                 android:layout_height="match_parent"
                 android:background="#323232"
                 android:orientation="horizontal"
-                android:paddingBottom="66dp"
-                android:paddingLeft="40dp"
+                android:paddingBottom="38dp"
+                android:paddingLeft="18dp"
                 android:paddingRight="10dp"
-                android:paddingTop="66dp">
+                android:paddingTop="38dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="881"
@@ -22,10 +22,11 @@
             android:paddingLeft="10dp">
 
             <com.tapc.update.ui.view.CustomTextView
+                android:id="@+id/setting_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
-                android:layout_marginTop="46dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="26dp"
                 android:text="@string/system_maintenance"
                 android:textColor="#B3B3B3"
                 android:textSize="@dimen/tx_size1"/>
@@ -33,9 +34,10 @@
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_below="@id/setting_title"
                 android:layout_marginBottom="5dp"
-                android:layout_marginLeft="40dp"
-                android:layout_marginTop="136dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="78dp"
                 android:fadeScrollbars="true"
                 android:orientation="vertical"
                 android:scrollbarFadeDuration="0"
@@ -92,25 +94,18 @@
                     </com.tapc.update.ui.view.FunctionItem>
                 </LinearLayout>
             </ScrollView>
-        </LinearLayout>
+        </RelativeLayout>
 
-        <RelativeLayout
+        <FrameLayout
+            android:id="@+id/fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="381"
-            android:background="@drawable/bg_frame">
-
-            <FrameLayout
-                android:id="@+id/fragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:paddingLeft="32dp"
-                android:paddingRight="48dp"
-                android:paddingTop="64dp"
-                android:visibility="visible">
-            </FrameLayout>
-        </RelativeLayout>
+            android:background="@drawable/bg_frame"
+            android:paddingLeft="20dp"
+            android:paddingRight="23dp"
+            android:paddingTop="38dp"
+            android:visibility="visible">
+        </FrameLayout>
     </LinearLayout>
 </RelativeLayout>

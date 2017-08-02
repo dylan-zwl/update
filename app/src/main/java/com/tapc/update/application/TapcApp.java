@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.view.View;
 
 import com.jht.tapc.jni.KeyEvent;
 import com.tapc.platform.model.device.controller.MachineController;
@@ -26,7 +27,7 @@ public class TapcApp extends Application {
         Config.initConfig();
         initMachineCtl();
 
-//        stopAllService(this);
+        stopAllService(this);
         startAllService(this);
     }
 
@@ -48,6 +49,7 @@ public class TapcApp extends Application {
             LocalBinder binder = (LocalBinder) service;
             if (className.getClassName().equals(MenuServie.class.getName())) {
                 mMenuService = (MenuServie) binder.getService();
+                mMenuService.getMenuBar().setVisibility(View.VISIBLE);
             }
         }
 
@@ -59,7 +61,7 @@ public class TapcApp extends Application {
         MachineController controller = MachineController.getInstance();
         controller.setReceiveBroadcast(this);
         controller.initController();
-//        controller.start();
+        controller.start();
 
         mKeyboardEvent = new KeyEvent(null, 200);
         mKeyboardEvent.openUinput();
@@ -69,6 +71,10 @@ public class TapcApp extends Application {
 
     public KeyEvent getKeyboardEvent() {
         return mKeyboardEvent;
+    }
+
+    public MenuServie getService() {
+        return mMenuService;
     }
 
     public UpdateProgress getUpdateProgress() {

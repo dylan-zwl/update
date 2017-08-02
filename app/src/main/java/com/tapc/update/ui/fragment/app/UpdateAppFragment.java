@@ -59,11 +59,12 @@ public class UpdateAppFragment extends BaseFragment {
         mStartUpdate.setText(getString(R.string.a_key_update));
 
         initVersionShow();
+        initPresenter();
     }
 
     private void initVersionShow() {
         MachineController.getInstance().sendCtlVersionCmd(null);
-        SystemClock.sleep(200);
+        SystemClock.sleep(500);
         String appVersion = AppUtil.getVersionName(mContext, Config.APP_PACKGGE);
         String mcuVersion = MachineController.getInstance().getCtlVersionValue();
         if (TextUtils.isEmpty(appVersion)) {
@@ -74,7 +75,9 @@ public class UpdateAppFragment extends BaseFragment {
         }
         mUpdateItemApp.setTitle(String.format(mContext.getString(R.string.update_app_title), appVersion));
         mUpdateItemMcu.setTitle(String.format(mContext.getString(R.string.update_mcu_title), mcuVersion));
+    }
 
+    private void initPresenter() {
         mAppPresenter = new AppPresenter(mContext, new UpdateConttract.View() {
             @Override
             public void updateProgress(int percent, String msg) {
@@ -82,10 +85,38 @@ public class UpdateAppFragment extends BaseFragment {
             }
 
             @Override
-            public void updateCompleted(boolean isSuccess, String msg) {
-                decTask();
-                stopUpdate();
-                ShowInforUtil.send(mContext, "APP", getString(R.string.update), isSuccess, msg);
+            public void updateCompleted(final boolean isSuccess, final String msg) {
+                String configPath = mUpdateFilePath + "/" + Config.APP_CONFIG_NAME;
+                if (!TextUtils.isEmpty(configPath) && new File(configPath).exists() && isSuccess) {
+                    String appConfigPath = Config.APP_CONFIG_PATH + "/" + Config.APP_CONFIG_NAME;
+                    FileUtil.copyFile(configPath, appConfigPath, new FileUtil.ProgressCallback() {
+                                @Override
+                                public void onProgress(int progress) {
+
+                                }
+
+                                @Override
+                                public void finish(int error) {
+                                    decTask();
+                                    stopUpdate();
+                                    boolean isConfigCopyResult = false;
+                                    String showMsg = msg;
+                                    if (error == 0) {
+                                        isConfigCopyResult = true;
+                                    } else {
+                                        showMsg = msg + "," + getString(R.string.app_config) + getString(R.string
+                                                .copy) + getString(R.string.failed);
+                                    }
+                                    ShowInforUtil.send(mContext, "APP", getString(R.string.update), isSuccess &&
+                                            isConfigCopyResult, showMsg);
+                                }
+                            }
+                    );
+                } else {
+                    decTask();
+                    stopUpdate();
+                    ShowInforUtil.send(mContext, "APP", getString(R.string.update), isSuccess, msg);
+                }
             }
         });
 
@@ -157,7 +188,7 @@ public class UpdateAppFragment extends BaseFragment {
     }
 
     private void appStartUpdate() {
-        String appFileName = getUpdateFile(mUpdateFilePath, new FilenameFilter() {
+        String appFileName = FileUtil.getFilename(mUpdateFilePath, new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 if (name.startsWith("APP") && name.endsWith(".apk")) {
@@ -181,7 +212,7 @@ public class UpdateAppFragment extends BaseFragment {
     }
 
     private void mcuStartUpdate() {
-        String mcuFileName = getUpdateFile(mUpdateFilePath, new FilenameFilter() {
+        String mcuFileName = FileUtil.getFilename(mUpdateFilePath, new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 if (name.startsWith("ROM") && name.endsWith(".bin")) {
@@ -204,15 +235,6 @@ public class UpdateAppFragment extends BaseFragment {
         }).start();
     }
 
-    private String getUpdateFile(String path, FilenameFilter filter) {
-        File files = new File(path);
-        String[] list = files.list(filter);
-        if (list != null && list.length > 0) {
-            return list[0];
-        }
-        return null;
-    }
-
     private boolean copyUpdateFile(String originFile, String savePath) {
         try {
             if (TextUtils.isEmpty(originFile) || !new File(originFile).exists()) {
@@ -231,5 +253,16 @@ public class UpdateAppFragment extends BaseFragment {
             Log.d(TAG, "copy file : " + e.getMessage());
         }
         return false;
+    }
+
+    @Override
+    public void stopUpdate() {
+        super.stopUpdate();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                initVersionShow();
+            }
+        });
     }
 }

@@ -111,12 +111,40 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
                     }
 
                     @Override
-                    public void updateCompleted(boolean isSuccess, String msg) {
-                        String text = ShowInforUtil.getInforText(mContext, "APP", getString(R.string.update), isSuccess,
-                                msg);
-                        addInforShow(text);
-                        decTask();
-                        stopUpdate(isSuccess);
+                    public void updateCompleted(final boolean isSuccess, final String msg) {
+                        String configPath = mUpdateFilePath + "/" + Config.APP_CONFIG_NAME;
+                        if (!TextUtils.isEmpty(configPath) && new File(configPath).exists() && isSuccess) {
+                            String appConfigPath = Config.APP_CONFIG_PATH + "/" + Config.APP_CONFIG_NAME;
+                            FileUtil.copyFile(configPath, appConfigPath, new FileUtil.ProgressCallback() {
+                                @Override
+                                public void onProgress(int progress) {
+
+                                }
+
+                                @Override
+                                public void finish(int error) {
+                                    boolean isConfigCopyResult = false;
+                                    String showMsg = msg;
+                                    if (error == 0) {
+                                        isConfigCopyResult = true;
+                                    } else {
+                                        showMsg = msg + "," + getString(R.string.app_config) + getString(R
+                                                .string.copy) + getString(R.string.failed);
+                                    }
+                                    String text = ShowInforUtil.getInforText(mContext, "APP", getString(R
+                                            .string.update), isSuccess && isConfigCopyResult, showMsg);
+                                    addInforShow(text);
+                                    decTask();
+                                    stopUpdate(isSuccess && isConfigCopyResult);
+                                }
+                            });
+                        } else {
+                            String text = ShowInforUtil.getInforText(mContext, "APP", getString(R.string.update),
+                                    isSuccess, msg);
+                            addInforShow(text);
+                            decTask();
+                            stopUpdate(isSuccess);
+                        }
                     }
                 });
                 mMcuPresenter = new McuPresenter(mContext, new UpdateConttract.View() {
@@ -152,6 +180,7 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
                 });
                 break;
         }
+
         mDownloadPresenter = new DownloadPresenter(mContext, new UpdateConttract.View() {
             @Override
             public void updateProgress(int percent, String msg) {
@@ -165,6 +194,7 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
                 startUpdateThead();
             }
         });
+
         startUpdate();
     }
 
@@ -227,7 +257,7 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
     }
 
     private void appStartUpdate() {
-        String appFileName = getUpdateFile(mUpdateFilePath, new FilenameFilter() {
+        String appFileName = FileUtil.getFilename(mUpdateFilePath, new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 if (name.startsWith("APP") && name.endsWith(".apk")) {
@@ -251,7 +281,7 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
     }
 
     private void mcuStartUpdate() {
-        String mcuFileName = getUpdateFile(mUpdateFilePath, new FilenameFilter() {
+        String mcuFileName = FileUtil.getFilename(mUpdateFilePath, new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 if (name.startsWith("ROM") && name.endsWith(".bin")) {
@@ -281,15 +311,6 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
                 mOsPresenter.update(mUpdateInfor);
             }
         }).start();
-    }
-
-    private String getUpdateFile(String path, FilenameFilter filter) {
-        File files = new File(path);
-        String[] list = files.list(filter);
-        if (list != null && list.length > 0) {
-            return list[0];
-        }
-        return null;
     }
 
     private boolean copyUpdateFile(String originFile, String savePath) {

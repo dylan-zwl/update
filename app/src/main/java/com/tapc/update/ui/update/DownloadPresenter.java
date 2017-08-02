@@ -9,7 +9,6 @@ import com.tapc.update.utils.okhttp.callback.FileCallBack;
 
 import java.io.File;
 
-import io.reactivex.disposables.Disposable;
 import okhttp3.Call;
 
 /**
@@ -19,7 +18,6 @@ import okhttp3.Call;
 public class DownloadPresenter implements UpdateConttract.AppPresenter {
     private Context mContext;
     private UpdateConttract.View mView;
-    private Disposable mDisposable;
     private Handler mHandler;
 
     public DownloadPresenter(Context context, UpdateConttract.View view) {
@@ -61,12 +59,6 @@ public class DownloadPresenter implements UpdateConttract.AppPresenter {
     }
 
     void stopUpdate(final boolean isSuccess, final String msg) {
-        if (mDisposable != null) {
-            if (mDisposable.isDisposed()) {
-                mDisposable.dispose();
-            }
-            mDisposable = null;
-        }
         mHandler.post(new Runnable() {
             @Override
             public void run() {

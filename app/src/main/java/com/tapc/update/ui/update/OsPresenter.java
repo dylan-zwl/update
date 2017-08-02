@@ -12,8 +12,6 @@ import com.tapc.update.utils.FileUtil;
 import java.io.File;
 import java.io.IOException;
 
-import io.reactivex.disposables.Disposable;
-
 /**
  * Created by Administrator on 2017/3/17.
  */
@@ -21,7 +19,6 @@ import io.reactivex.disposables.Disposable;
 public class OsPresenter implements UpdateConttract.OsPresenter {
     private Context mContext;
     private UpdateConttract.View mView;
-    private Disposable mDisposable;
     private Handler mHandler;
 
 

@@ -1,10 +1,9 @@
 package com.tapc.update.utils;
 
-import android.os.SystemClock;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
@@ -169,5 +168,14 @@ public class FileUtil {
             }
         }
         inZip.close();
+    }
+
+    public static String getFilename(String path, FilenameFilter filter) {
+        File files = new File(path);
+        String[] list = files.list(filter);
+        if (list != null && list.length > 0) {
+            return list[0];
+        }
+        return null;
     }
 }

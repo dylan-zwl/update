@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -24,12 +25,12 @@ public class UpdateItem extends RelativeLayout {
     @BindView(R.id.update_item_right_tx)
     TextView mRightTx;
     @BindView(R.id.update_item_start_btn)
-    TextView mStartBtn;
+    Button mStartBtn;
 
     public UpdateItem(Context context, AttributeSet attrs) {
         super(context, attrs);
         View view = LayoutInflater.from(context).inflate(R.layout.item_update_item, this);
-        ButterKnife.bind(view);
+        ButterKnife.bind(this, view);
 
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.UpdateItem);
         String title = array.getString(R.styleable.UpdateItem_title);
@@ -47,6 +48,7 @@ public class UpdateItem extends RelativeLayout {
         } else {
             mStartBtn.setVisibility(GONE);
         }
+        array.recycle();
     }
 
     public void setTitle(String title) {

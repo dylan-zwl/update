@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="94dp"
+                android:layout_height="54dp"
                 android:orientation="vertical">
 
     <RelativeLayout
@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="32dp"
+            android:layout_marginLeft="18dp"
             android:layout_toRightOf="@+id/func_line"
             android:button="@drawable/cb_update_app"
             android:clickable="false"/>
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
+            android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/func_ic"
             android:button="@drawable/cb_update_app"
             android:textColor="@color/tx_nomal2"
@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="18dp"
+            android:layout_marginLeft="12dp"
             android:layout_toRightOf="@id/func_name"
             android:indeterminateDrawable="@drawable/loading_time_progress"
             android:visibility="gone"/>
@@ -53,10 +53,10 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="4dp"
+        android:layout_height="3dp"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/func_arrows"
-        android:layout_marginRight="40dp"
+        android:layout_marginRight="24dp"
         android:background="@drawable/bg_function_line"/>
 
     <ImageView

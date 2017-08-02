@@ -10,8 +10,6 @@ import com.tapc.update.R;
 
 import java.io.File;
 
-import io.reactivex.disposables.Disposable;
-
 /**
  * Created by Administrator on 2017/3/17.
  */
@@ -19,7 +17,6 @@ import io.reactivex.disposables.Disposable;
 public class McuPresenter implements UpdateConttract.McuPresenter {
     private Context mContext;
     private UpdateConttract.View mView;
-    private Disposable mDisposable;
     private Handler mHandler;
     private MachineController mController;
     private String mMsg = "";
@@ -61,12 +58,6 @@ public class McuPresenter implements UpdateConttract.McuPresenter {
     }
 
     void stopUpdate(final boolean isSuccess, final String msg) {
-        if (mDisposable != null) {
-            if (mDisposable.isDisposed()) {
-                mDisposable.dispose();
-            }
-            mDisposable = null;
-        }
         mHandler.post(new Runnable() {
             @Override
             public void run() {

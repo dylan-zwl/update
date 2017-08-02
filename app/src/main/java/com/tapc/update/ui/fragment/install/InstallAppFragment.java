@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
@@ -38,7 +39,7 @@ public class InstallAppFragment extends BaseFragment {
     @BindView(R.id.install_all_chk)
     CheckBox mAllCheck;
 
-    private Handler mHandler;
+    private Thread mThread;
     private BaseAppAdpater mAdapter;
     private List<String> mListFilePath = new ArrayList<String>();
     private List<AppInfoEntity> mListApkInfor = new ArrayList<AppInfoEntity>();
@@ -52,10 +53,10 @@ public class InstallAppFragment extends BaseFragment {
     public void initView() {
         mHandler = new Handler();
 
-        new Thread(new Runnable() {
+        mThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                String path = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + Config.INSTALL_APP_PATH;
+                String path = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + Config.INSTALL_APP_PATH;
                 getFiles(path, ".apk");
                 if (mListFilePath != null && mListFilePath.size() > 0) {
                     getAppList();
@@ -68,13 +69,16 @@ public class InstallAppFragment extends BaseFragment {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mInstallAppLv.setAdapter(mAdapter);
-                            notifyChanged();
+                            if (mInstallAppLv != null) {
+                                mInstallAppLv.setAdapter(mAdapter);
+                                notifyChanged();
+                            }
                         }
                     });
                 }
             }
-        }).start();
+        });
+        mThread.start();
 
         mAllCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -143,7 +147,6 @@ public class InstallAppFragment extends BaseFragment {
             return;
         }
         appInfoEntity.setInstallStatus("");
-        notifyChanged();
         incTask();
         String path = appInfoEntity.getPath();
         boolean result = AppUtil.installApk(mContext, new File(path), new IPackageInstallObserver.Stub() {
@@ -160,17 +163,24 @@ public class InstallAppFragment extends BaseFragment {
                     isSuccess = false;
 
                 }
-                ShowInforUtil.send(mContext, mListApkInfor.get(index).getAppLabel(), getString(R.string.uninstall),
+                ShowInforUtil.send(mContext, mListApkInfor.get(index).getAppLabel(), getString(R.string.install),
                         isSuccess, "");
 
                 decTask();
+                if (mTaskNumber <= 0) {
+                    notifyChanged();
+                }
                 stopUpdate();
-                notifyChanged();
             }
         });
         if (result == false) {
+            ShowInforUtil.send(mContext, mListApkInfor.get(index).getAppLabel(), getString(R.string.install),
+                    false, "");
             mListApkInfor.get(index).setInstallStatus(getResources().getString(R.string.app_install_fail));
             decTask();
+            if (mTaskNumber <= 0) {
+                notifyChanged();
+            }
             stopUpdate();
         }
     }
@@ -182,6 +192,8 @@ public class InstallAppFragment extends BaseFragment {
     }
 
     class ViewHolder {
+        @BindView(R.id.install_rl)
+        RelativeLayout mInstallRl;
         @BindView(R.id.install_chk)
         CheckBox checkBox;
         @BindView(R.id.install_app_ic)
@@ -204,35 +216,52 @@ public class InstallAppFragment extends BaseFragment {
     }
 
     private View initItemView(final int position, View convertView) {
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
         if (convertView == null) {
             convertView = View.inflate(mContext, R.layout.item_install_app, null);
             viewHolder = new ViewHolder();
             ButterKnife.bind(viewHolder, convertView);
             convertView.setTag(viewHolder);
-
-            viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    mListApkInfor.get(position).setChecked(isChecked);
-                }
-            });
-
-            viewHolder.start.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    installApp(position, false);
-                    startUpdate();
-                }
-            });
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         final AppInfoEntity item = mListApkInfor.get(position);
+        viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mListApkInfor.get(position).setChecked(isChecked);
+            }
+        });
+
+        viewHolder.mInstallRl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = !mListApkInfor.get(position).isChecked();
+                mListApkInfor.get(position).setChecked(isChecked);
+                viewHolder.checkBox.setChecked(isChecked);
+            }
+        });
+
+        viewHolder.start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                installApp(position, false);
+                startUpdate();
+            }
+        });
         viewHolder.checkBox.setChecked(item.isChecked());
         viewHolder.icon.setImageDrawable(item.getAppIcon());
         viewHolder.name.setText(item.getAppLabel());
         viewHolder.installStatus.setText(item.getInstallStatus());
         return convertView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mThread != null) {
+            mThread.interrupt();
+        }
+        mHandler.removeCallbacksAndMessages(null);
     }
 }

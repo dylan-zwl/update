@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.tapc.update.application.TapcApp;
 
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * Created by Administrator on 2017/7/12.
@@ -18,16 +19,24 @@ import butterknife.ButterKnife;
 
 public abstract class BaseFragment extends Fragment {
     protected Context mContext;
-    protected Handler mHandler = new Handler();
+    protected Handler mHandler;
+    private Unbinder mUnbinder;
 
     abstract public int getContentView();
 
     abstract public void initView();
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(getContentView(), container, false);
-        ButterKnife.bind(this, view);
+        mUnbinder = ButterKnife.bind(this, view);
+        mHandler = new Handler();
         initView();
         return view;
     }
@@ -38,7 +47,27 @@ public abstract class BaseFragment extends Fragment {
         mContext = context;
     }
 
-    private int mTaskNumber;
+    /**
+     * onDestroyView中进行解绑操作
+     */
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mUnbinder.unbind();
+    }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    protected int mTaskNumber;
 
     public void updateProgressUi(final int progress) {
         mHandler.post(new Runnable() {

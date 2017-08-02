@@ -3,6 +3,7 @@ package com.tapc.update.ui.fragment.uninstall;
 import android.content.pm.IPackageDeleteObserver;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -10,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.tapc.update.R;
 import com.tapc.update.ui.adpater.BaseAppAdpater;
@@ -35,7 +37,7 @@ public class UninstallAppFragment extends BaseFragment {
     @BindView(R.id.show_system_app)
     CheckBox mShowSystemApp;
 
-    private Handler mHandler;
+    private Thread mThread;
     private BaseAppAdpater mAdapter;
     private List<AppInfoEntity> mListApkInfor = new ArrayList<AppInfoEntity>();
     private List<AppInfoEntity> mAllLstAppInfo;
@@ -49,7 +51,7 @@ public class UninstallAppFragment extends BaseFragment {
     @Override
     public void initView() {
         mHandler = new Handler();
-        new Thread(new Runnable() {
+        mThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 mAllLstAppInfo = AppUtil.getAllAppInfo(mContext, false);
@@ -66,12 +68,15 @@ public class UninstallAppFragment extends BaseFragment {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mUninstallAppLv.setAdapter(mAdapter);
-                        notifyChanged();
+                        if (mUninstallAppLv != null) {
+                            mUninstallAppLv.setAdapter(mAdapter);
+                            notifyChanged();
+                        }
                     }
                 });
             }
-        }).start();
+        });
+        mThread.start();
 
         mAllCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -152,19 +157,22 @@ public class UninstallAppFragment extends BaseFragment {
             @Override
             public void packageDeleted(String s, int i) throws RemoteException {
                 boolean isSuccess;
+                decTask();
                 if (i == 1) {
                     mListApkInfor.remove(appInfoEntity);
-                    notifyChanged();
+                    if (mTaskNumber <= 0) {
+                        notifyChanged();
+                    }
                     isSuccess = true;
                 } else {
                     isSuccess = false;
                 }
                 ShowInforUtil.send(mContext, appInfoEntity.getAppLabel(), getString(R.string.uninstall), isSuccess, "");
-                decTask();
                 stopUpdate();
             }
         });
         if (result == false) {
+            ShowInforUtil.send(mContext, appInfoEntity.getAppLabel(), getString(R.string.uninstall), false, "");
             decTask();
             stopUpdate();
         }
@@ -176,6 +184,8 @@ public class UninstallAppFragment extends BaseFragment {
     }
 
     class ViewHolder {
+        @BindView(R.id.uninstall_rl)
+        RelativeLayout mUninstallRl;
         @BindView(R.id.uninstall_chk)
         CheckBox checkBox;
         @BindView(R.id.uninstall_app_ic)
@@ -198,7 +208,7 @@ public class UninstallAppFragment extends BaseFragment {
     }
 
     private View initItemView(final int position, View convertView) {
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
         if (convertView == null) {
             convertView = View.inflate(mContext, R.layout.item_uninstall_app, null);
             viewHolder = new ViewHolder();
@@ -217,6 +227,14 @@ public class UninstallAppFragment extends BaseFragment {
                 mListApkInfor.get(position).setChecked(isChecked);
             }
         });
+        viewHolder.mUninstallRl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = !mListApkInfor.get(position).isChecked();
+                mListApkInfor.get(position).setChecked(isChecked);
+                viewHolder.checkBox.setChecked(isChecked);
+            }
+        });
         viewHolder.start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,9 +246,22 @@ public class UninstallAppFragment extends BaseFragment {
         viewHolder.openApp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IntentUtil.startApp(mContext, mListApkInfor.get(position).getPkgName());
+                try {
+                    IntentUtil.startApp(mContext, mListApkInfor.get(position).getPkgName());
+                } catch (Exception e) {
+                    Log.d("uninstall", "start app : " + mListApkInfor.get(position).getAppLabel() + " failed");
+                }
             }
         });
         return convertView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mThread != null) {
+            mThread.interrupt();
+        }
+        mHandler.removeCallbacksAndMessages(null);
     }
 }

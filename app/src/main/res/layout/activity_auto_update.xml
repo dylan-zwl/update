@@ -15,8 +15,8 @@
         android:id="@+id/customTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="60dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginTop="36dp"
         android:text="@string/system_maintenance"
         android:textColor="@color/tx_nomal1"
         android:textSize="@dimen/tx_title"/>
@@ -26,8 +26,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="60dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginRight="36dp"
+        android:layout_marginTop="36dp"
         android:background="@drawable/btn_exit2"
         android:gravity="center"
         android:visibility="gone">
@@ -47,12 +47,12 @@
     </LinearLayout>
 
     <ScrollView
-        android:layout_width="844dp"
-        android:layout_height="220dp"
+        android:layout_width="469dp"
+        android:layout_height="122dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="132dp"
-        android:background="@drawable/auto_update_msg"
+        android:layout_marginBottom="66dp"
+        android:background="@drawable/bg_auto_update_msg"
         android:paddingBottom="20dp"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"

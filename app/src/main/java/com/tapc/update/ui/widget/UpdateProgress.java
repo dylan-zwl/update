@@ -36,13 +36,13 @@ public class UpdateProgress extends RelativeLayout {
     public UpdateProgress(Context context) {
         super(context);
         View view = LayoutInflater.from(context).inflate(R.layout.widget_update_progress, this);
-        ButterKnife.bind(view);
+        ButterKnife.bind(this, view);
     }
 
     public UpdateProgress(Context context, AttributeSet attrs) {
         super(context, attrs);
         View view = LayoutInflater.from(context).inflate(R.layout.widget_update_progress, this);
-        ButterKnife.bind(view);
+        ButterKnife.bind(this, view);
     }
 
 

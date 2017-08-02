@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
 
+import com.tapc.update.R;
 import com.tapc.update.broadcastreceiver.MediaMountedReceiver;
 import com.tapc.update.service.binder.LocalBinder;
 import com.tapc.update.ui.entity.MenuInfor;
@@ -28,11 +29,12 @@ public class MenuServie extends Service {
     private UpdateProgress mUpdateProgress;
     private WindowManager mWindowManager;
     private Handler mHandler = new Handler();
+    private MediaMountedReceiver mReceiver;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("###", "start menuc service");
+        Log.d("MenuServie", "start");
     }
 
     @Override
@@ -51,30 +53,26 @@ public class MenuServie extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mWindowManager.removeView(mMenuBar);
+        if (mMenuBar != null) {
+            mWindowManager.removeView(mMenuBar);
+            mMenuBar = null;
+        }
+        if (mUpdateProgress != null) {
+            mWindowManager.removeView(mUpdateProgress);
+            mUpdateProgress = null;
+        }
+        if (mReceiver != null) {
+            unregisterReceiver(mReceiver);
+        }
     }
 
 
     @SuppressLint("InlinedApi")
     private void initView() {
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                547, WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                        | WindowManager.LayoutParams.FLAG_TOUCHABLE_WHEN_WAKING
-                        | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH,
-                PixelFormat.TRANSPARENT);
-        params.gravity = Gravity.RIGHT | Gravity.CENTER_HORIZONTAL;
-        params.x = 0;
-        params.y = 0;
-        mMenuBar = new MenuBar(this);
-        mWindowManager.addView(mMenuBar, params);
-
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
         filter.addDataScheme("file");
-        MediaMountedReceiver mReceiver = new MediaMountedReceiver();
+        mReceiver = new MediaMountedReceiver();
         registerReceiver(mReceiver, filter);
     }
 
@@ -102,7 +100,29 @@ public class MenuServie extends Service {
         return mUpdateProgress;
     }
 
+    public MenuBar getMenuBar() {
+        if (mMenuBar == null) {
+            int with = (int) MenuServie.this.getResources().getDimension(R.dimen.menu_w);
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                    with, WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                            | WindowManager.LayoutParams.FLAG_TOUCHABLE_WHEN_WAKING
+                            | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH,
+                    PixelFormat.TRANSPARENT);
+            params.gravity = Gravity.RIGHT | Gravity.CENTER_HORIZONTAL;
+            params.x = 0;
+            params.y = 0;
+            mMenuBar = new MenuBar(this);
+            mWindowManager.addView(mMenuBar, params);
+        }
+        return mMenuBar;
+    }
+
     public void addInfor(MenuInfor.inforType type, String text) {
-        mMenuBar.addInfor(type, text);
+        if (mMenuBar != null) {
+            mMenuBar.addInfor(type, text);
+        }
     }
 }

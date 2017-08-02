@@ -13,8 +13,6 @@ import com.tapc.update.utils.AppUtil;
 
 import java.io.File;
 
-import io.reactivex.disposables.Disposable;
-
 /**
  * Created by Administrator on 2017/3/17.
  */
@@ -22,7 +20,6 @@ import io.reactivex.disposables.Disposable;
 public class AppPresenter implements UpdateConttract.AppPresenter {
     private Context mContext;
     private UpdateConttract.View mView;
-    private Disposable mDisposable;
     private Handler mHandler;
 
     public AppPresenter(Context context, UpdateConttract.View view) {
@@ -67,12 +64,6 @@ public class AppPresenter implements UpdateConttract.AppPresenter {
     }
 
     void stopUpdate(final boolean isSuccess, final String msg) {
-        if (mDisposable != null) {
-            if (mDisposable.isDisposed()) {
-                mDisposable.dispose();
-            }
-            mDisposable = null;
-        }
         mHandler.post(new Runnable() {
             @Override
             public void run() {

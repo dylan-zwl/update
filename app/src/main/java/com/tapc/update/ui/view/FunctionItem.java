@@ -38,7 +38,7 @@ public class FunctionItem extends RelativeLayout {
     public FunctionItem(Context context, AttributeSet attrs) {
         super(context, attrs);
         View view = LayoutInflater.from(context).inflate(R.layout.item_function, this);
-        ButterKnife.bind(view);
+        ButterKnife.bind(this, view);
 
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.FunctionItem);
         int btnDrawable = array.getResourceId(R.styleable.FunctionItem_ic, 0);
@@ -51,7 +51,7 @@ public class FunctionItem extends RelativeLayout {
         if (!TextUtils.isEmpty(name)) {
             mFuncItemName.setText(name);
         }
-
+        array.recycle();
     }
 
     public void setChecked(boolean checked) {
