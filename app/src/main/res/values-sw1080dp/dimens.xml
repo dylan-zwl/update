@@ -1,0 +1,11 @@
+<resources>
+    <!--文字大小-->
+    <dimen name="tx_size1">36sp</dimen>
+    <dimen name="tx_size2">32sp</dimen>
+    <dimen name="tx_size3">28sp</dimen>
+    <dimen name="tx_size4">24sp</dimen>
+    <dimen name="tx_size5">20sp</dimen>
+    <dimen name="tx_title">72sp</dimen>
+
+    <dimen name="menu_w">548dp</dimen>
+</resources>

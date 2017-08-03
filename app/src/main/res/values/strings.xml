@@ -7,6 +7,7 @@
     <string name="func_vacopy">VA安装</string>
     <string name="func_install">应用安装</string>
     <string name="func_uninstall">应用卸载</string>
+    <string name="func_setting">系统设置</string>
 
     <!--升级-->
     <string name="update">升级</string>

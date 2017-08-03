@@ -17,6 +17,7 @@ public class Config {
     public static String CACHE_FILE_PATH;
     public static String FILE_PATH;
 
+    public static boolean IS_SHOW_MENUBAR = false;
     public static String MOUNTED_PATH = "/mnt/external_sd/";
     public static final String SAVEFILE_PATH = "tapc";
     public static final String UPDATE_APP_NAME = "update_app";

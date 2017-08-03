@@ -92,6 +92,15 @@
                         FunctionItem:name="@string/func_uninstall">
 
                     </com.tapc.update.ui.view.FunctionItem>
+
+                    <com.tapc.update.ui.view.FunctionItem
+                        android:id="@+id/func_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        FunctionItem:ic="@drawable/cb_uninstall"
+                        FunctionItem:name="@string/func_setting">
+
+                    </com.tapc.update.ui.view.FunctionItem>
                 </LinearLayout>
             </ScrollView>
         </RelativeLayout>

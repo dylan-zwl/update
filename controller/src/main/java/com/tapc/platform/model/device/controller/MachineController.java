@@ -3,6 +3,7 @@ package com.tapc.platform.model.device.controller;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Message;
 
 import com.tapc.platform.model.device.controller.uart.Commands;
 
@@ -29,7 +30,12 @@ public final class MachineController {
 
     public void initController() {
         if (null != sMachineController) {
-            mMessageHandler = new Handler();
+            mMessageHandler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                }
+            };
             mMachineStatusController = new MachieStatusController(mMessageHandler);
             mHeartController = new HeartController(mMessageHandler);
             mSpeedController = new SpeedController(mMessageHandler);
@@ -155,8 +161,10 @@ public final class MachineController {
      * mcu升级
      */
     public void updateMCU(String filePath, IOUpdateController.IOUpdateListener listener) {
-        mIOUpdateController = new IOUpdateController(mMessageHandler);
-        mIOUpdateController.start();
+        if (mIOUpdateController == null) {
+            mIOUpdateController = new IOUpdateController(mMessageHandler);
+            mIOUpdateController.start();
+        }
         mIOUpdateController.updateIO(filePath, listener);
     }
 

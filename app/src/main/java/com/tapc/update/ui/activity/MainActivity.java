@@ -1,8 +1,9 @@
 package com.tapc.update.ui.activity;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -11,6 +12,7 @@ import android.view.KeyEvent;
 import android.widget.FrameLayout;
 
 import com.tapc.update.R;
+import com.tapc.update.application.TapcApp;
 import com.tapc.update.ui.fragment.app.UpdateAppFragment;
 import com.tapc.update.ui.fragment.install.InstallAppFragment;
 import com.tapc.update.ui.fragment.os.UpdateOsFragment;
@@ -35,6 +37,8 @@ public class MainActivity extends FragmentActivity {
     FunctionItem mFuncItemInstall;
     @BindView(R.id.func_uninstall)
     FunctionItem mFuncItemUninstall;
+    @BindView(R.id.func_setting)
+    FunctionItem mFuncItemSetting;
     @BindView(R.id.fragment)
     FrameLayout mFragment;
 
@@ -42,6 +46,7 @@ public class MainActivity extends FragmentActivity {
     private Map<Item, Fragment> mFragmentList;
     private Fragment mCurrentfragment;
 
+    private Handler mHandler = new Handler();
     private UpdateAppFragment mUpdateAppFragment;
     private UpdateOsFragment mUpdateOsFragment;
     private VaCopyFragment mVaCopyFragment;
@@ -57,6 +62,13 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void initView() {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                TapcApp.getInstance().setMenuBarVisibility(true);
+            }
+        }, 1000);
+
         mFragmentManager = getSupportFragmentManager();
 //        mFragmentList = new HashMap<>();
 //        mFragmentList.put(Item.APP, new UpdateAppFragment());
@@ -72,7 +84,8 @@ public class MainActivity extends FragmentActivity {
         OS,
         VACOPY,
         INSTALL,
-        UNINSTALL
+        UNINSTALL,
+        SETTING
     }
 
     @OnClick(R.id.func_app)
@@ -100,12 +113,18 @@ public class MainActivity extends FragmentActivity {
         setCheckedFunc(Item.UNINSTALL);
     }
 
+    @OnClick(R.id.func_setting)
+    void setting() {
+        setCheckedFunc(Item.SETTING);
+    }
+
     private void setCheckedFunc(final Item item) {
         mFuncItemApp.setChecked(false);
         mFuncItemOs.setChecked(false);
         mFuncItemVacopy.setChecked(false);
         mFuncItemInstall.setChecked(false);
         mFuncItemUninstall.setChecked(false);
+        mFuncItemSetting.setChecked(false);
         switch (item) {
             case APP:
                 mFuncItemApp.setChecked(true);
@@ -126,6 +145,10 @@ public class MainActivity extends FragmentActivity {
             case UNINSTALL:
                 mFuncItemUninstall.setChecked(true);
                 replaceFragment(Fragment.instantiate(this, UninstallAppFragment.class.getName()));
+                break;
+            case SETTING:
+                mFuncItemSetting.setChecked(true);
+                startActivity(new Intent(Settings.ACTION_SETTINGS));
                 break;
         }
 //        showFragment(mFragmentList.get(item));

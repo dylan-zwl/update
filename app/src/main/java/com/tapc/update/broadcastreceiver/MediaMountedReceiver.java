@@ -4,10 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.view.View;
 
 import com.tapc.update.application.Config;
-import com.tapc.update.application.TapcApp;
 import com.tapc.update.ui.activity.AutoUpdateActivity;
 import com.tapc.update.ui.activity.MainActivity;
 import com.tapc.update.utils.IntentUtil;
@@ -28,7 +26,6 @@ public class MediaMountedReceiver extends BroadcastReceiver {
             if (new File(manualPath).exists()) {
                 IntentUtil.startActivity(context, MainActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK | Intent
                         .FLAG_ACTIVITY_CLEAR_TOP);
-                TapcApp.getInstance().getService().getMenuBar().setVisibility(View.VISIBLE);
             } else {
                 IntentUtil.startActivity(context, AutoUpdateActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK | Intent
                         .FLAG_ACTIVITY_CLEAR_TOP);

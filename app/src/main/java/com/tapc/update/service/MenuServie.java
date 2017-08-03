@@ -3,12 +3,12 @@ package com.tapc.update.service;
 import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.tapc.update.R;
@@ -25,7 +25,7 @@ import com.tapc.update.ui.widget.UpdateProgress;
 
 public class MenuServie extends Service {
     private LocalBinder mBinder;
-    private MenuBar mMenuBar;
+    private static MenuBar mMenuBar;
     private UpdateProgress mUpdateProgress;
     private WindowManager mWindowManager;
     private Handler mHandler = new Handler();
@@ -50,13 +50,11 @@ public class MenuServie extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mMenuBar != null) {
-            mWindowManager.removeView(mMenuBar);
-            mMenuBar = null;
-        }
+        removeMenuBar();
         if (mUpdateProgress != null) {
             mWindowManager.removeView(mUpdateProgress);
             mUpdateProgress = null;
@@ -69,11 +67,11 @@ public class MenuServie extends Service {
 
     @SuppressLint("InlinedApi")
     private void initView() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-        filter.addDataScheme("file");
-        mReceiver = new MediaMountedReceiver();
-        registerReceiver(mReceiver, filter);
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+//        filter.addDataScheme("file");
+//        mReceiver = new MediaMountedReceiver();
+//        registerReceiver(mReceiver, filter);
     }
 
     public UpdateProgress getUpdateProgress() {
@@ -118,6 +116,21 @@ public class MenuServie extends Service {
             mWindowManager.addView(mMenuBar, params);
         }
         return mMenuBar;
+    }
+
+    private void removeMenuBar() {
+        if (mMenuBar != null) {
+            mWindowManager.removeView(mMenuBar);
+            mMenuBar = null;
+        }
+    }
+
+    public void setMenuBarVisibility(boolean visibility) {
+        if (visibility) {
+            getMenuBar().setVisibility(View.VISIBLE);
+        } else {
+            removeMenuBar();
+        }
     }
 
     public void addInfor(MenuInfor.inforType type, String text) {

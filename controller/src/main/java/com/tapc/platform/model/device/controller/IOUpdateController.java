@@ -227,6 +227,7 @@ public class IOUpdateController extends GenericMessageHandler {
                     mLastUpdateStatus = Update_Status.SUCCESS;
                 else
                     mLastUpdateStatus = Update_Status.FAILED;
+                sendMessageToUI("INFO", "Update result : " + updateComplete);
             }
         }
 

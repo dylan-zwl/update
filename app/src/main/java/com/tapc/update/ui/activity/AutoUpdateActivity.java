@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
+import com.tapc.update.application.TapcApp;
 import com.tapc.update.ui.update.AppPresenter;
 import com.tapc.update.ui.update.DownloadPresenter;
 import com.tapc.update.ui.update.McuPresenter;
@@ -44,7 +45,7 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
 
     private static String TAG;
     private Context mContext;
-    protected Handler mHandler = new Handler();
+    private Handler mHandler = new Handler();
     private String mUpdateFilePath;
     boolean isCopySuccessed = false;
     boolean isUpdateSuccess = false;
@@ -69,6 +70,14 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
     private void initView() {
         TAG = getClass().getName();
         mContext = this;
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                TapcApp.getInstance().setMenuBarVisibility(false);
+            }
+        }, 1000);
+
         Intent intent = getIntent();
         if (intent != null) {
             Bundle bundle = intent.getExtras();

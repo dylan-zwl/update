@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="881"
@@ -22,6 +22,7 @@
             android:paddingLeft="10dp">
 
             <com.tapc.update.ui.view.CustomTextView
+                android:id="@+id/setting_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="40dp"
@@ -33,6 +34,7 @@
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_below="@id/setting_title"
                 android:layout_marginBottom="5dp"
                 android:layout_marginLeft="40dp"
                 android:layout_marginTop="136dp"
@@ -90,27 +92,29 @@
                         FunctionItem:name="@string/func_uninstall">
 
                     </com.tapc.update.ui.view.FunctionItem>
+
+                    <com.tapc.update.ui.view.FunctionItem
+                        android:id="@+id/func_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        FunctionItem:ic="@drawable/cb_uninstall"
+                        FunctionItem:name="@string/func_setting">
+
+                    </com.tapc.update.ui.view.FunctionItem>
                 </LinearLayout>
             </ScrollView>
-        </LinearLayout>
+        </RelativeLayout>
 
-        <RelativeLayout
+        <FrameLayout
+            android:id="@+id/fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="381"
-            android:background="@drawable/bg_frame">
-
-            <FrameLayout
-                android:id="@+id/fragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:paddingLeft="32dp"
-                android:paddingRight="48dp"
-                android:paddingTop="64dp"
-                android:visibility="visible">
-            </FrameLayout>
-        </RelativeLayout>
+            android:background="@drawable/bg_frame"
+            android:paddingLeft="32dp"
+            android:paddingRight="48dp"
+            android:paddingTop="64dp"
+            android:visibility="visible">
+        </FrameLayout>
     </LinearLayout>
 </RelativeLayout>
