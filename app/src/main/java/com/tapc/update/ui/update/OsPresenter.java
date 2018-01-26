@@ -51,8 +51,8 @@ public class OsPresenter implements UpdateConttract.OsPresenter {
                                     }
 
                                     @Override
-                                    public void finish(int error) {
-                                        if (error == 0) {
+                                    public void onCompeleted(boolean isSuccessd, String msg) {
+                                        if (isSuccessd) {
                                             mHandler.post(new Runnable() {
                                                 @Override
                                                 public void run() {

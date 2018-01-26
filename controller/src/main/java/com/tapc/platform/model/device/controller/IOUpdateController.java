@@ -34,7 +34,7 @@ public class IOUpdateController extends GenericMessageHandler {
 
     public int updateIO(String filepath, IOUpdateListener listener) {
         mListener = listener;
-        if (mUpdateHelper.getLastUpdateStatus() == Update_Status.IN_PROGRESS) {
+        if (mUpdateHelper.getLastUpdateStatus() == UpdateStatus.IN_PROGRESS) {
             throw new RuntimeException("Another update is already in progress.");
         }
 
@@ -70,25 +70,24 @@ public class IOUpdateController extends GenericMessageHandler {
         mUpdateHelper.ackReceivedCallBack(packet);
     }
 
-    @Override
-    protected void sendMessageToUI(String key, String value) {
+    protected void sendUpdateStatus(UpdateStatus status, String text) {
         if (mListener != null) {
-            switch (mUpdateHelper.getLastUpdateStatus()) {
+            switch (status) {
                 case IN_PROGRESS:
-                    mListener.onProgress(mProcess, value);
+                    mListener.onProgress(mProcess, text);
                     break;
                 case SUCCESS:
-                    mListener.successful(value);
+                    mListener.successful(text);
                     break;
                 case CANCELLED:
                 case FAILED:
-                    mListener.failed(value);
+                    mListener.failed(text);
                     break;
             }
         }
     }
 
-    public enum Update_Status {
+    public enum UpdateStatus {
         IN_PROGRESS, SUCCESS, FAILED, CANCELLED
     }
 
@@ -112,14 +111,14 @@ public class IOUpdateController extends GenericMessageHandler {
         private int mAckPacketNumber = 0;
         private String mRomBinary;
 
-        private Update_Status mLastUpdateStatus;
+        private UpdateStatus mLastUpdateStatus;
 
         private boolean lcbInUpdateMode = false;
 
         private IOUpdateHelper() {
         }
 
-        public Update_Status getLastUpdateStatus() {
+        public UpdateStatus getLastUpdateStatus() {
             return mLastUpdateStatus;
         }
 
@@ -132,14 +131,13 @@ public class IOUpdateController extends GenericMessageHandler {
         @Override
         public void run() {
             Date start = Calendar.getInstance().getTime();
-            mLastUpdateStatus = Update_Status.IN_PROGRESS;
+            mLastUpdateStatus = UpdateStatus.IN_PROGRESS;
             FileInputStream fis = null;
             mLastSentPacketNumber = 0;
             mAckPacketNumber = 0;
             mAckReceived = false;
             TransferPacket enterUpdateModeCommand = new TransferPacket(Commands.ENTER_UPDATE_MODE);
             enterUpdateModeCommand.setData(null);
-            boolean updateComplete = false;
             lcbInUpdateMode = false;
             mProcess = 0;
             try {
@@ -160,27 +158,22 @@ public class IOUpdateController extends GenericMessageHandler {
                 }
 
                 if (attemptTimes < 0) {
-                    mLastUpdateStatus = Update_Status.FAILED;
-                    sendMessageToUI("ERROR", "Couldnot enter Update Mode");
+                    sendUpdateStatus(UpdateStatus.FAILED, "Couldnot enter Update Mode");
                     return;
                 }
-
-                mLastUpdateStatus = Update_Status.IN_PROGRESS;
 
                 int dataReadSize = 0;
                 int readProcessed = 0;
                 // until reach end of stream while reading the ROM
                 // the first 1 byte of the data field is reserved for the
                 // packet sequence number so, load the data after the offset 1
-                while ((dataReadSize = fis.read(data, 1,
-                        mMax_data_read_buffer_size - 1)) != -1) {
+                while ((dataReadSize = fis.read(data, 1, mMax_data_read_buffer_size - 1)) != -1) {
                     readProcessed += dataReadSize;
                     mProcess = (int) ((readProcessed * 100) / totalFileSize);
-                    sendMessageToUI("PROGRESS", "" + (readProcessed * 100) / totalFileSize);
+                    sendUpdateStatus(UpdateStatus.IN_PROGRESS, "" + (readProcessed * 100) / totalFileSize);
                     // feed the packet sequence number in the data field
                     mLastSentPacketNumber = (mLastSentPacketNumber + 1) % 256;
-                    byte[] seqno = Utility.getByteArrayFromInteger(
-                            mLastSentPacketNumber, 1);
+                    byte[] seqno = Utility.getByteArrayFromInteger(mLastSentPacketNumber, 1);
                     data[0] = seqno[0];
 
                     // put the data in the transfer packet
@@ -193,7 +186,7 @@ public class IOUpdateController extends GenericMessageHandler {
                     // send the packet
                     if (sendPacket() > 0) {
                         // error occurred or failed
-                        sendMessageToUI("ERROR", "Update Failed");
+                        sendUpdateStatus(UpdateStatus.FAILED, "Update Failed");
                         return;
                     }
                 }
@@ -203,17 +196,15 @@ public class IOUpdateController extends GenericMessageHandler {
                 mTransferPacket.setData(null);
                 sendPacket();
 
-                sendMessageToUI("INFO", "Update Completed Successfully, Time taken: " + (Math.abs(Calendar.getInstance()
-                        .getTimeInMillis() - start.getTime()) / 10000) + 1 + " Second(s).");
-
-                updateComplete = true;
+                sendUpdateStatus(UpdateStatus.SUCCESS, "Update Completed Successfully, Time taken: " +
+                        (Math.abs(Calendar.getInstance().getTimeInMillis() - start.getTime()) / 10000) + 1 + " Second" +
+                        "(s).");
             } catch (FileNotFoundException e) {
-                sendMessageToUI("ERROR", "File not found: " + e.getMessage());
+                sendUpdateStatus(UpdateStatus.FAILED, "File not found: " + e.getMessage());
             } catch (IOException e) {
-                sendMessageToUI("ERROR", "IOException occurred: " + e.getMessage());
+                sendUpdateStatus(UpdateStatus.FAILED, "IOException occurred: " + e.getMessage());
             } catch (InterruptedException e) {
-                sendMessageToUI("ERROR", "Update Failed, thread interrupted");
-                mLastUpdateStatus = Update_Status.CANCELLED;
+                sendUpdateStatus(UpdateStatus.CANCELLED, "Update Failed, thread interrupted");
             } finally {
                 if (fis != null)
                     try {
@@ -222,12 +213,6 @@ public class IOUpdateController extends GenericMessageHandler {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-
-                if (updateComplete)
-                    mLastUpdateStatus = Update_Status.SUCCESS;
-                else
-                    mLastUpdateStatus = Update_Status.FAILED;
-                sendMessageToUI("INFO", "Update result : " + updateComplete);
             }
         }
 
@@ -262,8 +247,8 @@ public class IOUpdateController extends GenericMessageHandler {
 
 //				Log.d("IOUPDATE", "Send pckt number: " + mLastSentPacketNumber);
                 if (resend_attempt > 0) {
-                    sendMessageToUI("INFO", "ReSent packet no: " + mLastSentPacketNumber + ", attempt: " +
-                            resend_attempt);
+                    sendUpdateStatus(UpdateStatus.IN_PROGRESS, "ReSent packet no: " + mLastSentPacketNumber + ", " +
+                            "attempt: " + resend_attempt);
                 }
 
                 // wait for ack to arrive, it blocks over here
@@ -289,7 +274,7 @@ public class IOUpdateController extends GenericMessageHandler {
                 }
             } else if (packet.getCommand() == Commands.ENTER_UPDATE_MODE) {
                 lcbInUpdateMode = true;
-                sendMessageToUI("INFO", "LCB entered update mode");
+                sendUpdateStatus(UpdateStatus.IN_PROGRESS, "LCB entered update mode");
             }
         }
     }

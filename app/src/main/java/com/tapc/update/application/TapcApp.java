@@ -56,8 +56,7 @@ public class TapcApp extends Application {
 
     private void initMachineCtl() {
         MachineController controller = MachineController.getInstance();
-        controller.setReceiveBroadcast(this);
-        controller.initController();
+        controller.initController(this);
         controller.start();
 
         mKeyboardEvent = new KeyEvent(null, 200);

@@ -28,8 +28,12 @@ public final class MachineController {
         return sMachineController;
     }
 
-    public void initController() {
+    /**
+     * 初始化
+     */
+    public void initController(Context context) {
         if (null != sMachineController) {
+            mContext = context;
             mMessageHandler = new Handler() {
                 @Override
                 public void handleMessage(Message msg) {
@@ -46,10 +50,9 @@ public final class MachineController {
         }
     }
 
-    public void setReceiveBroadcast(Context context) {
-        mContext = context;
-    }
-
+    /**
+     * 开始
+     */
     public void start() {
         mHeartController.start();
         mSpeedController.start();
@@ -60,6 +63,9 @@ public final class MachineController {
         mKeyboardController.start();
     }
 
+    /**
+     * 停止
+     */
     public void stop() {
         mHeartController.stop();
         mSpeedController.stop();
@@ -71,7 +77,7 @@ public final class MachineController {
     }
 
     /**
-     * ui倒计时提醒mcu
+     * ui倒计时通知mcu预开始
      */
     public void registerPreStart() {
         mMachineStatusController.registerPreStart();
@@ -189,8 +195,8 @@ public final class MachineController {
     /**
      * 进入待机
      */
-    public void enterErpStatus(int delayTime) {
-        mMachineStatusController.enterERP(delayTime);
+    public void enterErpStatus(int autoWakeupTime) {
+        mMachineStatusController.enterERP(autoWakeupTime);
     }
 
     /**
@@ -200,8 +206,8 @@ public final class MachineController {
         return mMachineStatusController.getFanSpeedLevel();
     }
 
-    public void setFanLevel(int spdlvl) {
-        mMachineStatusController.setFanSpeedLevel(spdlvl);
+    public void setFanLevel(int level) {
+        mMachineStatusController.setFanSpeedLevel(level);
     }
 
     /**
@@ -212,7 +218,7 @@ public final class MachineController {
     }
 
     /**
-     * 设置机器轮径值
+     * 设置机器参数值
      */
     public void setMachinePram(byte[] databyte) {
         mMachineStatusController.setMachinePram(databyte);

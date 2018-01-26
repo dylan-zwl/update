@@ -131,12 +131,10 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
                                 }
 
                                 @Override
-                                public void finish(int error) {
-                                    boolean isConfigCopyResult = false;
+                                public void onCompeleted(boolean isSuccessd, String msg) {
+                                    boolean isConfigCopyResult = isSuccessd;
                                     String showMsg = msg;
-                                    if (error == 0) {
-                                        isConfigCopyResult = true;
-                                    } else {
+                                    if (!isSuccessd) {
                                         showMsg = msg + "," + getString(R.string.app_config) + getString(R
                                                 .string.copy) + getString(R.string.failed);
                                     }

@@ -103,7 +103,7 @@ public class MenuServie extends Service {
             int with = (int) MenuServie.this.getResources().getDimension(R.dimen.menu_w);
             WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                     with, WindowManager.LayoutParams.MATCH_PARENT,
-                    WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_PANEL,
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                             | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                             | WindowManager.LayoutParams.FLAG_TOUCHABLE_WHEN_WAKING

@@ -30,6 +30,10 @@ public class CopyFileUtil {
         long len = srcFile.length();
         int oneNum = (int) (len / threadCount);
 
+        if (oneNum < 1024) {
+            threadCount = 1;
+        }
+
         totalThreadCount = threadCount;
         executedCount = 0;
         startTime = System.currentTimeMillis();

@@ -12,14 +12,14 @@ import com.tapc.platform.model.device.controller.uart.TransferPacket;
 import com.tapc.platform.model.device.controller.uart.Utility;
 
 public class HardwareStatusController extends GenericMessageHandler {
-    public final static String DEVICE_SAFEKEY_STATUS = "action.safekey.status";
-    public final static String DEVICE_ERROR_STATUS = "action.error.status";
-    public final static int ERROR_MASK_VALUE = 0x0001;
-    public final static int SAFEKEY_MASK_VALUE = 0x0008;
-    public final static int KEY_MASK_VALUE = 0x0002;
-    public final static int WDT_OVERFLOW_MASK_VALUE = 0x0004;
-    public final static int STATUS_BIT_INVERTER_ERR_MASK_VALUE = 0x0010;
-    public final static int STATUS_BIT_ERR_MASK_VALUE = 0xff00;
+    public static final String DEVICE_SAFEKEY_STATUS = "action.safekey.status";
+    public static final String DEVICE_ERROR_STATUS = "action.error.status";
+    public static final int ERROR_MASK_VALUE = 0x0001;
+    public static final int SAFEKEY_MASK_VALUE = 0x0008;
+    public static final int KEY_MASK_VALUE = 0x0002;
+    public static final int WDT_OVERFLOW_MASK_VALUE = 0x0004;
+    public static final int STATUS_BIT_INVERTER_ERR_MASK_VALUE = 0x0010;
+    public static final int STATUS_BIT_ERR_MASK_VALUE = 0xff00;
 
     private Context mContext;
     private int mErrorCode;

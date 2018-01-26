@@ -33,8 +33,6 @@ import com.tapc.update.utils.ShowInforUtil;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -134,35 +132,27 @@ public class VaCopyFragment extends BaseFragment {
                 }
 
                 mCopyTime = System.currentTimeMillis();
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (mOriginFileSize <= 0) {
-                            cancel();
-                            return;
+                new FileUtil().copyFolder(mOriginPath, mTargetPath, new FileUtil.ProgressCallback() {
+                            @Override
+                            public void onProgress(int progress) {
+                                long usetime = (System.currentTimeMillis() - mCopyTime) / 1000;
+                                String time = String.format("%02d:%02d:%02d", usetime / 3600, usetime % 3600 / 60,
+                                        usetime % 60);
+                                updateProgressUi(progress);
+                                Log.d("copy progress", "" + progress + "  use time: " + time);
+                            }
+
+                            @Override
+                            public void onCompeleted(boolean isSuccessd, String msg) {
+                                ShowInforUtil.send(mContext, "VA", getString(R.string.copy), isSuccessd, "");
+                                //检测文件
+                                if (isSuccessd) {
+                                    checkVa();
+                                }
+                                stopUpdate();
+                            }
                         }
-                        int progress = (int) (mCopySize * 100 / mOriginFileSize);
-                        long usetime = (System.currentTimeMillis() - mCopyTime) / 1000;
-                        String time = String.format("%02d:%02d:%02d", usetime / 3600, usetime % 3600 / 60, usetime %
-                                60);
-                        updateProgressUi(progress);
-                        Log.d("copy progress", "" + progress + "  use time: " + time);
-                    }
-                }, 1000, 1000);
-
-                boolean result = copyFolder(mOriginPath, mTargetPath);
-                SystemClock.sleep(3000);
-                timer.cancel();
-
-                ShowInforUtil.send(mContext, "VA", getString(R.string.copy), result, "");
-
-                //检测文件
-                if (result) {
-                    checkVa();
-                }
-
-                stopUpdate();
+                );
             }
         }).start();
     }
@@ -227,6 +217,9 @@ public class VaCopyFragment extends BaseFragment {
                         @Override
                         public void copyResult(boolean isCopySuccess) {
                             mCopyFileResult = isCopySuccess;
+                            synchronized (this) {
+
+                            }
                         }
 
                         @Override
@@ -234,6 +227,7 @@ public class VaCopyFragment extends BaseFragment {
                             mCopySize = mCopySize + size;
                         }
                     });
+                    wait();
                     while (copyFileUtil.isFinish() == false) {
                         SystemClock.sleep(1);
                     }

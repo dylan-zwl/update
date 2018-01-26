@@ -96,12 +96,12 @@ public class UpdateAppFragment extends BaseFragment {
                                 }
 
                                 @Override
-                                public void finish(int error) {
+                                public void onCompeleted(boolean isSuccessd, String msg) {
                                     decTask();
                                     stopUpdate();
                                     boolean isConfigCopyResult = false;
                                     String showMsg = msg;
-                                    if (error == 0) {
+                                    if (isSuccessd) {
                                         isConfigCopyResult = true;
                                     } else {
                                         showMsg = msg + "," + getString(R.string.app_config) + getString(R.string
