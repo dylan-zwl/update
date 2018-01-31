@@ -6,17 +6,16 @@ import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import com.jht.tapc.jni.KeyEvent;
+import com.tapc.platform.jni.Driver;
 import com.tapc.platform.model.device.controller.MachineController;
 import com.tapc.update.service.MenuServie;
 import com.tapc.update.service.binder.LocalBinder;
-import com.tapc.update.ui.entity.MenuInfor;
+import com.tapc.update.ui.entity.MenuInfo;
 import com.tapc.update.ui.widget.UpdateProgress;
 import com.tapc.update.utils.IntentUtil;
 
 public class TapcApp extends Application {
     private static TapcApp sTapcApp;
-    private KeyEvent mKeyboardEvent;
     private MenuServie mMenuService;
 
     @Override
@@ -55,18 +54,12 @@ public class TapcApp extends Application {
     };
 
     private void initMachineCtl() {
+        Driver.openUinput(Driver.UINPUT_DEVICE_NAME);
+        Driver.initCom("/dev/ttyS3", 115200);
+
         MachineController controller = MachineController.getInstance();
         controller.initController(this);
         controller.start();
-
-        mKeyboardEvent = new KeyEvent(null, 200);
-        mKeyboardEvent.openUinput();
-        mKeyboardEvent.initCom();
-        mKeyboardEvent.start();
-    }
-
-    public KeyEvent getKeyboardEvent() {
-        return mKeyboardEvent;
     }
 
     public MenuServie getService() {
@@ -86,13 +79,9 @@ public class TapcApp extends Application {
         return null;
     }
 
-    public void addInfor(MenuInfor.inforType type, String text) {
+    public void addInfor(MenuInfo.inforType type, String text) {
         if (mMenuService != null) {
             mMenuService.addInfor(type, text);
         }
-    }
-
-    public void stopDeviceApp() {
-
     }
 }

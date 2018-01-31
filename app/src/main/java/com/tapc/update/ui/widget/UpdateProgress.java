@@ -2,24 +2,25 @@ package com.tapc.update.ui.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.tapc.update.R;
+import com.tapc.update.ui.base.BaseSystemView;
 import com.tapc.update.ui.view.CustomTextView;
+import com.tapc.update.utils.WindowManagerUtils;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
  * Created by Administrator on 2017/7/18.
  */
 
-public class UpdateProgress extends RelativeLayout {
+public class UpdateProgress extends BaseSystemView {
     @BindView(R.id.update_progress_tx)
     CustomTextView mProgressTx;
 
@@ -33,18 +34,24 @@ public class UpdateProgress extends RelativeLayout {
     @BindView(R.id.update_again)
     Button mUpdateAgain;
 
+    @Override
+    protected int getLayoutResID() {
+        return R.layout.widget_update_progress;
+    }
+
+    @Override
+    public WindowManager.LayoutParams getLayoutParams() {
+        return WindowManagerUtils.getLayoutParams(0, 0, WindowManager.LayoutParams.MATCH_PARENT, WindowManager
+                .LayoutParams.MATCH_PARENT, Gravity.TOP | Gravity.CENTER_VERTICAL);
+    }
+
     public UpdateProgress(Context context) {
         super(context);
-        View view = LayoutInflater.from(context).inflate(R.layout.widget_update_progress, this);
-        ButterKnife.bind(this, view);
     }
 
     public UpdateProgress(Context context, AttributeSet attrs) {
         super(context, attrs);
-        View view = LayoutInflater.from(context).inflate(R.layout.widget_update_progress, this);
-        ButterKnife.bind(this, view);
     }
-
 
     public void setProgress(int progress) {
         mProgressTx.setText("" + progress);

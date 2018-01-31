@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class VaPlayListAnalysis {
     public PlayEntity getvaInfor(InputStream xml) throws Exception {
         PlayEntity vaPlayList = new PlayEntity();
-        vaPlayList.evtList = new ArrayList<String>();
+        vaPlayList.setEvtList(new ArrayList<String>());
         XmlPullParser pullParser = Xml.newPullParser();
         pullParser.setInput(xml, "UTF-8");
         int event = pullParser.getEventType();
@@ -21,17 +21,17 @@ public class VaPlayListAnalysis {
                     break;
                 case XmlPullParser.START_TAG:
                     if ("name".equals(nodeName)) {
-                        vaPlayList.name = pullParser.nextText();
+                        vaPlayList.setName(pullParser.nextText());
                     } else if ("description".equals(nodeName)) {
-                        vaPlayList.description = pullParser.nextText();
+                        vaPlayList.setDescription(pullParser.nextText());
                     } else if ("location".equals(nodeName)) {
-                        vaPlayList.location = pullParser.nextText();
+                        vaPlayList.setLocation(pullParser.nextText());
                     } else if ("still".equals(nodeName)) {
-                        vaPlayList.still = pullParser.nextText().replace("\\", "/");
+                        vaPlayList.setStill(pullParser.nextText().replace("\\", "/"));
                     } else if ("uniqueid".equals(nodeName)) {
-                        vaPlayList.uniqueid = pullParser.nextText();
+                        vaPlayList.setUniqueid(pullParser.nextText());
                     } else if ("video".equals(nodeName)) {
-                        vaPlayList.evtList.add(pullParser.nextText().replace("\\", "/"));
+                        vaPlayList.getEvtList().add(pullParser.nextText().replace("\\", "/"));
                     }
                     break;
                 case XmlPullParser.END_TAG:

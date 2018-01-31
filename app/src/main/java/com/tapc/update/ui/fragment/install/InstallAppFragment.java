@@ -1,48 +1,47 @@
 package com.tapc.update.ui.fragment.install;
 
 import android.content.pm.ApplicationInfo;
-import android.content.pm.IPackageInstallObserver;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
-import android.os.RemoteException;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
-import com.tapc.update.ui.adpater.BaseAppAdpater;
+import com.tapc.update.ui.adpater.InstallAdpater;
 import com.tapc.update.ui.entity.AppInfoEntity;
 import com.tapc.update.ui.fragment.BaseFragment;
-import com.tapc.update.ui.view.CustomTextView;
 import com.tapc.update.utils.AppUtil;
+import com.tapc.update.utils.FileUtil;
+import com.tapc.update.utils.RxjavaUtils;
 import com.tapc.update.utils.ShowInforUtil;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 
 public class InstallAppFragment extends BaseFragment {
     @BindView(R.id.install_app_lv)
-    ListView mInstallAppLv;
+    RecyclerView mInstallAppLv;
     @BindView(R.id.install_all_chk)
     CheckBox mAllCheck;
 
-    private Thread mThread;
-    private BaseAppAdpater mAdapter;
+    private InstallAdpater mAdapter;
     private List<String> mListFilePath = new ArrayList<String>();
-    private List<AppInfoEntity> mListApkInfor = new ArrayList<AppInfoEntity>();
+    private List<AppInfoEntity> mListApkInfo = new ArrayList<AppInfoEntity>();
 
     @Override
     public int getContentView() {
@@ -53,61 +52,64 @@ public class InstallAppFragment extends BaseFragment {
     public void initView() {
         mHandler = new Handler();
 
-        mThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String path = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + Config.INSTALL_APP_PATH;
-                getFiles(path, ".apk");
-                if (mListFilePath != null && mListFilePath.size() > 0) {
-                    getAppList();
-                    mAdapter = new BaseAppAdpater(mListApkInfor, new BaseAppAdpater.Listener() {
-                        @Override
-                        public View getView(int position, View convertView, ViewGroup parent) {
-                            return initItemView(position, convertView);
-                        }
-                    });
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mInstallAppLv != null) {
-                                mInstallAppLv.setAdapter(mAdapter);
-                                notifyChanged();
-                            }
-                        }
-                    });
-                }
-            }
-        });
-        mThread.start();
-
+        //全部选项勾选
         mAllCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mListApkInfor != null) {
-                    for (int index = 0; index < mListApkInfor.size(); index++) {
-                        mListApkInfor.get(index).setChecked(isChecked);
+                if (mListApkInfo != null) {
+                    for (int index = 0; index < mListApkInfo.size(); index++) {
+                        mListApkInfo.get(index).setChecked(isChecked);
                     }
                     notifyChanged();
                 }
             }
         });
-    }
 
-    // 搜索目录，扩展名，是否进入子文件夹
-    private void getFiles(String Path, String Extension) {
-        File[] files = new File(Path).listFiles();
-        if (files != null) {
-            for (int i = 0; i < files.length; i++) {
-                File f = files[i];
-                if (f.isFile()) {
-                    if (f.getName().contains(Extension)) {
-                        mListFilePath.add(f.getPath());
+        RxjavaUtils.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
+                String path = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + Config.INSTALL_APP_PATH;
+                FileUtil.getFiles(path, new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        if (name.toLowerCase().contains(".apk")) {
+                            mListFilePath.add(dir + "/" + name);
+                        }
+                        return false;
+                    }
+                });
+                if (mListFilePath != null && mListFilePath.size() > 0) {
+                    getAppList();
+                    if (mListApkInfo != null && !mListApkInfo.isEmpty()) {
+                        e.onNext("show list");
                     }
                 }
+                e.onComplete();
             }
-        }
+        }, new Consumer() {
+            @Override
+            public void accept(@NonNull Object o) throws Exception {
+                mAdapter = new InstallAdpater(mListApkInfo);
+                mAdapter.setListener(new InstallAdpater.Listener() {
+                    @Override
+                    public void onStart(int position) {
+                        List<AppInfoEntity> list = new ArrayList<AppInfoEntity>();
+                        AppInfoEntity item = mListApkInfo.get(position);
+                        list.add(item);
+                        item.setChecked(true);
+                        notifyChanged();
+                        startInstallApp(list);
+                    }
+                });
+                mInstallAppLv.setLayoutManager(new LinearLayoutManager(mContext));
+                mInstallAppLv.setAdapter(mAdapter);
+            }
+        }, null);
     }
 
+    /**
+     * 功能描述 : 获取App显示列表
+     */
     private void getAppList() {
         for (String apkPath : mListFilePath) {
             PackageManager pm = mContext.getPackageManager();
@@ -118,7 +120,6 @@ public class InstallAppFragment extends BaseFragment {
                 // 得到安装包名称
                 appInfo.sourceDir = apkPath;
                 appInfo.publicSourceDir = apkPath;
-                appEntity.setInstallStatus("");
                 appEntity.setPath(apkPath);
                 try {
                     appEntity.setAppLabel(appInfo.loadLabel(pm).toString());
@@ -127,83 +128,54 @@ public class InstallAppFragment extends BaseFragment {
                     Log.e("ApkIconLoader", e.toString());
                 }
                 Log.d("app file", "" + appEntity.getAppLabel());
-                mListApkInfor.add(appEntity);
+                mListApkInfo.add(appEntity);
             }
         }
     }
 
-    private Runnable mInstallAppRunnable = new Runnable() {
-        public void run() {
-            for (int index = 0; index < mListApkInfor.size(); index++) {
-                installApp(index, true);
-            }
-            startUpdate();
-        }
-    };
-
-    private void installApp(final int index, boolean isNeedChecked) {
-        AppInfoEntity appInfoEntity = mListApkInfor.get(index);
+    private void installApp(final AppInfoEntity appInfoEntity, boolean isNeedChecked) {
         if (isNeedChecked && appInfoEntity.isChecked() == false) {
             return;
         }
         appInfoEntity.setInstallStatus("");
-        incTask();
         String path = appInfoEntity.getPath();
-        boolean result = AppUtil.installApk(mContext, new File(path), new IPackageInstallObserver.Stub() {
+        appInfoEntity.setInstallStatus("");
+        AppUtil.installApk(mContext, new File(path), new AppUtil.ProgressListener() {
             @Override
-            public void packageInstalled(String s, int i) throws RemoteException {
-                boolean isSuccess;
-                if (i == 1) {
-                    mListApkInfor.get(index).setInstallStatus(getResources().getString(R.string
-                            .app_install_success));
-                    isSuccess = true;
+            public void onCompleted(boolean isSuccessed, String message) {
+                if (isSuccessed) {
+                    appInfoEntity.setInstallStatus(getResources().getString(R.string.app_install_success));
                 } else {
-                    mListApkInfor.get(index).setInstallStatus(getResources().getString(R.string
-                            .app_install_fail));
-                    isSuccess = false;
+                    appInfoEntity.setInstallStatus(getResources().getString(R.string.app_install_fail));
 
                 }
-                ShowInforUtil.send(mContext, mListApkInfor.get(index).getAppLabel(), getString(R.string.install),
-                        isSuccess, "");
+                ShowInforUtil.send(mContext, appInfoEntity.getAppLabel(), getString(R.string.install), isSuccessed,
+                        "");
+            }
+        });
+    }
 
-                decTask();
-                if (mTaskNumber <= 0) {
+    private void startInstallApp(final List<AppInfoEntity> list) {
+        RxjavaUtils.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
+                startUpdate();
+                for (AppInfoEntity appInfoEntity : list) {
+                    installApp(appInfoEntity, true);
                     notifyChanged();
                 }
                 stopUpdate();
             }
-        });
-        if (result == false) {
-            ShowInforUtil.send(mContext, mListApkInfor.get(index).getAppLabel(), getString(R.string.install),
-                    false, "");
-            mListApkInfor.get(index).setInstallStatus(getResources().getString(R.string.app_install_fail));
-            decTask();
-            if (mTaskNumber <= 0) {
-                notifyChanged();
+        }, new Consumer() {
+            @Override
+            public void accept(@NonNull Object o) throws Exception {
             }
-            stopUpdate();
-        }
+        }, null);
     }
 
     @OnClick(R.id.install_all_app_btn)
     void installAllApp(View v) {
-        new Thread(mInstallAppRunnable).start();
-        startUpdate();
-    }
-
-    class ViewHolder {
-        @BindView(R.id.install_rl)
-        RelativeLayout mInstallRl;
-        @BindView(R.id.install_chk)
-        CheckBox checkBox;
-        @BindView(R.id.install_app_ic)
-        ImageView icon;
-        @BindView(R.id.install_app_name)
-        CustomTextView name;
-        @BindView(R.id.install_app_status)
-        CustomTextView installStatus;
-        @BindView(R.id.install_start_btn)
-        Button start;
+        startInstallApp(mListApkInfo);
     }
 
     private void notifyChanged() {
@@ -215,53 +187,9 @@ public class InstallAppFragment extends BaseFragment {
         });
     }
 
-    private View initItemView(final int position, View convertView) {
-        final ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = View.inflate(mContext, R.layout.item_install_app, null);
-            viewHolder = new ViewHolder();
-            ButterKnife.bind(viewHolder, convertView);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-        final AppInfoEntity item = mListApkInfor.get(position);
-        viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mListApkInfor.get(position).setChecked(isChecked);
-            }
-        });
-
-        viewHolder.mInstallRl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isChecked = !mListApkInfor.get(position).isChecked();
-                mListApkInfor.get(position).setChecked(isChecked);
-                viewHolder.checkBox.setChecked(isChecked);
-            }
-        });
-
-        viewHolder.start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                installApp(position, false);
-                startUpdate();
-            }
-        });
-        viewHolder.checkBox.setChecked(item.isChecked());
-        viewHolder.icon.setImageDrawable(item.getAppIcon());
-        viewHolder.name.setText(item.getAppLabel());
-        viewHolder.installStatus.setText(item.getInstallStatus());
-        return convertView;
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mThread != null) {
-            mThread.interrupt();
-        }
         mHandler.removeCallbacksAndMessages(null);
     }
 }

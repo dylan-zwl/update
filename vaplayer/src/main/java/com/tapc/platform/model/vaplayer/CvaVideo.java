@@ -79,11 +79,9 @@ public class CvaVideo {
         int Size;
         int Frame;
         boolean Result = false;
-        if (!checkLevelid(levelID))
-            return Result;
+        if (!checkLevelid(levelID)) return Result;
         Size = mLevelMap.get(levelID).size();
-        if ((SearchIndex < 0) || (SearchIndex >= Size))
-            return Result;
+        if ((SearchIndex < 0) || (SearchIndex >= Size)) return Result;
         Frame = mLevelMap.get(levelID).get(SearchIndex).GetFrame();
         if (CurrentFrame >= Frame) {
             Result = true;
@@ -95,8 +93,7 @@ public class CvaVideo {
         int Size;
         int Frame;
         boolean Result = false;
-        if (!checkLevelid(levelID))
-            return Result;
+        if (!checkLevelid(levelID)) return Result;
         Size = mLevelMap.get(levelID).size();
         for (int i = 0; i < Size; i++) {
             Frame = mLevelMap.get(levelID).get(i).GetFrame();
@@ -112,11 +109,9 @@ public class CvaVideo {
     public boolean findNextIncline(int SearchIndex) {
         int Size;
 
-        if (!checkLevelid(levelID))
-            return false;
+        if (!checkLevelid(levelID)) return false;
         Size = mLevelMap.get(levelID).size();
-        if ((SearchIndex < 0) || (SearchIndex >= Size))
-            return false;
+        if ((SearchIndex < 0) || (SearchIndex >= Size)) return false;
 
         for (int i = SearchIndex; i < Size; i++) {
             if (mLevelMap.get(levelID).get(i).GetIncline() != CvaEvent.INVALID_EVENT_VALUE) {
@@ -130,11 +125,9 @@ public class CvaVideo {
     public boolean findNextResistance(int SearchIndex) {
         int Size;
 
-        if (!checkLevelid(levelID))
-            return false;
+        if (!checkLevelid(levelID)) return false;
         Size = mLevelMap.get(levelID).size();
-        if ((SearchIndex < 0) || (SearchIndex >= Size))
-            return false;
+        if ((SearchIndex < 0) || (SearchIndex >= Size)) return false;
 
         for (int i = SearchIndex; i < Size; i++) {
             if (mLevelMap.get(levelID).get(i).GetResistance() != CvaEvent.INVALID_EVENT_VALUE) {
@@ -146,14 +139,12 @@ public class CvaVideo {
     }
 
     public boolean checkLevelid(int Level) {
-        if (!mLevelMap.containsKey(Level))
-            return false;
+        if (!mLevelMap.containsKey(Level)) return false;
         return true;
     }
 
     public boolean setLevel(int Level) {
-        if (!mLevelMap.containsKey(Level))
-            return false;
+        if (!mLevelMap.containsKey(Level)) return false;
         levelID = Level;
         return true;
     }
@@ -168,14 +159,10 @@ public class CvaVideo {
 
     public int getEventCount() {
         for (int i = 0; i < mLevelMap.get(levelID).size(); i++) {
-            Log.d("ObjectEvent", " Frame:"
-                    + mLevelMap.get(levelID).get(i).GetFrame() + " Resistance:"
-                    + mLevelMap.get(levelID).get(i).GetResistance()
-                    + " Incline:" + mLevelMap.get(levelID).get(i).GetIncline()
-                    + " FileNameStringID:"
-                    + mLevelMap.get(levelID).get(i).GetFileNameID()
-                    + " MessageStringID:"
-                    + mLevelMap.get(levelID).get(i).GetMessageID());
+            Log.d("ObjectEvent", " Frame:" + mLevelMap.get(levelID).get(i).GetFrame() + " Resistance:" + mLevelMap
+                    .get(levelID).get(i).GetResistance() + " Incline:" + mLevelMap.get(levelID).get(i).GetIncline() +
+                    " FileNameStringID:" + mLevelMap.get(levelID).get(i).GetFileNameID() + " MessageStringID:" +
+                    mLevelMap.get(levelID).get(i).GetMessageID());
         }
         return mLevelMap.get(levelID).size();
     }
@@ -214,8 +201,7 @@ public class CvaVideo {
     }
 
     public String getEventString(int ID, VaLanguage Language) {
-        if (!mLanguageMap.containsKey(Language))
-            return "";
+        if (!mLanguageMap.containsKey(Language)) return "";
         return mLanguageMap.get(Language).get(ID);
     }
 

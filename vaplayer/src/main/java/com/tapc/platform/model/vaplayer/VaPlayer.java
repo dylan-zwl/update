@@ -4,6 +4,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -91,14 +92,13 @@ public class VaPlayer {
     private void playVideo(int VideoIndex) {
         try {
             isCanSetVideo = false;
-            String EvtFile = mNowVaPlayVideo.getPath() + "/" + mNowVaPlayVideo.evtList.get(VideoIndex);
+            String EvtFile = mNowVaPlayVideo.getPath() + "/" + mNowVaPlayVideo.getEvtList().get(VideoIndex);
             InputStream EvtInputStream = new FileInputStream(EvtFile);
             CvaFactory cvafactory = new CvaFactory();
             CvaVideo video = new CvaVideo();
             String videoDirectory = EvtFile.substring(0, EvtFile.lastIndexOf("/") + 1);
             video.setPath(videoDirectory);
-            cvafactory.DeserializeVideo(EvtInputStream,
-                    EvtInputStream.available(), video);
+            cvafactory.DeserializeVideo(EvtInputStream, EvtInputStream.available(), video);
             EvtInputStream.close();
             video.setLevel(mLevelID);
             if (mMediaPlayer == null) {
@@ -112,7 +112,7 @@ public class VaPlayer {
                         mCurrentPosition = -1;
                         if (PlayFlag) {
                             mVideoIndex++;
-                            if (mVideoIndex < mNowVaPlayVideo.evtList.size()) {
+                            if (mVideoIndex < mNowVaPlayVideo.getEvtList().size()) {
                                 playVideo(mVideoIndex);
                             } else {
                                 mVideoIndex = 0;
@@ -126,7 +126,7 @@ public class VaPlayer {
                     @Override
                     public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
                         releaseMediaPlayer();
-                        String error = "Play " + mNowVaPlayVideo.evtList.get(mVideoIndex) + " error";
+                        String error = "Play " + mNowVaPlayVideo.getEvtList().get(mVideoIndex) + " error";
                         Log.d("mMediaPlayer", error);
                         if (mListener != null) {
                             mListener.error(error);
@@ -312,7 +312,7 @@ public class VaPlayer {
         }
     }
 
-    public void start(PlayEntity vaPlay) {
+    public void start(@NonNull PlayEntity vaPlay) {
         stopVoiceThread();
         PlayFlag = true;
         mNowVaPlayVideo = vaPlay;
@@ -341,6 +341,13 @@ public class VaPlayer {
             playerPause(mMediaPlayer, PlayFlag);
             playerPause(mVoicePlayer, PlayFlag);
             playerPause(mBackMusic, PlayFlag);
+        }
+    }
+
+    public void setSurfaceHolder(SurfaceHolder surfaceHolder) {
+        if (mMediaPlayer != null) {
+            mSurfaceHolder = surfaceHolder;
+            mMediaPlayer.setDisplay(surfaceHolder);
         }
     }
 
@@ -429,8 +436,8 @@ public class VaPlayer {
                 if (mCurrentPosition != -1) {
                     SystemClock.sleep(2000);
                 }
-                int CurrentFrame = (int) (((double) mMediaPlayer
-                        .getCurrentPosition() * video.getFramesPerSecondx1000()) / 1000000);
+                int CurrentFrame = (int) (((double) mMediaPlayer.getCurrentPosition() * video.getFramesPerSecondx1000
+                        ()) / 1000000);
                 if (video.findPreviousValueEventIndex(CurrentFrame)) {
                     if (mCurrentPosition != -1) {
                         while (video.searchIndex >= 1) {
@@ -452,8 +459,7 @@ public class VaPlayer {
                                 .getFramesPerSecondx1000()) / 1000000);
                         // Log.d("video CurrentPosition",
                         // "" + mMediaPlayer.getCurrentPosition() / 1000);
-                        if (video.findNextEventFrame(CurrentFrame,
-                                video.searchIndex)) {
+                        if (video.findNextEventFrame(CurrentFrame, video.searchIndex)) {
                             // Log.d("FindNextEventFrame", "SearchIndex: "
                             // + video.searchIndex + " CurrentFrame: "
                             // + CurrentFrame + " frame: "

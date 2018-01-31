@@ -134,12 +134,12 @@ public class ReceiveDataHandler extends Observable implements IReceiveDataHandle
         Commands cmd = Commands.getCommandForID(ReceivedCommand);
 
         if (cmd == Commands.NULL) {
-            Log.d(this.toString(), "ERROR PACKET DUMPING START\n");
-            //ERROR MESSAGE RECEIVED, SHOW UNKNOWN COMMAND
-            for (byte b : Uart_RxBUff)
-                Log.d(this.toString(), "ERROR PACKET BYTE DUMPING: " + b + "\n");
-
-            Log.d(this.toString(), "ERROR PACKET DUMPING FINISH\n");
+//            Log.d(this.toString(), "ERROR PACKET DUMPING START\n");
+//            //ERROR MESSAGE RECEIVED, SHOW UNKNOWN COMMAND
+//            for (byte b : Uart_RxBUff)
+//                Log.d(this.toString(), "ERROR PACKET BYTE DUMPING: " + b + "\n");
+//
+//            Log.d(this.toString(), "ERROR PACKET DUMPING FINISH\n");
 
             return;
         }

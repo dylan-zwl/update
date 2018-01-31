@@ -8,10 +8,10 @@ public class AppInfoEntity {
     private Drawable appIcon;
     private Intent intent;
     private String pkgName;
-    private String path;
     private int type;
-    private boolean isSystemApp;
-    private boolean isChecked;
+    private boolean systemApp;
+    private boolean checked;
+    private String path;
     private String installStatus;
 
     public int getType() {
@@ -23,6 +23,14 @@ public class AppInfoEntity {
     }
 
     public AppInfoEntity() {
+    }
+
+    public String getAppLabel() {
+        return appLabel;
+    }
+
+    public void setAppLabel(String appLabel) {
+        this.appLabel = appLabel;
     }
 
     public Drawable getAppIcon() {
@@ -49,43 +57,35 @@ public class AppInfoEntity {
         this.pkgName = pkgName;
     }
 
-    public boolean isSystemApp() {
-        return isSystemApp;
-    }
-
     public void setSystemApp(boolean systemApp) {
-        isSystemApp = systemApp;
+        this.systemApp = systemApp;
     }
 
-    public boolean isChecked() {
-        return isChecked;
+    public boolean isSystemApp() {
+        return systemApp;
     }
 
     public void setChecked(boolean checked) {
-        isChecked = checked;
-    }
-
-    public String getInstallStatus() {
-        return installStatus;
-    }
-
-    public void setInstallStatus(String installStatus) {
-        this.installStatus = installStatus;
-    }
-
-    public String getPath() {
-        return path;
+        this.checked = checked;
     }
 
     public void setPath(String path) {
         this.path = path;
     }
 
-    public void setAppLabel(String appLabel) {
-        this.appLabel = appLabel;
+    public String getPath() {
+        return path;
     }
 
-    public String getAppLabel() {
-        return appLabel;
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setInstallStatus(String installStatus) {
+        this.installStatus = installStatus;
+    }
+
+    public String getInstallStatus() {
+        return installStatus;
     }
 }

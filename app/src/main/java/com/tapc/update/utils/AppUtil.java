@@ -12,6 +12,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.RemoteException;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -21,6 +22,8 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 
@@ -44,6 +47,10 @@ public class AppUtil {
         }
     }
 
+    public interface ProgressListener {
+        void onCompleted(boolean isSuccessed, String message);
+    }
+
     /**
      * 安装apk
      *
@@ -56,6 +63,37 @@ public class AppUtil {
         intent.setAction(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         context.startActivity(intent);
+    }
+
+    public static void installApk(Context context, final File file, final ProgressListener listener) {
+        try {
+            final CountDownLatch countDownLatch = new CountDownLatch(1);
+            Uri uri = Uri.fromFile(file);
+            PackageManager pm = context.getPackageManager();
+            pm.installPackage(uri, new IPackageInstallObserver.Stub() {
+                @Override
+                public void packageInstalled(String s, int i) throws RemoteException {
+                    if (listener != null) {
+                        if (i == 1) {
+                            listener.onCompleted(true, "");
+                        } else {
+                            listener.onCompleted(false, s);
+                        }
+                    }
+                    countDownLatch.countDown();
+                }
+            }, PackageManager.INSTALL_REPLACE_EXISTING, file.getAbsolutePath());
+            try {
+                boolean result = countDownLatch.await(180, TimeUnit.SECONDS);
+                if (!result) {
+                    listener.onCompleted(false, "time out");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            listener.onCompleted(false, e.getMessage());
+        }
     }
 
     public static boolean installApk(Context context, File file, IPackageInstallObserver.Stub observer) {
@@ -75,6 +113,36 @@ public class AppUtil {
         intent.setAction(Intent.ACTION_DELETE);
         intent.setData(Uri.parse("package:" + pkgName));
         context.startActivity(intent);
+    }
+
+    public static void unInstallApk(Context context, String pkgName, final ProgressListener listener) {
+        try {
+            final CountDownLatch countDownLatch = new CountDownLatch(1);
+            PackageManager pm = context.getPackageManager();
+            pm.deletePackage(pkgName, new IPackageDeleteObserver.Stub() {
+                @Override
+                public void packageDeleted(String s, int i) throws RemoteException {
+                    if (listener != null) {
+                        if (i == 1) {
+                            listener.onCompleted(true, "");
+                        } else {
+                            listener.onCompleted(false, s);
+                        }
+                    }
+                    countDownLatch.countDown();
+                }
+            }, 0);
+            try {
+                boolean result = countDownLatch.await(180, TimeUnit.SECONDS);
+                if (!result) {
+                    listener.onCompleted(false, "time out");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            listener.onCompleted(false, e.getMessage());
+        }
     }
 
     public static boolean unInstallApk(Context context, String pkgName, IPackageDeleteObserver.Stub observer) {

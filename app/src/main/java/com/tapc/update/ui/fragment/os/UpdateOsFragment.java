@@ -7,9 +7,9 @@ import android.widget.TextView;
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
 import com.tapc.update.ui.fragment.BaseFragment;
-import com.tapc.update.ui.update.OsPresenter;
-import com.tapc.update.ui.update.UpdateConttract;
-import com.tapc.update.ui.update.UpdateInfor;
+import com.tapc.update.ui.presenter.OsPresenter;
+import com.tapc.update.ui.presenter.UpdateConttract;
+import com.tapc.update.ui.presenter.UpdateInfor;
 import com.tapc.update.ui.view.UpdateItem;
 import com.tapc.update.utils.ShowInforUtil;
 

@@ -13,8 +13,8 @@ public class CvaFactory {
 
     public static int bytesToInt(byte[] ary, int offset) {
         int value;
-        value = (int) ((ary[offset] & 0xFF) | ((ary[offset + 1] << 8) & 0xFF00)
-                | ((ary[offset + 2] << 16) & 0xFF0000) | ((ary[offset + 3] << 24) & 0xFF000000));
+        value = (int) ((ary[offset] & 0xFF) | ((ary[offset + 1] << 8) & 0xFF00) | ((ary[offset + 2] << 16) &
+                0xFF0000) | ((ary[offset + 3] << 24) & 0xFF000000));
         return value;
     }
 
@@ -36,8 +36,7 @@ public class CvaFactory {
         return object;
     }
 
-    public boolean DeserializeVideo(InputStream inputStream, int BufferSize,
-                                    CvaVideo Video) {
+    public boolean DeserializeVideo(InputStream inputStream, int BufferSize, CvaVideo Video) {
         ObjectSize objectSize = new ObjectSize();
         ObjectHeader pObject = new ObjectHeader();
         ObjectString pObjectString = new ObjectString();
@@ -57,11 +56,8 @@ public class CvaFactory {
                         Video.setFramesPerSecondx1000(pObjectVideo.FramesPerSecondx1000);
                         break;
                     case OBJECT_ID_STRING:
-                        pObjectString.setDate(inputStream, pObject.Size
-                                - objectSize.HeaderSize, objectSize.StringSize);
-                        Video.addEventString(pObjectString.MsgString,
-                                pObjectString.StringID,
-                                pObjectString.LanguageID);
+                        pObjectString.setDate(inputStream, pObject.Size - objectSize.HeaderSize, objectSize.StringSize);
+                        Video.addEventString(pObjectString.MsgString, pObjectString.StringID, pObjectString.LanguageID);
                         break;
                     case OBJECT_ID_LEVEL:
                         pObjectLevel.setDate(inputStream, objectSize.LevelSize);
@@ -128,8 +124,7 @@ public class CvaFactory {
                 StringID = bytesToInt(Buffer, 0);
                 LanguageID = bytesToInt(Buffer, 4);
                 Type = bytesToInt(Buffer, 8);
-                MsgString = new String(Buffer, objectSize, size - objectSize)
-                        .trim();
+                MsgString = new String(Buffer, objectSize, size - objectSize).trim();
                 // Log.d("ObjectString", "StringID:" + StringID + " LanguageID:"
                 // + LanguageID + " Type:" + Type + " MsgString:"
                 // + MsgString);

@@ -22,7 +22,8 @@ import com.tapc.platform.model.vaplayer.VaPlayer;
 import com.tapc.platform.model.vaplayer.ValUtil;
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
-import com.tapc.update.ui.adpater.GalleryAdapter;
+import com.tapc.update.ui.adpater.VaAdapter;
+import com.tapc.update.ui.base.BaseRecyclerViewAdapter;
 import com.tapc.update.ui.fragment.BaseFragment;
 import com.tapc.update.ui.view.UpdateItem;
 import com.tapc.update.utils.CopyFileUtil;
@@ -172,24 +173,26 @@ public class VaCopyFragment extends BaseFragment {
     private boolean check(String originFile, String targetFile) {
         File listFile = new File(originFile);
         final String[] file = listFile.list();
-        File temp = null;
-        for (int i = 0; i < file.length; i++) {
-            if (originFile.endsWith(File.separator)) {
-                temp = new File(originFile + file[i]);
-            } else {
-                temp = new File(originFile + File.separator + file[i]);
-            }
-            if (temp.isFile()) {
-                File checkFile = new File(targetFile + "/" + (temp.getName()).toString());
-                if (checkFile.exists()) {
-                    if (checkFile.length() == temp.length()) {
-                        return true;
-                    }
+        if (file != null && file.length > 0) {
+            File temp = null;
+            for (int i = 0; i < file.length; i++) {
+                if (originFile.endsWith(File.separator)) {
+                    temp = new File(originFile + file[i]);
+                } else {
+                    temp = new File(originFile + File.separator + file[i]);
                 }
-                Log.d("check file fail:", "" + checkFile.getAbsoluteFile());
-                return false;
-            } else if (temp.isDirectory()) {
-                return check(originFile + "/" + file[i], targetFile + "/" + file[i]);
+                if (temp.isFile()) {
+                    File checkFile = new File(targetFile + "/" + (temp.getName()).toString());
+                    if (checkFile.exists()) {
+                        if (checkFile.length() == temp.length()) {
+                            return true;
+                        }
+                    }
+                    Log.d("check file fail:", "" + checkFile.getAbsoluteFile());
+                    return false;
+                } else if (temp.isDirectory()) {
+                    return check(originFile + "/" + file[i], targetFile + "/" + file[i]);
+                }
             }
         }
         return true;
@@ -258,22 +261,22 @@ public class VaCopyFragment extends BaseFragment {
     SeekBar mPlayProgress;
 
     private ArrayList<PlayEntity> mPlayList;
-    private GalleryAdapter mGalleryAdapter;
+    private VaAdapter mVaAdapter;
     private Disposable mDisposable;
 
     private void initPlayView(Context context) {
-        if (mGalleryAdapter == null) {
+        if (mVaAdapter == null) {
             LinearLayoutManager manager = new LinearLayoutManager(context);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             mRecyclerView.setLayoutManager(manager);
-            mGalleryAdapter = new GalleryAdapter(context, mPlayList);
-            mGalleryAdapter.setOnItemClickListener(new GalleryAdapter.OnItemClickListener<PlayEntity>() {
+            mVaAdapter = new VaAdapter(mPlayList);
+            mVaAdapter.setOnItemClickListener(new BaseRecyclerViewAdapter.OnItemClickListener<PlayEntity>() {
                 @Override
                 public void onItemClick(View view, PlayEntity playEntity) {
-                    startPlay(playEntity);
+
                 }
             });
-            mRecyclerView.setAdapter(mGalleryAdapter);
+            mRecyclerView.setAdapter(mVaAdapter);
             mPlayProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -309,7 +312,7 @@ public class VaCopyFragment extends BaseFragment {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mGalleryAdapter.notifyDataSetChanged(mPlayList);
+                mVaAdapter.notifyDataSetChanged(mPlayList);
             }
         });
     }

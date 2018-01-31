@@ -29,7 +29,6 @@ buildscript {
         gradle.projectsEvaluated {
             tasks.withType(JavaCompile) {
                 options.compilerArgs.add('-Xbootclasspath/p:app\\src\\libs\\classes-full-3188.jar')
-//            options.compilerArgs.add('-Xbootclasspath/p:app\\src\\libs\\classes-full-8935.jar')
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.tapc.update.utils;
 
+import android.text.TextUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -45,6 +47,15 @@ public class FileUtil {
             return list[0];
         }
         return null;
+    }
+
+    //筛选文件
+    public static String[] getFiles(String path, FilenameFilter filter) {
+        if (TextUtils.isEmpty(path)) {
+            return null;
+        }
+        File files = new File(path);
+        return files.list(filter);
     }
 
     public static void copyFile(String oldPath, String newPath, ProgressCallback callback) {

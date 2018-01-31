@@ -13,12 +13,11 @@ import android.widget.LinearLayout;
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
 import com.tapc.update.application.TapcApp;
-import com.tapc.update.ui.update.AppPresenter;
-import com.tapc.update.ui.update.DownloadPresenter;
-import com.tapc.update.ui.update.McuPresenter;
-import com.tapc.update.ui.update.OsPresenter;
-import com.tapc.update.ui.update.UpdateConttract;
-import com.tapc.update.ui.update.UpdateInfor;
+import com.tapc.update.ui.presenter.AppPresenter;
+import com.tapc.update.ui.presenter.McuPresenter;
+import com.tapc.update.ui.presenter.OsPresenter;
+import com.tapc.update.ui.presenter.UpdateConttract;
+import com.tapc.update.ui.presenter.UpdateInfor;
 import com.tapc.update.ui.view.CustomTextView;
 import com.tapc.update.ui.widget.UpdateProgress;
 import com.tapc.update.utils.FileUtil;
@@ -55,7 +54,6 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
     private AppPresenter mAppPresenter;
     private McuPresenter mMcuPresenter;
     private OsPresenter mOsPresenter;
-    private DownloadPresenter mDownloadPresenter;
 
     private UpdateInfor mUpdateInfor;
 
@@ -113,47 +111,47 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
         mProgress.setListener(this);
         switch (mUpdateInfor.getFileType()) {
             case APP:
-                mAppPresenter = new AppPresenter(mContext, new UpdateConttract.View() {
-                    @Override
-                    public void updateProgress(int percent, String msg) {
-
-                    }
-
-                    @Override
-                    public void updateCompleted(final boolean isSuccess, final String msg) {
-                        String configPath = mUpdateFilePath + "/" + Config.APP_CONFIG_NAME;
-                        if (!TextUtils.isEmpty(configPath) && new File(configPath).exists() && isSuccess) {
-                            String appConfigPath = Config.APP_CONFIG_PATH + "/" + Config.APP_CONFIG_NAME;
-                            FileUtil.copyFile(configPath, appConfigPath, new FileUtil.ProgressCallback() {
-                                @Override
-                                public void onProgress(int progress) {
-
-                                }
-
-                                @Override
-                                public void onCompeleted(boolean isSuccessd, String msg) {
-                                    boolean isConfigCopyResult = isSuccessd;
-                                    String showMsg = msg;
-                                    if (!isSuccessd) {
-                                        showMsg = msg + "," + getString(R.string.app_config) + getString(R
-                                                .string.copy) + getString(R.string.failed);
-                                    }
-                                    String text = ShowInforUtil.getInforText(mContext, "APP", getString(R
-                                            .string.update), isSuccess && isConfigCopyResult, showMsg);
-                                    addInforShow(text);
-                                    decTask();
-                                    stopUpdate(isSuccess && isConfigCopyResult);
-                                }
-                            });
-                        } else {
-                            String text = ShowInforUtil.getInforText(mContext, "APP", getString(R.string.update),
-                                    isSuccess, msg);
-                            addInforShow(text);
-                            decTask();
-                            stopUpdate(isSuccess);
-                        }
-                    }
-                });
+//                mAppPresenter = new UpdatePresenter(mContext, new UpdateConttract.View() {
+//                    @Override
+//                    public void updateProgress(int percent, String msg) {
+//
+//                    }
+//
+//                    @Override
+//                    public void updateCompleted(final boolean isSuccess, final String msg) {
+//                        String configPath = mUpdateFilePath + "/" + Config.APP_CONFIG_NAME;
+//                        if (!TextUtils.isEmpty(configPath) && new File(configPath).exists() && isSuccess) {
+//                            String appConfigPath = Config.APP_CONFIG_PATH + "/" + Config.APP_CONFIG_NAME;
+//                            FileUtil.copyFile(configPath, appConfigPath, new FileUtil.ProgressCallback() {
+//                                @Override
+//                                public void onProgress(int progress) {
+//
+//                                }
+//
+//                                @Override
+//                                public void onCompeleted(boolean isSuccessd, String msg) {
+//                                    boolean isConfigCopyResult = isSuccessd;
+//                                    String showMsg = msg;
+//                                    if (!isSuccessd) {
+//                                        showMsg = msg + "," + getString(R.string.app_config) + getString(R
+//                                                .string.copy) + getString(R.string.failed);
+//                                    }
+//                                    String text = ShowInforUtil.getInforText(mContext, "APP", getString(R
+//                                            .string.update), isSuccess && isConfigCopyResult, showMsg);
+//                                    addInforShow(text);
+//                                    decTask();
+//                                    stopUpdate(isSuccess && isConfigCopyResult);
+//                                }
+//                            });
+//                        } else {
+//                            String text = ShowInforUtil.getInforText(mContext, "APP", getString(R.string.update),
+//                                    isSuccess, msg);
+//                            addInforShow(text);
+//                            decTask();
+//                            stopUpdate(isSuccess);
+//                        }
+//                    }
+//                });
                 mMcuPresenter = new McuPresenter(mContext, new UpdateConttract.View() {
                     @Override
                     public void updateProgress(int percent, String msg) {
@@ -188,19 +186,19 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
                 break;
         }
 
-        mDownloadPresenter = new DownloadPresenter(mContext, new UpdateConttract.View() {
-            @Override
-            public void updateProgress(int percent, String msg) {
-                updateProgressUi(percent);
-            }
-
-            @Override
-            public void updateCompleted(boolean isSuccess, String msg) {
-                String text = ShowInforUtil.getInforText(mContext, getString(R.string.download), "", isSuccess, msg);
-                addInforShow(text);
-                startUpdateThead();
-            }
-        });
+//        mDownloadPresenter = new DownloadPresenter(mContext, new UpdateConttract.View() {
+//            @Override
+//            public void updateProgress(int percent, String msg) {
+//                updateProgressUi(percent);
+//            }
+//
+//            @Override
+//            public void updateCompleted(boolean isSuccess, String msg) {
+//                String text = ShowInforUtil.getInforText(mContext, getString(R.string.download), "", isSuccess, msg);
+//                addInforShow(text);
+//                startUpdateThead();
+//            }
+//        });
 
         startUpdate();
     }
@@ -242,7 +240,7 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mDownloadPresenter.update(updateInfor);
+//                mDownloadPresenter.update(updateInfor);
             }
         }).start();
     }

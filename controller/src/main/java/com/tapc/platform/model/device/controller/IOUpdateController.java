@@ -34,9 +34,9 @@ public class IOUpdateController extends GenericMessageHandler {
 
     public int updateIO(String filepath, IOUpdateListener listener) {
         mListener = listener;
-        if (mUpdateHelper.getLastUpdateStatus() == UpdateStatus.IN_PROGRESS) {
-            throw new RuntimeException("Another update is already in progress.");
-        }
+//        if (mUpdateHelper.getLastUpdateStatus() == UpdateStatus.IN_PROGRESS) {
+//            throw new RuntimeException("Another update is already in progress.");
+//        }
 
         mUpdateThread = new Thread(mUpdateHelper.setBinaryPath(filepath));
 

@@ -2,47 +2,61 @@ package com.tapc.update.ui.widget;
 
 import android.content.Context;
 import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
+import android.view.WindowManager;
 
+import com.tapc.platform.jni.Driver;
 import com.tapc.update.R;
-import com.tapc.update.application.TapcApp;
-import com.tapc.update.ui.adpater.BaseAppAdpater;
-import com.tapc.update.ui.entity.MenuInfor;
-import com.tapc.update.ui.view.CustomTextView;
+import com.tapc.update.ui.adpater.MenuInfoAdapter;
+import com.tapc.update.ui.base.BaseSystemView;
+import com.tapc.update.ui.entity.MenuInfo;
+import com.tapc.update.utils.WindowManagerUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
-public class MenuBar extends LinearLayout {
+public class MenuBar extends BaseSystemView {
     @BindView(R.id.infor_lv)
-    ListView mListView;
+    RecyclerView mListView;
 
-    private Context mContext;
-    private BaseAppAdpater mAdapter;
-    private List<MenuInfor> mInforList;
+    private MenuInfoAdapter mAdapter;
+    private List<MenuInfo> mInforList;
     private Handler mHandler = new Handler();
 
     public MenuBar(Context context) {
         super(context);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.widget_menu, this, true);
-        ButterKnife.bind(this);
-        mContext = context;
-        initView();
+    }
+
+    @Override
+    protected int getLayoutResID() {
+        return R.layout.widget_menu;
+    }
+
+    @Override
+    public WindowManager.LayoutParams getLayoutParams() {
+        int with = (int) getResources().getDimension(R.dimen.menu_w);
+        return WindowManagerUtils.getLayoutParams(0, 0, with, WindowManager.LayoutParams.MATCH_PARENT, Gravity.RIGHT
+                | Gravity.CENTER_HORIZONTAL);
+    }
+
+    @Override
+    protected void initView() {
+        super.initView();
+        mInforList = new ArrayList<>();
+        mAdapter = new MenuInfoAdapter(mInforList);
+        mListView.setLayoutManager(new LinearLayoutManager(mContext));
+        mListView.setAdapter(mAdapter);
     }
 
     @OnClick(R.id.menu_back)
     void backOnClick() {
-        TapcApp.getInstance().getKeyboardEvent().backEvent();
+        Driver.back();
     }
 
     @OnClick(R.id.menu_exit)
@@ -56,11 +70,11 @@ public class MenuBar extends LinearLayout {
         notifyDataSetChanged();
     }
 
-    public void addInfor(MenuInfor.inforType type, String text) {
-        MenuInfor menuInfor = new MenuInfor();
-        menuInfor.setInforType(type);
-        menuInfor.setText(text);
-        mInforList.add(menuInfor);
+    public void addInfor(MenuInfo.inforType type, String text) {
+        MenuInfo menuInfo = new MenuInfo();
+        menuInfo.setInforType(type);
+        menuInfo.setText(text);
+        mInforList.add(menuInfo);
         notifyDataSetChanged();
     }
 
@@ -71,40 +85,5 @@ public class MenuBar extends LinearLayout {
                 mAdapter.notifyDataSetChanged();
             }
         });
-    }
-
-    private void initView() {
-        mInforList = new ArrayList<>();
-        mAdapter = new BaseAppAdpater(mInforList, new BaseAppAdpater.Listener() {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                ViewHolder viewHolder;
-                if (convertView == null) {
-                    convertView = View.inflate(mContext, R.layout.item_infor, null);
-                    viewHolder = new ViewHolder();
-                    ButterKnife.bind(viewHolder, convertView);
-                    convertView.setTag(viewHolder);
-                } else {
-                    viewHolder = (ViewHolder) convertView.getTag();
-                }
-                MenuInfor item = mInforList.get(position);
-                switch (item.getInforType()) {
-                    case INFOR:
-                        viewHolder.text.setTextColor(mContext.getResources().getColor(R.color.tx_nomal3));
-                        break;
-                    case ERROR:
-                        viewHolder.text.setTextColor(mContext.getResources().getColor(R.color.tx_nomal5));
-                        break;
-                }
-                viewHolder.text.setText(item.getText());
-                return convertView;
-            }
-        });
-        mListView.setAdapter(mAdapter);
-    }
-
-    class ViewHolder {
-        @BindView(R.id.infor_text)
-        CustomTextView text;
     }
 }

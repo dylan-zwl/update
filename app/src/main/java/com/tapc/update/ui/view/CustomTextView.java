@@ -1,5 +1,6 @@
 package com.tapc.update.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
@@ -9,6 +10,7 @@ import android.widget.TextView;
  * Created by Administrator on 2017/3/20.
  */
 
+@SuppressLint("AppCompatCustomView")
 public class CustomTextView extends TextView {
     public CustomTextView(Context context, AttributeSet attrs) {
         super(context, attrs);

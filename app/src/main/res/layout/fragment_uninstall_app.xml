@@ -72,11 +72,11 @@
             android:background="@drawable/img_item_line"/>
     </RelativeLayout>
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/uninstall_app_lv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="15dp"
         android:divider="@null">
-    </ListView>
+    </android.support.v7.widget.RecyclerView>
 </LinearLayout>

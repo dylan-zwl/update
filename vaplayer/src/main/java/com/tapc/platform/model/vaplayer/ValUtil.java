@@ -33,11 +33,9 @@ public class ValUtil {
                 }
             });
 
-            if (Files != null) {
-                if (Files.length > 0) {
-                    for (int nums = 0; nums < Files.length; nums++) {
-                        fileList.add(Files[nums].getAbsolutePath());
-                    }
+            if (Files != null && Files.length > 0) {
+                for (int nums = 0; nums < Files.length; nums++) {
+                    fileList.add(Files[nums].getAbsolutePath());
                 }
                 Collections.sort(fileList);
                 for (String FileDiretory : fileList) {
@@ -48,10 +46,10 @@ public class ValUtil {
                     PlayEntity vaPlayList = new PlayEntity();
                     vaPlayList = mvaPlayListAnalysis.getvaInfor(PlayListxml);
                     vaPlayList.setPath(path);
-                    Log.d("PlayList", " name:" + vaPlayList.name + " description:" + vaPlayList.description
-                            + " location:" + vaPlayList.location + " still:" + vaPlayList.still + " uniqueid:"
-                            + vaPlayList.uniqueid);
-                    for (String Evtstr : vaPlayList.evtList) {
+                    Log.d("PlayList", " name:" + vaPlayList.getName() + " description:" + vaPlayList.getDescription()
+                            + " location:" + vaPlayList.getLocation() + " still:" + vaPlayList.getStill() + " " +
+                            "uniqueid:" + vaPlayList.getUniqueid());
+                    for (String Evtstr : vaPlayList.getEvtList()) {
                         Log.d("PlayList Evt", Evtstr);
                     }
                     list.add(vaPlayList);
@@ -62,7 +60,7 @@ public class ValUtil {
         }
         return list;
     }
-    
+
     public static VaInfor getvaInfor(InputStream xml) throws Exception {
         VaInfor mvaInfor = new VaInfor();
         XmlPullParser pullParser = Xml.newPullParser();

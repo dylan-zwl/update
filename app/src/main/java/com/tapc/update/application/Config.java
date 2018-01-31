@@ -22,7 +22,7 @@ public class Config {
     public static final String SAVEFILE_PATH = "tapc";
     public static final String UPDATE_APP_NAME = "update_app";
     public static final String UPDATE_OS_NAME = "update.zip";
-    public static final String INSTALL_APP_PATH = "app/";
+    public static final String INSTALL_APP_PATH = "third_app";
     public static final String APP_PACKGGE = "com.tapc.platform";
     public static final String APP_CONFIG_NAME = "config.xml";
     public static String APP_CONFIG_PATH;

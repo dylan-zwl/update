@@ -47,12 +47,12 @@
             android:background="#F2F2F2"
             android:padding="4dp">
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/infor_lv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-            </ListView>
+            </android.support.v7.widget.RecyclerView>
         </LinearLayout>
     </LinearLayout>
 

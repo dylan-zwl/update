@@ -67,7 +67,6 @@ public abstract class BaseFragment extends Fragment {
         super.onDestroy();
     }
 
-    protected int mTaskNumber;
 
     public void updateProgressUi(final int progress) {
         mHandler.post(new Runnable() {
@@ -79,39 +78,20 @@ public abstract class BaseFragment extends Fragment {
     }
 
     public void startUpdate() {
-        if (mTaskNumber > 0) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    TapcApp.getInstance().getUpdateProgress().setUpdateProgressVisibility(View.VISIBLE, false);
-                }
-            });
-        }
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                TapcApp.getInstance().getUpdateProgress().setUpdateProgressVisibility(View.VISIBLE, false);
+            }
+        });
     }
 
     public void stopUpdate() {
-        if (mTaskNumber <= 0) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    TapcApp.getInstance().getUpdateProgress().setUpdateProgressVisibility(View.GONE, false);
-                }
-            });
-        }
-    }
-
-    public void decTask() {
-        mTaskNumber--;
-        if (mTaskNumber < 0) {
-            mTaskNumber = 0;
-        }
-    }
-
-    public void incTask() {
-        mTaskNumber++;
-    }
-
-    public void setTask(int number) {
-        mTaskNumber = number;
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                TapcApp.getInstance().getUpdateProgress().setUpdateProgressVisibility(View.GONE, false);
+            }
+        });
     }
 }
