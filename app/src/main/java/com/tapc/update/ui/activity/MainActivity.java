@@ -13,14 +13,12 @@ import android.widget.FrameLayout;
 
 import com.tapc.update.R;
 import com.tapc.update.application.TapcApp;
-import com.tapc.update.ui.fragment.app.UpdateAppFragment;
-import com.tapc.update.ui.fragment.install.InstallAppFragment;
-import com.tapc.update.ui.fragment.os.UpdateOsFragment;
-import com.tapc.update.ui.fragment.uninstall.UninstallAppFragment;
-import com.tapc.update.ui.fragment.vacopy.VaCopyFragment;
+import com.tapc.update.ui.fragment.InstallAppFragment;
+import com.tapc.update.ui.fragment.UninstallAppFragment;
+import com.tapc.update.ui.fragment.UpdateAppFragment;
+import com.tapc.update.ui.fragment.UpdateOsFragment;
+import com.tapc.update.ui.fragment.VaCopyFragment;
 import com.tapc.update.ui.view.FunctionItem;
-
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,15 +41,9 @@ public class MainActivity extends FragmentActivity {
     FrameLayout mFragment;
 
     protected FragmentManager mFragmentManager;
-    private Map<Item, Fragment> mFragmentList;
     private Fragment mCurrentfragment;
 
     private Handler mHandler = new Handler();
-    private UpdateAppFragment mUpdateAppFragment;
-    private UpdateOsFragment mUpdateOsFragment;
-    private VaCopyFragment mVaCopyFragment;
-    private InstallAppFragment mInstallAppFragment;
-    private UninstallAppFragment mUninstallAppFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,21 +62,16 @@ public class MainActivity extends FragmentActivity {
         }, 1000);
 
         mFragmentManager = getSupportFragmentManager();
-//        mFragmentList = new HashMap<>();
-//        mFragmentList.put(Item.APP, new UpdateAppFragment());
-//        mFragmentList.put(Item.OS, new UpdateOsFragment());
-//        mFragmentList.put(Item.VACOPY, new VaCopyFragment());
-//        mFragmentList.put(Item.INSTALL, new InstallAppFragment());
-//        mFragmentList.put(Item.UNINSTALL, new UninstallAppFragment());
         setCheckedFunc(Item.APP);
+        TapcApp.getInstance().getService().getMenuBar().show();
     }
 
     private enum Item {
         APP,
-        OS,
         VACOPY,
         INSTALL,
         UNINSTALL,
+        OS,
         SETTING
     }
 
