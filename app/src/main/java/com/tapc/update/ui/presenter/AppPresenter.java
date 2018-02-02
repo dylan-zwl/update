@@ -7,8 +7,10 @@ import android.text.TextUtils;
 
 import com.tapc.update.R;
 import com.tapc.update.utils.AppUtil;
+import com.tapc.update.utils.FileUtil;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * Created by Administrator on 2017/3/17.
@@ -24,7 +26,23 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
     }
 
     @Override
-    public void update(final UpdateInfor updateInfor) {
+    public void update(String filePath) {
+        String appFileName = FileUtil.getFilename(filePath, new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                name = name.toLowerCase();
+                if (name.startsWith("app") && name.endsWith(".apk")) {
+                    return true;
+                }
+                return false;
+            }
+        });
+        final UpdateInfor updateInfor = new UpdateInfor();
+        updateInfor.setFileType(UpdateInfor.FileType.APP);
+        updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
+        updateInfor.setFileName(appFileName);
+        updateInfor.setPath(filePath);
+
         String fileName = updateInfor.getFileName();
         if (!TextUtils.isEmpty(fileName)) {
             final File file = new File(updateInfor.getPath(), fileName);

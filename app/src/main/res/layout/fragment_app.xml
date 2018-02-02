@@ -16,8 +16,7 @@
         android:id="@+id/update_app"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        UpdateItem:btn_tx="@string/update"
-        UpdateItem:title="@string/update_app_title">
+        UpdateItem:btn_tx="@string/update">
 
     </com.tapc.update.ui.view.UpdateItem>
 
@@ -25,8 +24,7 @@
         android:id="@+id/update_mcu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        UpdateItem:btn_tx="@string/update"
-        UpdateItem:title="@string/update_mcu_title">
+        UpdateItem:btn_tx="@string/update">
 
     </com.tapc.update.ui.view.UpdateItem>
 </LinearLayout>

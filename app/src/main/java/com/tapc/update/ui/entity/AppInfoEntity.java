@@ -13,6 +13,7 @@ public class AppInfoEntity {
     private boolean checked;
     private String path;
     private String installStatus;
+    private String version;
 
     public int getType() {
         return type;
@@ -87,5 +88,13 @@ public class AppInfoEntity {
 
     public String getInstallStatus() {
         return installStatus;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

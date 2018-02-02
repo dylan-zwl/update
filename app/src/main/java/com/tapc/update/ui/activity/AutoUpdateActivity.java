@@ -1,357 +1,255 @@
 package com.tapc.update.ui.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
-import com.tapc.update.application.TapcApp;
+import com.tapc.update.ui.base.BaseActivity;
+import com.tapc.update.ui.entity.AppInfoEntity;
 import com.tapc.update.ui.presenter.AppPresenter;
+import com.tapc.update.ui.presenter.CopyFilePresenter;
+import com.tapc.update.ui.presenter.InstallPresenter;
 import com.tapc.update.ui.presenter.McuPresenter;
-import com.tapc.update.ui.presenter.OsPresenter;
 import com.tapc.update.ui.presenter.UpdateConttract;
-import com.tapc.update.ui.presenter.UpdateInfor;
-import com.tapc.update.ui.view.CustomTextView;
-import com.tapc.update.ui.widget.UpdateProgress;
-import com.tapc.update.utils.FileUtil;
+import com.tapc.update.ui.presenter.VaPresenter;
+import com.tapc.update.ui.view.UpdateProgress;
+import com.tapc.update.utils.AppUtil;
+import com.tapc.update.utils.CopyFileUtils;
+import com.tapc.update.utils.RxjavaUtils;
 import com.tapc.update.utils.ShowInforUtil;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
- * Created by Administrator on 2017/7/19.
+ * Created by Administrator on 2018/2/1.
  */
 
-public class AutoUpdateActivity extends Activity implements UpdateProgress.Listener {
+public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.Listener {
     @BindView(R.id.auto_update_infor)
-    CustomTextView mInfor;
+    TextView mInfor;
     @BindView(R.id.auto_update_progress)
     UpdateProgress mProgress;
     @BindView(R.id.auto_update_exit)
     LinearLayout mLinearLayout;
 
-    private static String TAG;
+    private Disposable mDisposable;
+    private StringBuilder mStringBuilder;
+    private Handler mHandler;
     private Context mContext;
-    private Handler mHandler = new Handler();
+    private List<Boolean> mUpdateStatusList;
+
     private String mUpdateFilePath;
     boolean isCopySuccessed = false;
-    boolean isUpdateSuccess = false;
-    private StringBuilder stringBuilder;
-    private int mTaskNumber;
 
     private AppPresenter mAppPresenter;
     private McuPresenter mMcuPresenter;
-    private OsPresenter mOsPresenter;
-
-    private UpdateInfor mUpdateInfor;
+    private CopyFilePresenter mCopyFilePresenter;
+    private InstallPresenter mInstallPresenter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_auto_update);
-        ButterKnife.bind(this);
-        initView();
+    protected int getLayoutResID() {
+        return R.layout.activity_auto_update;
     }
 
-    private void initView() {
-        TAG = getClass().getName();
+    @Override
+    public void initView() {
         mContext = this;
-
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                TapcApp.getInstance().setMenuBarVisibility(false);
-            }
-        }, 1000);
-
-        Intent intent = getIntent();
-        if (intent != null) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                mUpdateInfor = (UpdateInfor) bundle.get("update_infor");
-            }
-        }
-
-        if (mUpdateInfor == null) {
-            String originFile = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + Config.UPDATE_APP_NAME + ".zip";
-            if (new File(originFile).exists()) {
-                mUpdateInfor = new UpdateInfor();
-                mUpdateInfor.setFileType(UpdateInfor.FileType.APP);
-                mUpdateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
-            } else {
-                String osFileName = Config.UPDATE_OS_NAME;
-                String osPath = Config.MOUNTED_PATH + Config.SAVEFILE_PATH;
-                if (new File(osPath, osFileName).exists()) {
-                    mUpdateInfor = new UpdateInfor();
-                    mUpdateInfor.setFileType(UpdateInfor.FileType.OS);
-                    mUpdateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
-                    mUpdateInfor.setPath(Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/");
-                    mUpdateInfor.setFileName(osFileName);
-                }
-            }
-        }
-        if (mUpdateInfor == null) {
-            addInforShow(getString(R.string.no_file));
-            stopUpdate(false);
-            return;
-        }
-
+        mStringBuilder = new StringBuilder();
+        mHandler = new Handler();
         mProgress.setListener(this);
-        switch (mUpdateInfor.getFileType()) {
-            case APP:
-//                mAppPresenter = new UpdatePresenter(mContext, new UpdateConttract.View() {
-//                    @Override
-//                    public void updateProgress(int percent, String msg) {
-//
-//                    }
-//
-//                    @Override
-//                    public void updateCompleted(final boolean isSuccess, final String msg) {
-//                        String configPath = mUpdateFilePath + "/" + Config.APP_CONFIG_NAME;
-//                        if (!TextUtils.isEmpty(configPath) && new File(configPath).exists() && isSuccess) {
-//                            String appConfigPath = Config.APP_CONFIG_PATH + "/" + Config.APP_CONFIG_NAME;
-//                            FileUtil.copyFile(configPath, appConfigPath, new FileUtil.ProgressCallback() {
-//                                @Override
-//                                public void onProgress(int progress) {
-//
-//                                }
-//
-//                                @Override
-//                                public void onCompeleted(boolean isSuccessd, String msg) {
-//                                    boolean isConfigCopyResult = isSuccessd;
-//                                    String showMsg = msg;
-//                                    if (!isSuccessd) {
-//                                        showMsg = msg + "," + getString(R.string.app_config) + getString(R
-//                                                .string.copy) + getString(R.string.failed);
-//                                    }
-//                                    String text = ShowInforUtil.getInforText(mContext, "APP", getString(R
-//                                            .string.update), isSuccess && isConfigCopyResult, showMsg);
-//                                    addInforShow(text);
-//                                    decTask();
-//                                    stopUpdate(isSuccess && isConfigCopyResult);
-//                                }
-//                            });
-//                        } else {
-//                            String text = ShowInforUtil.getInforText(mContext, "APP", getString(R.string.update),
-//                                    isSuccess, msg);
-//                            addInforShow(text);
-//                            decTask();
-//                            stopUpdate(isSuccess);
-//                        }
-//                    }
-//                });
-                mMcuPresenter = new McuPresenter(mContext, new UpdateConttract.View() {
-                    @Override
-                    public void updateProgress(int percent, String msg) {
-                        updateProgressUi(percent);
-                    }
+        mInstallPresenter = new InstallPresenter(mContext);
 
-                    @Override
-                    public void updateCompleted(boolean isSuccess, String msg) {
-                        String text = ShowInforUtil.getInforText(mContext, "MCU", getString(R.string.update), isSuccess,
-                                msg);
-                        addInforShow(text);
-                        decTask();
-                        stopUpdate(isSuccess);
-                    }
-                });
-                break;
-            case OS:
-                mOsPresenter = new OsPresenter(mContext, new UpdateConttract.View() {
-                    @Override
-                    public void updateProgress(int percent, String msg) {
-                        updateProgressUi(percent);
-                    }
-
-                    @Override
-                    public void updateCompleted(boolean isSuccess, String msg) {
-                        String text = ShowInforUtil.getInforText(mContext, "OS", getString(R.string.copy), isSuccess,
-                                msg);
-                        addInforShow(text);
-                        stopUpdate(isSuccess);
-                    }
-                });
-                break;
-        }
-
-//        mDownloadPresenter = new DownloadPresenter(mContext, new UpdateConttract.View() {
-//            @Override
-//            public void updateProgress(int percent, String msg) {
-//                updateProgressUi(percent);
-//            }
-//
-//            @Override
-//            public void updateCompleted(boolean isSuccess, String msg) {
-//                String text = ShowInforUtil.getInforText(mContext, getString(R.string.download), "", isSuccess, msg);
-//                addInforShow(text);
-//                startUpdateThead();
-//            }
-//        });
-
-        startUpdate();
+        startUpdateThead();
     }
 
-    private void startUpdate() {
-        if (mUpdateInfor == null) {
-            return;
-        }
-        mLinearLayout.setVisibility(View.GONE);
-        switch (mUpdateInfor.getUpdateType()) {
-            case NETWORK:
-                downloadUpdateFile(mUpdateInfor);
-                break;
-            case LOCAL:
-                startUpdateThead();
-                break;
-        }
+    private void initConfig() {
+//        Driver drive = new Driver();
+//        drive.initCom(Driver.UART_DEVICE_NAME_S700, 115200);
+//        initControl();
+    }
+
+    private void initControl() {
+//        SystemSettings systemSettings = new TreadmillSystemSettings();
+//        systemSettings.Load(this, null);
+//        AppSettings.setPlatform(CommonEnum.Platform.S700);
+//        AppSettings.setLoopbackMode(false);
+//        MachineController controller = MachineController.getInstance();
+//        controller.initController(this);
+//        controller.start();
+//        WorkOuting.getInstance().initWorkOuting(controller.getMachineOperateListener(), this);
     }
 
     private void startUpdateThead() {
-        new Thread(new Runnable() {
+        mDisposable = RxjavaUtils.create(new ObservableOnSubscribe<String>() {
             @Override
-            public void run() {
-                switch (mUpdateInfor.getFileType()) {
-                    case APP:
-                        startCopyUpdateFile();
-                        appStartUpdate();
-                        mcuStartUpdate();
+            public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
+                e.onNext("start");
+                mUpdateStatusList = new ArrayList<Boolean>();
+
+                //app 升级
+                startCopyUpdateFile();
+                appstartUpdateThead();
+                mcustartUpdateThead();
+
+                //第三方应用安装
+                String appPath = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/third_app";
+                List<AppInfoEntity> list = mInstallPresenter.getAppList(appPath);
+                if (list != null && list.size() > 0) {
+                    for (final AppInfoEntity appInfoEntity : list) {
+                        mInstallPresenter.installApp(appInfoEntity, true, new AppUtil.ProgressListener() {
+                            @Override
+                            public void onCompleted(boolean isSuccessed, String message) {
+                                addInforShow(appInfoEntity.getAppLabel(), getString(R.string.install), isSuccessed,
+                                        message);
+                                mUpdateStatusList.add(isSuccessed);
+                            }
+                        });
+                    }
+                }
+
+                String va = "va";
+                String originFile = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + va;
+                String targetFile = Config.IN_SD_FILE_PATH + Config.SAVEFILE_PATH + "/" + va;
+                File file = new File(originFile);
+                if (file.exists()) {
+                    VaPresenter vaPresenter = new VaPresenter();
+                    if (vaPresenter.check(originFile, targetFile)) {
+
+                        long startTime = System.currentTimeMillis();
+                        boolean result = new CopyFileUtils().copyFolder(originFile, targetFile, new CopyFileUtils
+                                .ProgressCallback() {
+                            @Override
+                            public void onProgress(int progress) {
+                                updateProgressUi(progress);
+                            }
+
+                            @Override
+                            public void onCompeleted(boolean isSuccessed, String msg) {
+                                addInforShow(getString(R.string.va), getString(R.string.copy), isSuccessed, msg);
+                            }
+                        });
+                        if (result) {
+                            result = new VaPresenter().check(originFile, targetFile);
+                        }
+                        mUpdateStatusList.add(result);
+
+                        long usetime = (System.currentTimeMillis() - startTime) / 1000;
+                        Log.d("copy progress", "  use time: " + usetime);
+                    } else {
+                        addInforShow(getString(R.string.va), getString(R.string.copy), true, "");
+                    }
+                }
+
+                e.onNext("finished");
+
+                e.onComplete();
+            }
+        }, new Consumer() {
+            @Override
+            public void accept(@NonNull Object o) throws Exception {
+                switch ((String) o) {
+                    case "start":
+                        mLinearLayout.setVisibility(View.GONE);
+                        mProgress.setProgressTxVisibility(true);
                         break;
-                    case OS:
-                        osStartUpdate();
+                    case "finished":
+                        mProgress.setUpdateStatus(checkUpdateStatus(mUpdateStatusList));
+                        mLinearLayout.setVisibility(View.VISIBLE);
                         break;
                 }
             }
-        }).start();
+        }, null);
     }
 
-    private void downloadUpdateFile(final UpdateInfor updateInfor) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-//                mDownloadPresenter.update(updateInfor);
-            }
-        }).start();
-    }
-
+    /**
+     * 功能描述 : 复制升级文件
+     */
     private void startCopyUpdateFile() {
         if (isCopySuccessed == false) {
-            String originFile = "";
-            switch (mUpdateInfor.getUpdateType()) {
-                case NETWORK:
-                    originFile = mUpdateInfor.getPath() + "/" + mUpdateInfor.getFileName() + ".zip";
-                    break;
-                case LOCAL:
-                    originFile = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + Config.UPDATE_APP_NAME + ".zip";
-                    break;
-            }
+            String originFile = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + Config.UPDATE_APP_NAME + ".zip";
             mUpdateFilePath = Config.IN_SD_FILE_PATH + "/" + Config.SAVEFILE_PATH + "/" + Config.UPDATE_APP_NAME;
-            isCopySuccessed = copyUpdateFile(originFile, mUpdateFilePath);
+            if (mCopyFilePresenter == null) {
+                mCopyFilePresenter = new CopyFilePresenter();
+            }
+            isCopySuccessed = mCopyFilePresenter.copyUpdateFile(originFile, mUpdateFilePath);
         }
     }
 
-    private void appStartUpdate() {
-        String appFileName = FileUtil.getFilename(mUpdateFilePath, new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if (name.startsWith("APP") && name.endsWith(".apk")) {
-                    return true;
+    private void appstartUpdateThead() {
+        if (mAppPresenter == null) {
+            mAppPresenter = new AppPresenter(mContext, new UpdateConttract.View() {
+                @Override
+                public void updateProgress(int percent, String msg) {
+
                 }
-                return false;
-            }
-        });
-        final UpdateInfor updateInfor = new UpdateInfor();
-        updateInfor.setFileType(UpdateInfor.FileType.APP);
-        updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
-        updateInfor.setFileName(appFileName);
-        updateInfor.setPath(mUpdateFilePath);
-        incTask();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mAppPresenter.update(updateInfor);
-            }
-        }).start();
-    }
 
-    private void mcuStartUpdate() {
-        String mcuFileName = FileUtil.getFilename(mUpdateFilePath, new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if (name.startsWith("ROM") && name.endsWith(".bin")) {
-                    return true;
+                @Override
+                public void updateCompleted(final boolean isSuccess, final String msg) {
+                    addInforShow(getString(R.string.app), getString(R.string.update), isSuccess, msg);
+                    mUpdateStatusList.add(isSuccess);
                 }
-                return false;
-            }
-        });
-        final UpdateInfor updateInfor = new UpdateInfor();
-        updateInfor.setFileType(UpdateInfor.FileType.MCU);
-        updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
-        updateInfor.setPath(mUpdateFilePath);
-        updateInfor.setFileName(mcuFileName);
-        incTask();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mMcuPresenter.update(updateInfor);
-            }
-        }).start();
-    }
-
-    private void osStartUpdate() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mOsPresenter.update(mUpdateInfor);
-            }
-        }).start();
-    }
-
-    private boolean copyUpdateFile(String originFile, String savePath) {
-        try {
-            if (TextUtils.isEmpty(originFile) || !new File(originFile).exists()) {
-                return false;
-            }
-            File saveFile = new File(savePath);
-            if (saveFile.exists()) {
-                FileUtil.RecursionDeleteFile(saveFile);
-            } else {
-                saveFile.mkdirs();
-            }
-
-            FileUtil.upZipFile(originFile, saveFile.getAbsolutePath());
-            return true;
-        } catch (Exception e) {
-            Log.d(TAG, "copy file : " + e.getMessage());
+            });
         }
-        return false;
+        mAppPresenter.update(mUpdateFilePath);
     }
 
-    private void addInforShow(String msg) {
-        if (stringBuilder == null) {
-            stringBuilder = new StringBuilder();
+    private void mcustartUpdateThead() {
+        if (mMcuPresenter == null) {
+            mMcuPresenter = new McuPresenter(mContext, new UpdateConttract.View() {
+                @Override
+                public void updateProgress(int percent, String msg) {
+                    updateProgressUi(percent);
+                }
+
+                @Override
+                public void updateCompleted(boolean isSuccess, String msg) {
+                    addInforShow(getString(R.string.mcu), getString(R.string.update), isSuccess, msg);
+                    mUpdateStatusList.add(isSuccess);
+                }
+            });
         }
-        stringBuilder.append(msg + "\n");
+        mMcuPresenter.update(mUpdateFilePath);
+    }
+
+    /**
+     * 功能描述 : 信息显示
+     *
+     * @param :
+     */
+    private void addInforShow(String title, String updateType, boolean isSuccess, String msg) {
+        String info = ShowInforUtil.getInforText(mContext, title, updateType, isSuccess, msg);
+        if (mStringBuilder == null) {
+            mStringBuilder = new StringBuilder();
+        }
+        mStringBuilder.append(info + "\n");
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mInfor.setText(stringBuilder.toString());
+                String text = mStringBuilder.toString();
+                if (text != null) {
+                    mInfor.setText(text);
+                }
             }
         });
     }
 
-    public void updateProgressUi(final int progress) {
+    private void updateProgressUi(final int progress) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -360,39 +258,34 @@ public class AutoUpdateActivity extends Activity implements UpdateProgress.Liste
         });
     }
 
-    public void stopUpdate(boolean isSuccess) {
-        if (isUpdateSuccess == true) {
-            isUpdateSuccess = isSuccess;
+    private boolean checkUpdateStatus(List<Boolean> list) {
+        for (boolean result : list) {
+            if (!result) {
+                return false;
+            }
         }
-        if (mTaskNumber <= 0) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mProgress.setUpdateStatus(isUpdateSuccess);
-                    mLinearLayout.setVisibility(View.VISIBLE);
-                }
-            });
-        }
-    }
-
-    public void decTask() {
-        mTaskNumber--;
-        if (mTaskNumber < 0) {
-            mTaskNumber = 0;
-        }
-    }
-
-    public void incTask() {
-        mTaskNumber++;
-    }
-
-    @OnClick(R.id.auto_update_exit)
-    void exit() {
-        finish();
+        return true;
     }
 
     @Override
     public void updateAgainOnClick() {
-        startUpdate();
+        mStringBuilder = new StringBuilder();
+        mInfor.setText("");
+        startUpdateThead();
+    }
+
+    @OnClick(R.id.auto_update_exit)
+    void exit() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        startActivity(intent);
+        System.exit(0);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDisposable.dispose();
     }
 }

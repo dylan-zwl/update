@@ -12,9 +12,8 @@ public class UpdateConttract {
     }
 
     public interface UpdatePresenter {
-        void update(UpdateInfor updateInfor);
+        void update(String filePath);
     }
-
 
     public interface McuPresenter {
         void update(UpdateInfor updateInfor);

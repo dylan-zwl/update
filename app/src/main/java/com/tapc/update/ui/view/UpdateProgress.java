@@ -1,31 +1,31 @@
-package com.tapc.update.ui.widget;
+package com.tapc.update.ui.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.tapc.update.R;
-import com.tapc.update.ui.base.BaseSystemView;
-import com.tapc.update.ui.view.CustomTextView;
-import com.tapc.update.utils.WindowManagerUtils;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
+
 
 /**
  * Created by Administrator on 2017/7/18.
  */
 
-public class UpdateProgress extends BaseSystemView {
+public class UpdateProgress extends RelativeLayout {
     @BindView(R.id.update_progress_tx)
-    CustomTextView mProgressTx;
+    TextView mProgressTx;
 
     @BindView(R.id.update_progress_unit)
-    CustomTextView mProgressUnit;
+    TextView mProgressUnit;
 
     @BindView(R.id.update_progress)
     ProgressBar mUpdateProgress;
@@ -34,32 +34,20 @@ public class UpdateProgress extends BaseSystemView {
     @BindView(R.id.update_again)
     Button mUpdateAgain;
 
-    @Override
-    protected int getLayoutResID() {
-        return R.layout.widget_update_progress;
-    }
-
-    @Override
-    public WindowManager.LayoutParams getLayoutParams() {
-        return WindowManagerUtils.getLayoutParams(0, 0, WindowManager.LayoutParams.MATCH_PARENT, WindowManager
-                .LayoutParams.MATCH_PARENT, Gravity.TOP | Gravity.CENTER_VERTICAL);
-    }
-
-    public UpdateProgress(Context context) {
-        super(context);
-    }
-
     public UpdateProgress(Context context, AttributeSet attrs) {
         super(context, attrs);
+        View view = LayoutInflater.from(context).inflate(R.layout.widget_update_progress, this);
+        ButterKnife.bind(this, view);
     }
 
     public void setProgress(int progress) {
         mProgressTx.setText("" + progress);
         mProgressTx.setVisibility(VISIBLE);
         mProgressUnit.setVisibility(VISIBLE);
+        setProgressTxVisibility(true);
     }
 
-    public void setProgressTxVisibility(int visibility) {
+    private void setProgressTxVisibility(int visibility) {
         if (visibility != VISIBLE) {
             mProgressTx.setText("");
         }
@@ -67,11 +55,9 @@ public class UpdateProgress extends BaseSystemView {
         mProgressUnit.setVisibility(visibility);
     }
 
-    public void setUpdateProgressVisibility(int visibility, boolean isShowProgress) {
-        setVisibility(visibility);
+    public void setProgressTxVisibility(boolean isShowProgress) {
         if (isShowProgress) {
             setProgressTxVisibility(View.VISIBLE);
-            mUpdateProgress.setVisibility(VISIBLE);
         } else {
             setProgressTxVisibility(View.GONE);
         }

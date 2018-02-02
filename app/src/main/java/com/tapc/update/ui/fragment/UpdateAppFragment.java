@@ -1,27 +1,22 @@
-package com.tapc.update.ui.fragment.app;
+package com.tapc.update.ui.fragment;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
-import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.tapc.platform.model.device.controller.MachineController;
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
-import com.tapc.update.ui.fragment.BaseFragment;
 import com.tapc.update.ui.presenter.AppPresenter;
+import com.tapc.update.ui.presenter.CopyFilePresenter;
 import com.tapc.update.ui.presenter.McuPresenter;
 import com.tapc.update.ui.presenter.UpdateConttract;
-import com.tapc.update.ui.presenter.UpdateInfor;
 import com.tapc.update.ui.view.UpdateItem;
 import com.tapc.update.utils.AppUtil;
-import com.tapc.update.utils.FileUtil;
 import com.tapc.update.utils.RxjavaUtils;
 import com.tapc.update.utils.ShowInforUtil;
-
-import java.io.File;
-import java.io.FilenameFilter;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -51,6 +46,7 @@ public class UpdateAppFragment extends BaseFragment {
 
     private AppPresenter mAppPresenter;
     private McuPresenter mMcuPresenter;
+    private CopyFilePresenter mCopyFilePresenter;
 
     @Override
     public int getContentView() {
@@ -61,9 +57,20 @@ public class UpdateAppFragment extends BaseFragment {
     public void initView() {
         mTitle.setText(getString(R.string.func_app));
         mStartUpdate.setText(getString(R.string.a_key_update));
+        mUpdateItemApp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startUpdateApp();
+            }
+        });
+        mUpdateItemMcu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startUpdateMcu();
+            }
+        });
 
         initVersionShow();
-        initPresenter();
     }
 
     private void initVersionShow() {
@@ -77,36 +84,32 @@ public class UpdateAppFragment extends BaseFragment {
         if (TextUtils.isEmpty(mcuVersion)) {
             mcuVersion = "";
         }
-        mUpdateItemApp.setTitle(String.format(mContext.getString(R.string.update_app_title), appVersion));
-        mUpdateItemMcu.setTitle(String.format(mContext.getString(R.string.update_mcu_title), mcuVersion));
-    }
-
-    private void initPresenter() {
-
+        mUpdateItemApp.setTitle(getString(R.string.app) + String.format(getString(R.string.version), appVersion));
+        mUpdateItemMcu.setTitle(getString(R.string.mcu) + String.format(getString(R.string.version), mcuVersion));
     }
 
     @OnClick(R.id.func_start_btn)
     void start() {
-        startUpdateThead(mode.ALL);
+        startUpdateThead(Mode.ALL);
     }
 
     @OnClick(R.id.update_app)
     void startUpdateApp() {
-        startUpdateThead(mode.ONLY_APP);
+        startUpdateThead(Mode.ONLY_APP);
     }
 
     @OnClick(R.id.update_mcu)
     void startUpdateMcu() {
-        startUpdateThead(mode.ONLY_MCU);
+        startUpdateThead(Mode.ONLY_MCU);
     }
 
-    private enum mode {
+    private enum Mode {
         ALL,
         ONLY_APP,
         ONLY_MCU
     }
 
-    private void startUpdateThead(final mode mode) {
+    private void startUpdateThead(final Mode mode) {
         RxjavaUtils.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
@@ -149,26 +152,14 @@ public class UpdateAppFragment extends BaseFragment {
         if (isCopySuccessed == false) {
             String originFile = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + Config.UPDATE_APP_NAME + ".zip";
             mUpdateFilePath = Config.IN_SD_FILE_PATH + "/" + Config.SAVEFILE_PATH + "/" + Config.UPDATE_APP_NAME;
-            isCopySuccessed = copyUpdateFile(originFile, mUpdateFilePath);
+            if (mCopyFilePresenter == null) {
+                mCopyFilePresenter = new CopyFilePresenter();
+            }
+            isCopySuccessed = mCopyFilePresenter.copyUpdateFile(originFile, mUpdateFilePath);
         }
     }
 
     private void appStartUpdate() {
-        String appFileName = FileUtil.getFilename(mUpdateFilePath, new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                name = name.toLowerCase();
-                if (name.startsWith("app") && name.endsWith(".apk")) {
-                    return true;
-                }
-                return false;
-            }
-        });
-        final UpdateInfor updateInfor = new UpdateInfor();
-        updateInfor.setFileType(UpdateInfor.FileType.APP);
-        updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
-        updateInfor.setFileName(appFileName);
-        updateInfor.setPath(mUpdateFilePath);
         if (mAppPresenter == null) {
             mAppPresenter = new AppPresenter(mContext, new UpdateConttract.View() {
                 @Override
@@ -178,30 +169,14 @@ public class UpdateAppFragment extends BaseFragment {
 
                 @Override
                 public void updateCompleted(final boolean isSuccess, final String msg) {
-                    ShowInforUtil.send(mContext, "APP", getString(R.string.update), isSuccess, msg);
+                    ShowInforUtil.send(mContext, getString(R.string.app), getString(R.string.update), isSuccess, msg);
                 }
             });
         }
-        mAppPresenter.update(updateInfor);
+        mAppPresenter.update(mUpdateFilePath);
     }
 
     private void mcuStartUpdate() {
-        String mcuFileName = FileUtil.getFilename(mUpdateFilePath, new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                name = name.toLowerCase();
-                if (name.startsWith("rom") && name.endsWith(".bin")) {
-                    return true;
-                }
-                return false;
-            }
-        });
-        final UpdateInfor updateInfor = new UpdateInfor();
-        updateInfor.setFileType(UpdateInfor.FileType.MCU);
-        updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
-        updateInfor.setPath(mUpdateFilePath);
-        updateInfor.setFileName(mcuFileName);
-
         if (mMcuPresenter == null) {
             mMcuPresenter = new McuPresenter(mContext, new UpdateConttract.View() {
                 @Override
@@ -211,31 +186,11 @@ public class UpdateAppFragment extends BaseFragment {
 
                 @Override
                 public void updateCompleted(boolean isSuccess, String msg) {
-                    ShowInforUtil.send(mContext, "MCU", getString(R.string.update), isSuccess, msg);
+                    ShowInforUtil.send(mContext, getString(R.string.mcu), getString(R.string.update), isSuccess, msg);
                 }
             });
         }
-        mMcuPresenter.update(updateInfor);
-    }
-
-    private boolean copyUpdateFile(String originFile, String savePath) {
-        try {
-            if (TextUtils.isEmpty(originFile) || !new File(originFile).exists()) {
-                return false;
-            }
-            File saveFile = new File(savePath);
-            if (saveFile.exists()) {
-                FileUtil.RecursionDeleteFile(saveFile);
-            } else {
-                saveFile.mkdirs();
-            }
-
-            FileUtil.upZipFile(originFile, saveFile.getAbsolutePath());
-            return true;
-        } catch (Exception e) {
-            Log.d(TAG, "copy file : " + e.getMessage());
-        }
-        return false;
+        mMcuPresenter.update(mUpdateFilePath);
     }
 
     @Override

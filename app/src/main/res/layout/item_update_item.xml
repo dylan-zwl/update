@@ -25,7 +25,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:button="@drawable/cb_update_app"
-            android:textColor="@color/tx_nomal1"
+            android:textColor="@color/tx_nomal3"
             android:textSize="@dimen/tx_size5"
             android:visibility="gone"/>
 

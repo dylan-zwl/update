@@ -5,118 +5,131 @@ package com.tapc.update.utils;
  */
 
 
-import android.util.Log;
-
 import java.io.File;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 
 public class CopyFileUtil {
-    private long startTime = 0;
-    private int totalThreadCount = 0;
-    private int executedCount = 0;
-    private boolean isCopyFailed = false;
-    private boolean isFinish = false;
-    private CopyListener copyListener;
+    private long mCopySize;
+    private int mOldProgress;
+    private boolean isCopySuccess;
+    private String mErrorMessage = "";
 
-    public void start(String srcPath, String destPath, int threadCount, CopyListener copyListener) {
-        File srcFile = new File(srcPath);
-        if (srcFile == null || srcFile.exists() == false) {
-            isFinish = true;
-            copyListener.copyResult(false);
-            return;
-        }
-        long len = srcFile.length();
-        int oneNum = (int) (len / threadCount);
+    /**
+     * 功能描述 : 复制文件监听器
+     */
+    public interface ProgressCallback {
+        void onProgress(int progress);
 
-        if (oneNum < 1024) {
-            threadCount = 1;
-        }
-
-        totalThreadCount = threadCount;
-        executedCount = 0;
-        startTime = System.currentTimeMillis();
-        isCopyFailed = false;
-        isFinish = false;
-        this.copyListener = copyListener;
-
-        for (int i = 0; i < threadCount - 1; i++) {
-            CopyThread ct = new CopyThread(srcPath, destPath, oneNum * i, oneNum * (i + 1));
-            ct.start();
-        }
-        CopyThread ct = new CopyThread(srcPath, destPath, oneNum * (threadCount - 1), (int) len);
-        ct.start();
+        void onCompeleted(boolean isSuccessd, String msg);
     }
 
-    public boolean isFinish() {
-        return isFinish;
-    }
-
-    public interface CopyListener {
-        void copyResult(boolean isCopySuccess);
-
-        void copyCount(int size);
-    }
-
-    private void finish(String destPath) {
-        executedCount++;
-        if (totalThreadCount == executedCount) {
-            executedCount = 0;
-            long time = System.currentTimeMillis() - startTime;
-            Log.d(destPath + " 复制完成", "花费时长：" + time);
-            copyListener.copyResult(!isCopyFailed);
-            isFinish = true;
-        }
-    }
-
-
-    private class CopyThread extends Thread {
-        private String srcPath;
-        private String destPath;
-        private int start, end;
-
-        public CopyThread(String srcPath, String destPath, int start, int end) {
-            //要复制的源文件路径
-            this.srcPath = srcPath;
-            //复制到的文件路径
-            this.destPath = destPath;
-            //复制起始位置
-            this.start = start;
-            //复制结束位置
-            this.end = end;
+    private synchronized boolean copyFolder(String originFile, String targetFile, long originFileSize, final
+    ProgressCallback callback) throws Exception {
+        new File(targetFile).mkdirs();
+        File listFile = new File(originFile);
+        final String[] file = listFile.list();
+        if (file == null && file.length <= 0) {
+            return true;
         }
 
-        public void run() {
-            try {
-                RandomAccessFile in = new RandomAccessFile(srcPath, "r");
-                RandomAccessFile out = new RandomAccessFile(destPath, "rw");
-
-                // 将输入跳转到指定位置
-                in.seek(start);
-                // 从指定位置开始写
-                out.seek(start);
-
-                FileChannel inChannel = in.getChannel();
-                FileChannel outChannel = out.getChannel();
-
-                //锁住需要操作的区域
-                int size = (end - start);
-                FileLock lock = outChannel.lock(start, size, false);
-
-                inChannel.transferTo(start, size, outChannel);
-//                outChannel.transferFrom(inChannel, start, (end - start));
-
-                //释放锁
-                lock.release();
-                out.close();
-                in.close();
-                copyListener.copyCount(size);
-            } catch (Exception e) {
-                e.printStackTrace();
-                isCopyFailed = true;
+        File tempFile = null;
+        for (int i = 0; i < file.length; i++) {
+            if (originFile.endsWith(File.separator)) {
+                tempFile = new File(originFile + file[i]);
+            } else {
+                tempFile = new File(originFile + File.separator + file[i]);
             }
-            finish(destPath);
+            if (tempFile.isFile()) {
+                boolean result = copyFile(tempFile, targetFile, originFileSize, callback);
+                if (!result) {
+                    return false;
+                }
+            } else if (tempFile.isDirectory()) {
+                copyFolder(originFile + "/" + file[i], targetFile + "/" + file[i], originFileSize, callback);
+            }
+        }
+        return true;
+    }
+
+    private synchronized boolean copyFile(File originFile, final String targetPath, final long originFileSize, final
+    ProgressCallback callback) {
+        isCopySuccess = false;
+        String srcPath = originFile.getAbsolutePath();
+        String destPath = targetPath + "/" + (originFile.getName()).toString();
+        isCopySuccess = new CopyFileThread().startCopy(srcPath, destPath, 5);
+        final CopyFileThread copyFileThread = new CopyFileThread();
+//        Timer timer = new Timer();
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                long size = mCopySize + copyFileThread.getCopySize();
+//                int progress = (int) (size * 100 / originFileSize);
+//                if (mOldProgress != progress) {
+//                    mOldProgress = progress;
+//                    callback.onProgress(progress);
+//                }
+//            }
+//        }, 50, 500);
+//        timer.cancel();
+//        isCopySuccess = copyFileThread.startCopy(srcPath, destPath, 5);
+
+        mCopySize = mCopySize + copyFileThread.getLength();
+        return isCopySuccess;
+    }
+
+    /**
+     * 功能描述 :  复制文件
+     *
+     * @param :
+     */
+    public synchronized void copyFile(final String originFile, final String targetFile, final ProgressCallback
+            callback) {
+        try {
+            File file = new File(originFile);
+            if (file == null || !file.exists()) {
+                callback.onCompeleted(false, "no file");
+                return;
+            }
+            if (file.isFile()) {
+                callback.onCompeleted(false, "not a file");
+                return;
+            }
+            mCopySize = 0;
+            long fileSize = FileUtil.getFileSize(file);
+            mOldProgress = -1;
+            mErrorMessage = "";
+
+            boolean result = copyFile(file, targetFile, fileSize, callback);
+            if (result) {
+                callback.onCompeleted(true, "");
+            } else {
+                callback.onCompeleted(true, mErrorMessage);
+            }
+        } catch (Exception e) {
+            callback.onCompeleted(false, e.getMessage());
+        }
+    }
+
+    /**
+     * 功能描述 :  复制文件夹
+     *
+     * @param :
+     */
+    public synchronized void copyFolder(final String originFile, final String targetFile, final ProgressCallback
+            callback) {
+        try {
+            mCopySize = 0;
+            long fileSize = FileUtil.getFileSize(new File(originFile));
+            mOldProgress = -1;
+            mErrorMessage = "";
+
+            boolean result = copyFolder(originFile, targetFile, fileSize, callback);
+            if (result) {
+                callback.onCompeleted(true, "");
+            } else {
+                callback.onCompeleted(true, mErrorMessage);
+            }
+        } catch (Exception e) {
+            callback.onCompeleted(false, e.getMessage());
         }
     }
 }

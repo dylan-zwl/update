@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.tapc.update.application.Config;
-import com.tapc.update.ui.activity.AutoUpdateActivity;
 import com.tapc.update.ui.activity.MainActivity;
 import com.tapc.update.utils.IntentUtil;
 
@@ -27,8 +26,8 @@ public class MediaMountedReceiver extends BroadcastReceiver {
                 IntentUtil.startActivity(context, MainActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK | Intent
                         .FLAG_ACTIVITY_CLEAR_TOP);
             } else {
-                IntentUtil.startActivity(context, AutoUpdateActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK | Intent
-                        .FLAG_ACTIVITY_CLEAR_TOP);
+//                IntentUtil.startActivity(context, AutoUpdateActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK | Intent
+//                        .FLAG_ACTIVITY_CLEAR_TOP);
             }
         }
     }

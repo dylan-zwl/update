@@ -1,4 +1,4 @@
-package com.tapc.update.ui.fragment.os;
+package com.tapc.update.ui.fragment;
 
 import android.text.TextUtils;
 import android.widget.Button;
@@ -6,7 +6,6 @@ import android.widget.TextView;
 
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
-import com.tapc.update.ui.fragment.BaseFragment;
 import com.tapc.update.ui.presenter.OsPresenter;
 import com.tapc.update.ui.presenter.UpdateConttract;
 import com.tapc.update.ui.presenter.UpdateInfor;
@@ -43,7 +42,7 @@ public class UpdateOsFragment extends BaseFragment {
 
         String osVersion = android.os.Build.DISPLAY;
         if (!TextUtils.isEmpty(osVersion)) {
-            mUpdateItemOS.setTitle(String.format(mContext.getString(R.string.update_os_title), osVersion));
+            mUpdateItemOS.setTitle(String.format(getString(R.string.os) + getString(R.string.version), osVersion));
         }
 
         mOsPresenter = new OsPresenter(mContext, new UpdateConttract.View() {

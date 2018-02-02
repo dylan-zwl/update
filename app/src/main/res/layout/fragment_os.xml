@@ -16,8 +16,7 @@
         android:id="@+id/update_os"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        UpdateItem:is_show_btn="false"
-        UpdateItem:title="@string/update_os_title">
+        UpdateItem:is_show_btn="false">
 
     </com.tapc.update.ui.view.UpdateItem>
 </LinearLayout>

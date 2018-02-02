@@ -58,15 +58,6 @@
                     </com.tapc.update.ui.view.FunctionItem>
 
                     <com.tapc.update.ui.view.FunctionItem
-                        android:id="@+id/func_os"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        FunctionItem:ic="@drawable/cb_update_os"
-                        FunctionItem:name="@string/func_os">
-
-                    </com.tapc.update.ui.view.FunctionItem>
-
-                    <com.tapc.update.ui.view.FunctionItem
                         android:id="@+id/func_vacopy"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -90,6 +81,15 @@
                         android:layout_height="wrap_content"
                         FunctionItem:ic="@drawable/cb_uninstall"
                         FunctionItem:name="@string/func_uninstall">
+
+                    </com.tapc.update.ui.view.FunctionItem>
+
+                    <com.tapc.update.ui.view.FunctionItem
+                        android:id="@+id/func_os"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        FunctionItem:ic="@drawable/cb_update_os"
+                        FunctionItem:name="@string/func_os">
 
                     </com.tapc.update.ui.view.FunctionItem>
 

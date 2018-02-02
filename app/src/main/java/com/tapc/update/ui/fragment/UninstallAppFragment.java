@@ -1,4 +1,4 @@
-package com.tapc.update.ui.fragment.uninstall;
+package com.tapc.update.ui.fragment;
 
 import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,7 +10,6 @@ import android.widget.CompoundButton;
 import com.tapc.update.R;
 import com.tapc.update.ui.adpater.UninstallAdpater;
 import com.tapc.update.ui.entity.AppInfoEntity;
-import com.tapc.update.ui.fragment.BaseFragment;
 import com.tapc.update.utils.AppUtil;
 import com.tapc.update.utils.RxjavaUtils;
 import com.tapc.update.utils.ShowInforUtil;
@@ -23,6 +22,7 @@ import butterknife.OnClick;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 public class UninstallAppFragment extends BaseFragment {
@@ -37,6 +37,7 @@ public class UninstallAppFragment extends BaseFragment {
     private List<AppInfoEntity> mApkInfoList = new ArrayList<AppInfoEntity>();
     private List<AppInfoEntity> mAllLstAppInfo;
     private boolean isHasGetSystemApp = false;
+    private Disposable mDisposable;
 
     @Override
     public int getContentView() {
@@ -78,7 +79,7 @@ public class UninstallAppFragment extends BaseFragment {
             }
         });
 
-        RxjavaUtils.create(new ObservableOnSubscribe<String>() {
+        mDisposable = RxjavaUtils.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
                 mAllLstAppInfo = AppUtil.getAllAppInfo(mContext, false);
@@ -172,6 +173,7 @@ public class UninstallAppFragment extends BaseFragment {
                     notifyChanged();
                 }
                 stopUpdate();
+                e.onComplete();
             }
         }, new Consumer() {
             @Override
@@ -205,5 +207,8 @@ public class UninstallAppFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         mHandler.removeCallbacksAndMessages(null);
+        if (mDisposable != null) {
+            mDisposable.dispose();
+        }
     }
 }

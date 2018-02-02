@@ -50,11 +50,8 @@ public class MenuServie extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        removeMenuBar();
-        if (mUpdateProgress != null) {
-            mWindowManager.removeView(mUpdateProgress);
-            mUpdateProgress = null;
-        }
+        mMenuBar.dismiss();
+        mUpdateProgress.dismiss();
         if (mReceiver != null) {
             unregisterReceiver(mReceiver);
         }
@@ -70,7 +67,6 @@ public class MenuServie extends Service {
 //        registerReceiver(mReceiver, filter);
 
         mMenuBar = new MenuBar(this);
-        mMenuBar.show();
 
         mUpdateProgress = new UpdateProgress(this);
         mUpdateProgress.addViewToWindow();
@@ -84,18 +80,11 @@ public class MenuServie extends Service {
         return mMenuBar;
     }
 
-    private void removeMenuBar() {
-        if (mMenuBar != null) {
-            mWindowManager.removeView(mMenuBar);
-            mMenuBar = null;
-        }
-    }
-
     public void setMenuBarVisibility(boolean visibility) {
         if (visibility) {
             getMenuBar().setVisibility(View.VISIBLE);
         } else {
-            removeMenuBar();
+            getMenuBar().setVisibility(View.GONE);
         }
     }
 

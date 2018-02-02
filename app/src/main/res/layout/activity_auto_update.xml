@@ -4,12 +4,11 @@
                 android:layout_height="match_parent"
                 android:background="#3c3c3c">
 
-    <com.tapc.update.ui.widget.UpdateProgress
+    <com.tapc.update.ui.view.UpdateProgress
         android:id="@+id/auto_update_progress"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-    </com.tapc.update.ui.widget.UpdateProgress>
+    </com.tapc.update.ui.view.UpdateProgress>
 
     <com.tapc.update.ui.view.CustomTextView
         android:id="@+id/customTextView"

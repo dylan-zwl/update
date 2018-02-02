@@ -19,12 +19,6 @@ import java.util.zip.ZipInputStream;
 
 public class FileUtil {
 
-    public interface ProgressCallback {
-        void onProgress(int progress);
-
-        void onCompeleted(boolean isSuccessd, String msg);
-    }
-
     //获取文件夹大小
     public static long getFileSize(File file) throws Exception {
         long size = 0;
@@ -56,38 +50,6 @@ public class FileUtil {
         }
         File files = new File(path);
         return files.list(filter);
-    }
-
-    public static void copyFile(String oldPath, String newPath, ProgressCallback callback) {
-        try {
-            int bytesum = 0;
-            int byteread = 0;
-            File oldfile = new File(oldPath);
-            if (oldfile.exists()) {
-                long fileSize = oldfile.length();
-                int oldIndex = -1;
-                InputStream inStream = new FileInputStream(oldPath);
-                FileOutputStream fs = new FileOutputStream(newPath);
-                byte[] buffer = new byte[1024];
-                while ((byteread = inStream.read(buffer)) != -1) {
-                    bytesum += byteread;
-                    fs.write(buffer, 0, byteread);
-                    int progress = (int) ((bytesum * 100 / fileSize));
-                    if (progress != oldIndex) {
-                        oldIndex = progress;
-                        callback.onProgress(progress);
-                    }
-                }
-                inStream.close();
-                fs.close();
-                callback.onCompeleted(true, "");
-            } else {
-                callback.onCompeleted(false, "no file");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            callback.onCompeleted(false, e.getMessage());
-        }
     }
 
     /**
@@ -188,75 +150,5 @@ public class FileUtil {
             }
         }
         inZip.close();
-    }
-
-    private long mCopySize;
-    private int mOldProgress;
-    private long mOriginFileSize;
-    private ProgressCallback mCallback;
-    private Object mLock;
-
-    public synchronized void copyFolder(final String originFile, final String targetFile, final ProgressCallback
-            callback) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mLock = new Object();
-                    mCopySize = 0;
-                    mOriginFileSize = getFileSize(new File(originFile));
-                    mCallback = callback;
-                    mOldProgress = -1;
-
-                    copyFolder(originFile, targetFile);
-                    callback.onCompeleted(true, "");
-                } catch (Exception e) {
-                    callback.onCompeleted(false, e.getMessage());
-                }
-            }
-        }).start();
-    }
-
-    private synchronized void copyFolder(String originFile, String targetFile) throws Exception {
-        new File(targetFile).mkdirs();
-        File listFile = new File(originFile);
-        final String[] file = listFile.list();
-        File temp = null;
-
-        for (int i = 0; i < file.length; i++) {
-            if (originFile.endsWith(File.separator)) {
-                temp = new File(originFile + file[i]);
-            } else {
-                temp = new File(originFile + File.separator + file[i]);
-            }
-            if (temp.isFile()) {
-                synchronized (mLock) {
-                    CopyFileUtil copyFileUtil = new CopyFileUtil();
-                    String srcPath = temp.getAbsolutePath();
-                    String destPath = targetFile + "/" + (temp.getName()).toString();
-                    copyFileUtil.start(srcPath, destPath, 5, new CopyFileUtil.CopyListener() {
-                        @Override
-                        public void copyResult(boolean isCopySuccess) {
-                            synchronized (mLock) {
-                                mLock.notify();
-                            }
-                        }
-
-                        @Override
-                        public void copyCount(int size) {
-                            mCopySize = mCopySize + size;
-                            int progress = (int) (mCopySize * 100 / mOriginFileSize);
-                            if (mOldProgress != progress) {
-                                mOldProgress = progress;
-                                mCallback.onProgress(progress);
-                            }
-                        }
-                    });
-                    mLock.wait();
-                }
-            } else if (temp.isDirectory()) {
-                copyFolder(originFile + "/" + file[i], targetFile + "/" + file[i]);
-            }
-        }
     }
 }

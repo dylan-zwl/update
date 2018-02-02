@@ -13,7 +13,7 @@
     </LinearLayout>
 
     <com.tapc.update.ui.view.UpdateItem
-        android:id="@+id/va_from_path"
+        android:id="@+id/va_origin_path"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         UpdateItem:is_show_btn="false"

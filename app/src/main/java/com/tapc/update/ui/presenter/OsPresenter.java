@@ -7,7 +7,7 @@ import android.os.RecoverySystem;
 import android.text.TextUtils;
 
 import com.tapc.update.R;
-import com.tapc.update.utils.FileUtil;
+import com.tapc.update.utils.CopyFileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,8 +38,8 @@ public class OsPresenter implements UpdateConttract.OsPresenter {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        FileUtil.copyFile(file.getAbsolutePath(), cacheFilePath, new
-                                FileUtil.ProgressCallback() {
+                        CopyFileUtils.copyFile(file.getAbsolutePath(), cacheFilePath, new
+                                CopyFileUtils.ProgressCallback() {
                                     @Override
                                     public void onProgress(final int progress) {
                                         mHandler.post(new Runnable() {
@@ -51,8 +51,8 @@ public class OsPresenter implements UpdateConttract.OsPresenter {
                                     }
 
                                     @Override
-                                    public void onCompeleted(boolean isSuccessd, String msg) {
-                                        if (isSuccessd) {
+                                    public void onCompeleted(boolean isSuccessed, String msg) {
+                                        if (isSuccessed) {
                                             mHandler.post(new Runnable() {
                                                 @Override
                                                 public void run() {
@@ -60,7 +60,6 @@ public class OsPresenter implements UpdateConttract.OsPresenter {
                                                         stopUpdate(true, "");
                                                         RecoverySystem.installPackage(mContext, new File
                                                                 (cacheFilePath));
-
                                                     } catch (IOException e) {
                                                         e.printStackTrace();
                                                         stopUpdate(false, "");
