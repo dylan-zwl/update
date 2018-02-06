@@ -2,7 +2,6 @@ package com.tapc.update.ui.fragment;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -23,6 +22,7 @@ import butterknife.OnClick;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 /**
@@ -42,11 +42,9 @@ public class UpdateAppFragment extends BaseFragment {
 
     private static final String TAG = UpdateAppFragment.class.getSimpleName();
     private String mUpdateFilePath;
-    boolean isCopySuccessed = false;
-
+    private Disposable mDisposable;
     private AppPresenter mAppPresenter;
     private McuPresenter mMcuPresenter;
-    private CopyFilePresenter mCopyFilePresenter;
 
     @Override
     public int getContentView() {
@@ -57,18 +55,6 @@ public class UpdateAppFragment extends BaseFragment {
     public void initView() {
         mTitle.setText(getString(R.string.func_app));
         mStartUpdate.setText(getString(R.string.a_key_update));
-        mUpdateItemApp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startUpdateApp();
-            }
-        });
-        mUpdateItemMcu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startUpdateMcu();
-            }
-        });
 
         initVersionShow();
     }
@@ -110,11 +96,11 @@ public class UpdateAppFragment extends BaseFragment {
     }
 
     private void startUpdateThead(final Mode mode) {
-        RxjavaUtils.create(new ObservableOnSubscribe<String>() {
+        mDisposable = RxjavaUtils.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
                 e.onNext("start");
-                startCopyUpdateFile();
+                mUpdateFilePath = CopyFilePresenter.startCopyUpdateFile();
                 switch (mode) {
                     case ONLY_APP:
                         appStartUpdate();
@@ -128,6 +114,8 @@ public class UpdateAppFragment extends BaseFragment {
                         break;
                 }
                 e.onNext("stop");
+                SystemClock.sleep(4000);
+                e.onNext("show version");
                 e.onComplete();
             }
         }, new Consumer() {
@@ -140,23 +128,12 @@ public class UpdateAppFragment extends BaseFragment {
                     case "stop":
                         stopUpdate();
                         break;
+                    case "show version":
+                        initVersionShow();
+                        break;
                 }
             }
         }, null);
-    }
-
-    /**
-     * 功能描述 : 复制升级文件
-     */
-    private void startCopyUpdateFile() {
-        if (isCopySuccessed == false) {
-            String originFile = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + Config.UPDATE_APP_NAME + ".zip";
-            mUpdateFilePath = Config.IN_SD_FILE_PATH + "/" + Config.SAVEFILE_PATH + "/" + Config.UPDATE_APP_NAME;
-            if (mCopyFilePresenter == null) {
-                mCopyFilePresenter = new CopyFilePresenter();
-            }
-            isCopySuccessed = mCopyFilePresenter.copyUpdateFile(originFile, mUpdateFilePath);
-        }
     }
 
     private void appStartUpdate() {
@@ -194,8 +171,9 @@ public class UpdateAppFragment extends BaseFragment {
     }
 
     @Override
-    public void stopUpdate() {
-        super.stopUpdate();
-        initVersionShow();
+    public void onDestroyView() {
+        super.onDestroyView();
+        RxjavaUtils.dispose(mDisposable);
+        mDisposable = null;
     }
 }

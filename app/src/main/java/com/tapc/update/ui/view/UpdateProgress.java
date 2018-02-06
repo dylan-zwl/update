@@ -44,7 +44,6 @@ public class UpdateProgress extends RelativeLayout {
         mProgressTx.setText("" + progress);
         mProgressTx.setVisibility(VISIBLE);
         mProgressUnit.setVisibility(VISIBLE);
-        setProgressTxVisibility(true);
     }
 
     private void setProgressTxVisibility(int visibility) {
@@ -55,9 +54,11 @@ public class UpdateProgress extends RelativeLayout {
         mProgressUnit.setVisibility(visibility);
     }
 
-    public void setProgressTxVisibility(boolean isShowProgress) {
+    public void setUpdateProgressVisibility(int visibility, boolean isShowProgress) {
+        setVisibility(visibility);
         if (isShowProgress) {
-            setProgressTxVisibility(View.VISIBLE);
+            setProgress(0);
+            mUpdateProgress.setVisibility(VISIBLE);
         } else {
             setProgressTxVisibility(View.GONE);
         }
@@ -65,6 +66,7 @@ public class UpdateProgress extends RelativeLayout {
 
     public void setUpdateStatus(boolean isSuccess) {
         mUpdateProgress.setVisibility(GONE);
+        setProgressTxVisibility(View.GONE);
         if (isSuccess) {
             mUpdateSuccess.setVisibility(VISIBLE);
             mUpdateAgain.setVisibility(GONE);

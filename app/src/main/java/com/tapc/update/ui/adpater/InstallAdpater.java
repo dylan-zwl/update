@@ -22,11 +22,9 @@ import butterknife.ButterKnife;
  */
 
 public class InstallAdpater extends BaseRecyclerViewAdapter<InstallAdpater.ViewHolder, AppInfoEntity> {
-    private List<AppInfoEntity> mListApkInfor;
 
     public InstallAdpater(List<AppInfoEntity> datas) {
         super(datas);
-        mListApkInfor = datas;
     }
 
     @Override
@@ -42,7 +40,7 @@ public class InstallAdpater extends BaseRecyclerViewAdapter<InstallAdpater.ViewH
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         super.onBindViewHolder(holder, position);
-        final AppInfoEntity item = mListApkInfor.get(position);
+        final AppInfoEntity item = mDatas.get(position);
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

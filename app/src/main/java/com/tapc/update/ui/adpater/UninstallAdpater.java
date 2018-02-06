@@ -24,11 +24,9 @@ import butterknife.ButterKnife;
  */
 
 public class UninstallAdpater extends BaseRecyclerViewAdapter<UninstallAdpater.ViewHolder, AppInfoEntity> {
-    private List<AppInfoEntity> mListApkInfor;
 
     public UninstallAdpater(List<AppInfoEntity> datas) {
         super(datas);
-        mListApkInfor = datas;
     }
 
     @Override
@@ -44,7 +42,7 @@ public class UninstallAdpater extends BaseRecyclerViewAdapter<UninstallAdpater.V
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         super.onBindViewHolder(holder, position);
-        final AppInfoEntity item = mListApkInfor.get(position);
+        final AppInfoEntity item = mDatas.get(position);
         holder.checkBox.setChecked(item.isChecked());
         holder.icon.setImageDrawable(item.getAppIcon());
         holder.name.setText(item.getAppLabel());

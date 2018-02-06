@@ -92,6 +92,7 @@ public class AppUtil {
                 e.printStackTrace();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             listener.onCompleted(false, e.getMessage());
         }
     }
@@ -141,6 +142,7 @@ public class AppUtil {
                 e.printStackTrace();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             listener.onCompleted(false, e.getMessage());
         }
     }
@@ -186,6 +188,7 @@ public class AppUtil {
                 return packageInfo;
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -213,6 +216,7 @@ public class AppUtil {
             }
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
         }
         Log.d(TAG, pkgName + " exit fail");
         return false;
@@ -232,7 +236,8 @@ public class AppUtil {
                     isSystemApp = true;
                 }
 
-                if (isShowSystemApp == false && isSystemApp) {
+                if (isShowSystemApp == false && isSystemApp || applicationInfo.packageName.equals(context
+                        .getPackageName())) {
                     continue;
                 }
 

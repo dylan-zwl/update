@@ -28,7 +28,7 @@ public class CopyFileUtils {
         if (originFile == null || !originFile.exists() || TextUtils.isEmpty(targetFilePath)) {
             return result;
         }
-        File targetFile = new File(targetFilePath, originFile.getName());
+        File targetFile = new File(targetFilePath);
         if (targetFile != null && targetFile.exists()) {
             targetFile.delete();
         }
@@ -62,8 +62,8 @@ public class CopyFileUtils {
     /**
      * 功能描述 : 复制整个文件夹内容
      *
-     * @param originFilePath 源文件路径 如：c:/fqf
-     * @param targetFilePath 复制后路径 如：f:/fqf/ff
+     * @param originFilePath 源文件路径
+     * @param targetFilePath 复制后路径
      * @return boolean
      */
     public static boolean copyFolder(String originFilePath, String targetFilePath) {
@@ -81,7 +81,7 @@ public class CopyFileUtils {
                 }
 
                 if (temp.isFile()) {
-                    result = copyFile(temp.getAbsolutePath(), targetFilePath);
+                    result = copyFile(temp.getAbsolutePath(), targetFilePath + "/" + file[i]);
                 } else if (temp.isDirectory()) {
                     result = copyFolder(temp.getAbsolutePath(), targetFilePath + "/" + file[i]);
                 }
@@ -109,7 +109,7 @@ public class CopyFileUtils {
             int byteread = 0;
             File originFile = new File(originFilePath);
             if (originFile.exists()) {
-                File targetFile = new File(targetFilePath, originFile.getName());
+                File targetFile = new File(targetFilePath);
                 if (targetFile != null && targetFile.exists()) {
                     targetFile.delete();
                 }
@@ -150,8 +150,8 @@ public class CopyFileUtils {
     /**
      * 复制整个文件夹内容
      *
-     * @param oldPath String 原文件路径 如：c:/fqf
-     * @param newPath String 复制后路径 如：f:/fqf/ff
+     * @param oldPath String 原文件路径
+     * @param newPath String 复制后路径
      * @return boolean
      */
     private long mCopyLength = 0;
@@ -168,10 +168,12 @@ public class CopyFileUtils {
             e.printStackTrace();
             return false;
         }
-        return copyFolder(originFilePath, targetFilePath, length, callback);
+        boolean result = copyFolder(originFilePath, targetFilePath, length, callback);
+        callback.onCompeleted(result, "");
+        return result;
     }
 
-    public boolean copyFolder(String originFilePath, String targetFilePath, long length, ProgressCallback callback) {
+    private boolean copyFolder(String originFilePath, String targetFilePath, long length, ProgressCallback callback) {
         boolean result = false;
         try {
             (new File(targetFilePath)).mkdirs();

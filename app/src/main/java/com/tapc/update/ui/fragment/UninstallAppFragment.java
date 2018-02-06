@@ -207,8 +207,7 @@ public class UninstallAppFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         mHandler.removeCallbacksAndMessages(null);
-        if (mDisposable != null) {
-            mDisposable.dispose();
-        }
+        RxjavaUtils.dispose(mDisposable);
+        mDisposable = null;
     }
 }

@@ -14,12 +14,4 @@ public class UpdateConttract {
     public interface UpdatePresenter {
         void update(String filePath);
     }
-
-    public interface McuPresenter {
-        void update(UpdateInfor updateInfor);
-    }
-
-    public interface OsPresenter {
-        void update(UpdateInfor updateInfor);
-    }
 }

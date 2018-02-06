@@ -64,8 +64,7 @@ public class InstallAppFragment extends BaseFragment {
         mDisposable = RxjavaUtils.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
-                String path = Config.MOUNTED_PATH + Config.SAVEFILE_PATH + "/" + Config.INSTALL_APP_PATH;
-                mListApkInfo = mInstallPresenter.getAppList(path);
+                mListApkInfo = mInstallPresenter.getAppList(Config.INSTALL_APP_PATH);
                 if (mListApkInfo != null && mListApkInfo.size() > 0) {
                     e.onNext("start show");
                 }
@@ -141,8 +140,7 @@ public class InstallAppFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         mHandler.removeCallbacksAndMessages(null);
-        if (mDisposable != null) {
-            mDisposable.dispose();
-        }
+        RxjavaUtils.dispose(mDisposable);
+        mDisposable = null;
     }
 }

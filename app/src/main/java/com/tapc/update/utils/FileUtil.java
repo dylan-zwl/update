@@ -35,10 +35,12 @@ public class FileUtil {
 
     //筛选文件名
     public static String getFilename(String path, FilenameFilter filter) {
-        File files = new File(path);
-        String[] list = files.list(filter);
-        if (list != null && list.length > 0) {
-            return list[0];
+        if (!TextUtils.isEmpty(path)) {
+            File files = new File(path);
+            String[] list = files.list(filter);
+            if (list != null && list.length > 0) {
+                return list[0];
+            }
         }
         return null;
     }

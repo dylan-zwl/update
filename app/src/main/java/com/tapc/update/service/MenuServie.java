@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.tapc.update.broadcastreceiver.MediaMountedReceiver;
+import com.tapc.update.broadcast.MediaMountedReceiver;
 import com.tapc.update.service.binder.LocalBinder;
 import com.tapc.update.ui.entity.MenuInfo;
 import com.tapc.update.ui.widget.MenuBar;
@@ -60,16 +60,8 @@ public class MenuServie extends Service {
 
     @SuppressLint("InlinedApi")
     private void initView() {
-//        IntentFilter filter = new IntentFilter();
-//        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-//        filter.addDataScheme("file");
-//        mReceiver = new MediaMountedReceiver();
-//        registerReceiver(mReceiver, filter);
-
         mMenuBar = new MenuBar(this);
-
         mUpdateProgress = new UpdateProgress(this);
-        mUpdateProgress.addViewToWindow();
     }
 
     public UpdateProgress getUpdateProgress() {
@@ -83,6 +75,8 @@ public class MenuServie extends Service {
     public void setMenuBarVisibility(boolean visibility) {
         if (visibility) {
             getMenuBar().setVisibility(View.VISIBLE);
+            mMenuBar.show();
+            mUpdateProgress.addViewToWindow();
         } else {
             getMenuBar().setVisibility(View.GONE);
         }

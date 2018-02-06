@@ -59,7 +59,7 @@ public class UpdateProgress extends BaseSystemView {
         mProgressUnit.setVisibility(VISIBLE);
     }
 
-    public void setProgressTxVisibility(int visibility) {
+    private void setProgressTxVisibility(int visibility) {
         if (visibility != VISIBLE) {
             mProgressTx.setText("");
         }
@@ -70,7 +70,7 @@ public class UpdateProgress extends BaseSystemView {
     public void setUpdateProgressVisibility(int visibility, boolean isShowProgress) {
         setVisibility(visibility);
         if (isShowProgress) {
-            setProgressTxVisibility(View.VISIBLE);
+            setProgress(0);
             mUpdateProgress.setVisibility(VISIBLE);
         } else {
             setProgressTxVisibility(View.GONE);
@@ -79,6 +79,7 @@ public class UpdateProgress extends BaseSystemView {
 
     public void setUpdateStatus(boolean isSuccess) {
         mUpdateProgress.setVisibility(GONE);
+        setProgressTxVisibility(View.GONE);
         if (isSuccess) {
             mUpdateSuccess.setVisibility(VISIBLE);
             mUpdateAgain.setVisibility(GONE);

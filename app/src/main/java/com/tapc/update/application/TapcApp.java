@@ -22,7 +22,7 @@ public class TapcApp extends Application {
     public void onCreate() {
         super.onCreate();
         sTapcApp = this;
-        Config.initConfig();
+        Config.initConfig(null);
         initMachineCtl();
         stopAllService(this);
         startAllService(this);

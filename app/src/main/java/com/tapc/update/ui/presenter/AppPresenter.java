@@ -53,7 +53,8 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
                 if (!TextUtils.isEmpty(installPackageName)) {
                     PackageManager pm = mContext.getPackageManager();
                     PackageInfo info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
-                    if (info == null || !info.packageName.equals(installPackageName)) {
+                    if (info == null || (!info.packageName.equals("com.tapc.test") && !info.packageName.equals
+                            (installPackageName))) {
                         mView.updateCompleted(false, mContext.getString(R.string.file_Illegal));
                         return;
                     }

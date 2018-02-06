@@ -12,6 +12,7 @@ import android.view.KeyEvent;
 import android.widget.FrameLayout;
 
 import com.tapc.update.R;
+import com.tapc.update.application.Config;
 import com.tapc.update.application.TapcApp;
 import com.tapc.update.ui.fragment.InstallAppFragment;
 import com.tapc.update.ui.fragment.UninstallAppFragment;
@@ -19,6 +20,7 @@ import com.tapc.update.ui.fragment.UpdateAppFragment;
 import com.tapc.update.ui.fragment.UpdateOsFragment;
 import com.tapc.update.ui.fragment.VaCopyFragment;
 import com.tapc.update.ui.view.FunctionItem;
+import com.tapc.update.utils.AppUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +52,8 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
+
+        AppUtil.exitApp(this, Config.APP_PACKGGE);
         initView();
     }
 
@@ -57,13 +61,12 @@ public class MainActivity extends FragmentActivity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                TapcApp.getInstance().setMenuBarVisibility(true);
+                TapcApp.getInstance().getService().setMenuBarVisibility(true);
             }
         }, 1000);
 
         mFragmentManager = getSupportFragmentManager();
         setCheckedFunc(Item.APP);
-        TapcApp.getInstance().getService().getMenuBar().show();
     }
 
     private enum Item {

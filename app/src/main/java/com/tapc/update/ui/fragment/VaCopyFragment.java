@@ -23,11 +23,12 @@ import com.tapc.update.R;
 import com.tapc.update.application.Config;
 import com.tapc.update.ui.adpater.VaAdapter;
 import com.tapc.update.ui.base.BaseRecyclerViewAdapter;
-import com.tapc.update.ui.presenter.VaPresenter;
+import com.tapc.update.ui.presenter.CopyFilePresenter;
 import com.tapc.update.ui.view.UpdateItem;
 import com.tapc.update.utils.CopyFileUtils;
 import com.tapc.update.utils.FileUtil;
 import com.tapc.update.utils.IntentUtil;
+import com.tapc.update.utils.RxjavaUtils;
 import com.tapc.update.utils.ShowInforUtil;
 
 import java.io.File;
@@ -36,7 +37,11 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by Administrator on 2017/7/10.
@@ -58,10 +63,10 @@ public class VaCopyFragment extends BaseFragment {
     @BindView(R.id.va_check)
     UpdateItem mVaCheck;
 
+    private Disposable mDisposable;
     private Handler mHandler;
     private String mOriginPath;
     private String mTargetPath;
-    private VaPresenter mVaPresenter;
 
     @Override
     public int getContentView() {
@@ -73,20 +78,6 @@ public class VaCopyFragment extends BaseFragment {
         mHandler = new Handler();
         mTitle.setText(getString(R.string.func_vacopy));
         mStartUpdate.setText(getString(R.string.va_copy));
-        mVaPresenter = new VaPresenter();
-
-        mVaFileManager.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openFileManager();
-            }
-        });
-        mVaCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkVa();
-            }
-        });
 
         initVaPath();
     }
@@ -98,7 +89,7 @@ public class VaCopyFragment extends BaseFragment {
     }
 
     private void initVaPath() {
-        String filePath = Config.MOUNTED_PATH + Config.SAVEFILE_PATH;
+        String filePath = Config.ORIGIN_SAVEFILE_PATH;
         String vaFileName = FileUtil.getFilename(filePath, new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -113,31 +104,37 @@ public class VaCopyFragment extends BaseFragment {
             vaFileName = ".va";
         }
 
-        mOriginPath = filePath + "/" + vaFileName;
-        mTargetPath = Config.IN_SD_FILE_PATH + Config.SAVEFILE_PATH + "/" + vaFileName;
+        mOriginPath = filePath + vaFileName;
+        mTargetPath = Config.TARGET_SAVEFILE_PATH + vaFileName;
         mVaOriginPath.setRightTx(mOriginPath);
         mVaTargetPath.setRightTx(mTargetPath);
     }
 
     @OnClick(R.id.func_start_btn)
     void startCopy() {
-        new Thread(new Runnable() {
+        mDisposable = RxjavaUtils.create(new ObservableOnSubscribe<String>() {
             @Override
-            public void run() {
+            public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
                 if (TextUtils.isEmpty(mOriginPath) || !new File(mOriginPath).exists()) {
                     ShowInforUtil.send(mContext, "VA", getString(R.string.copy), false, mContext.getString(R.string
                             .no_file));
                     return;
                 }
 
-                startUpdate();
+                //先检测是否已复制
+                if (CopyFilePresenter.check(mOriginPath, mTargetPath)) {
+                    ShowInforUtil.send(mContext, "VA", getString(R.string.check_file), true, "");
+                    return;
+                }
 
+                //开始复制
+                startUpdate();
                 FileUtil.RecursionDeleteFile(new File(mTargetPath));
                 long originFileSize = 0;
                 try {
                     originFileSize = FileUtil.getFileSize(new File(mOriginPath));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception error) {
+                    error.printStackTrace();
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
@@ -166,32 +163,17 @@ public class VaCopyFragment extends BaseFragment {
                 if (result) {
                     checkVa();
                 }
-//                new CopyFileUtil().copyFolder(mOriginPath, mTargetPath, new CopyFileUtil.ProgressCallback() {
-//                            @Override
-//                            public void onProgress(int progress) {
-//                                long usetime = (System.currentTimeMillis() - mCopyTime) / 1000;
-//                                String time = String.format("%02d:%02d:%02d", usetime / 3600, usetime % 3600 / 60,
-//                                        usetime % 60);
-//                                updateProgressUi(progress);
-//                                Log.d("copy progress", "" + progress + "  use time: " + time);
-//                            }
-//
-//                            @Override
-//                            public void onCompeleted(boolean isSuccessd, String msg) {
-//                                ShowInforUtil.send(mContext, "VA", getString(R.string.copy), isSuccessd, "");
-//                                //检测文件
-//                                if (isSuccessd) {
-//                                    checkVa();
-//                                }
-//                                stopUpdate();
-//                            }
-//                        }
-//                );
                 long usetime = (System.currentTimeMillis() - startTime) / 1000;
                 Log.d("copy progress", "  use time: " + usetime);
                 stopUpdate();
+                e.onComplete();
             }
-        }).start();
+        }, new Consumer() {
+            @Override
+            public void accept(@NonNull Object o) throws Exception {
+
+            }
+        }, null);
     }
 
     @OnClick(R.id.va_file_manager)
@@ -201,62 +183,17 @@ public class VaCopyFragment extends BaseFragment {
 
     @OnClick(R.id.va_check)
     void checkVa() {
-        boolean result = mVaPresenter.check(mOriginPath, mTargetPath);
+        boolean result = CopyFilePresenter.check(mOriginPath, mTargetPath);
         initPlayView(mContext);
         ShowInforUtil.send(mContext, "VA", getString(R.string.check_file), result, "");
     }
 
-//
-//    private boolean copyFolder(String originFile, String targetFile) {
-//        try {
-//            (new File(targetFile)).mkdirs();
-//            File listFile = new File(originFile);
-//            final String[] file = listFile.list();
-//            File temp = null;
-//
-//            for (int i = 0; i < file.length; i++) {
-//                if (originFile.endsWith(File.separator)) {
-//                    temp = new File(originFile + file[i]);
-//                } else {
-//                    temp = new File(originFile + File.separator + file[i]);
-//                }
-//                if (temp.isFile()) {
-//                    mCopyFileResult = false;
-//                    CopyFileUtil copyFileUtil = new CopyFileUtil();
-//                    String srcPath = temp.getAbsolutePath();
-//                    String destPath = targetFile + "/" + (temp.getName()).toString();
-//                    copyFileUtil.start(srcPath, destPath, 5, new CopyFileUtil.CopyListener() {
-//                        @Override
-//                        public void copyResult(boolean isCopySuccess) {
-//                            mCopyFileResult = isCopySuccess;
-//                            synchronized (this) {
-//
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void copyCount(int size) {
-//                            mCopySize = mCopySize + size;
-//                        }
-//                    });
-//                    wait();
-//                    while (copyFileUtil.isFinish() == false) {
-//                        SystemClock.sleep(1);
-//                    }
-//                    if (mCopyFileResult == false) {
-//                        return false;
-//                    }
-//                } else if (temp.isDirectory()) {
-//                    return copyFolder(originFile + "/" + file[i], targetFile + "/" + file[i]);
-//                }
-//            }
-//            return true;
-//        } catch (Exception e) {
-//            System.out.println("复制整个文件夹内容操作出错");
-//            e.printStackTrace();
-//            return false;
-//        }
-//    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        RxjavaUtils.dispose(mDisposable);
+        mDisposable = null;
+    }
 
     /**
      * 功能描述 : va 播放
@@ -270,7 +207,6 @@ public class VaCopyFragment extends BaseFragment {
 
     private ArrayList<PlayEntity> mPlayList;
     private VaAdapter mVaAdapter;
-    private Disposable mDisposable;
 
     private void initPlayView(Context context) {
         if (mVaAdapter == null) {

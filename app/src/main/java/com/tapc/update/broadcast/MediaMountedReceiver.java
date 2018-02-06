@@ -1,4 +1,4 @@
-package com.tapc.update.broadcastreceiver;
+package com.tapc.update.broadcast;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.tapc.update.application.Config;
+import com.tapc.update.ui.activity.AutoUpdateActivity;
 import com.tapc.update.ui.activity.MainActivity;
 import com.tapc.update.utils.IntentUtil;
 
@@ -21,13 +22,17 @@ public class MediaMountedReceiver extends BroadcastReceiver {
                 return;
             }
             Config.MOUNTED_PATH = path;
-            String manualPath = Config.MOUNTED_PATH + "/" + Config.SAVEFILE_PATH + "manual";
+            Config.initConfig(path);
+            String manualPath = Config.MOUNTED_PATH + "/" + Config.TARGET_SAVEFILE_PATH + "manual";
+            if (!IntentUtil.isApplicationBroughtToBackground(context)) {
+                return;
+            }
             if (new File(manualPath).exists()) {
                 IntentUtil.startActivity(context, MainActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK | Intent
                         .FLAG_ACTIVITY_CLEAR_TOP);
             } else {
-//                IntentUtil.startActivity(context, AutoUpdateActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK | Intent
-//                        .FLAG_ACTIVITY_CLEAR_TOP);
+                IntentUtil.startActivity(context, AutoUpdateActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK | Intent
+                        .FLAG_ACTIVITY_CLEAR_TOP);
             }
         }
     }

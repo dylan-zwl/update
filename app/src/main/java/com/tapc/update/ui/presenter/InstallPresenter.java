@@ -44,9 +44,10 @@ public class InstallPresenter {
             }
         });
         if (filePathList != null && filePathList.length > 0) {
-            for (String apkPath : filePathList) {
+            for (String apkFileName : filePathList) {
                 PackageManager pm = mContext.getPackageManager();
-                PackageInfo info = pm.getPackageArchiveInfo(path + "/" + apkPath, PackageManager.GET_ACTIVITIES);
+                String apkPath = path + "/" + apkFileName;
+                PackageInfo info = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
                 if (info != null) {
                     ApplicationInfo appInfo = info.applicationInfo;
                     AppInfoEntity appEntity = new AppInfoEntity();
@@ -54,15 +55,17 @@ public class InstallPresenter {
                     appInfo.sourceDir = apkPath;
                     appInfo.publicSourceDir = apkPath;
                     try {
-                        appEntity.setAppLabel(appInfo.loadLabel(pm).toString());
                         appEntity.setAppIcon(appInfo.loadIcon(pm));
-                        appEntity.setPath(apkPath);
-                        appEntity.setVersion(info.versionName);
-                        listApkInfo.add(appEntity);
-                        Log.d("app file", "" + appEntity.getAppLabel());
                     } catch (OutOfMemoryError e) {
                         Log.e("app file icon loader", e.toString());
                     }
+                    appEntity.setAppLabel(apkPath.substring(apkPath
+                            .lastIndexOf("/") + 1));
+                    appEntity.setPath(apkPath);
+                    appEntity.setPkgName(info.packageName);
+                    appEntity.setVersion(info.versionName);
+                    listApkInfo.add(appEntity);
+                    Log.d("app file", "" + appEntity.getAppLabel());
                 }
             }
         }

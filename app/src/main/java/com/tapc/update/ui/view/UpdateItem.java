@@ -2,6 +2,7 @@ package com.tapc.update.ui.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -58,5 +59,11 @@ public class UpdateItem extends RelativeLayout {
     public void setRightTx(String tx) {
         mRightTx.setText(tx);
         mRightTx.setVisibility(VISIBLE);
+    }
+
+    @Override
+    public void setOnClickListener(@Nullable OnClickListener l) {
+        super.setOnClickListener(l);
+        mStartBtn.setOnClickListener(l);
     }
 }

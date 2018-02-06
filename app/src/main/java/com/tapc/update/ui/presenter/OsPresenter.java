@@ -2,11 +2,11 @@ package com.tapc.update.ui.presenter;
 
 import android.content.Context;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.RecoverySystem;
 import android.text.TextUtils;
 
 import com.tapc.update.R;
+import com.tapc.update.application.Config;
 import com.tapc.update.utils.CopyFileUtils;
 
 import java.io.File;
@@ -16,75 +16,54 @@ import java.io.IOException;
  * Created by Administrator on 2017/3/17.
  */
 
-public class OsPresenter implements UpdateConttract.OsPresenter {
+public class OsPresenter implements UpdateConttract.UpdatePresenter {
     private Context mContext;
     private UpdateConttract.View mView;
-    private Handler mHandler;
-
 
     public OsPresenter(Context context, UpdateConttract.View view) {
-        mHandler = new Handler();
         mContext = context;
         mView = view;
     }
 
     @Override
-    public void update(UpdateInfor updateInfor) {
-        String fileName = updateInfor.getFileName();
-        if (!TextUtils.isEmpty(fileName)) {
-            final File file = new File(updateInfor.getPath(), fileName);
+    public void update(String filePath) {
+        UpdateInfor updateInfor = new UpdateInfor();
+        updateInfor.setFileType(UpdateInfor.FileType.OS);
+        updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
+        updateInfor.setPath(filePath);
+        updateInfor.setFileName(Config.UPDATE_OS_NAME);
+        update(updateInfor);
+    }
+
+    private void update(UpdateInfor updateInfor) {
+        if (!TextUtils.isEmpty(updateInfor.getPath())) {
+            final File file = new File(updateInfor.getPath(), updateInfor.getFileName());
             if (file != null && file.exists()) {
                 final String cacheFilePath = Environment.getDataDirectory() + "/" + updateInfor.getFileName();
-                new Thread(new Runnable() {
+                CopyFileUtils.copyFile(file.getAbsolutePath(), cacheFilePath, new CopyFileUtils.ProgressCallback() {
                     @Override
-                    public void run() {
-                        CopyFileUtils.copyFile(file.getAbsolutePath(), cacheFilePath, new
-                                CopyFileUtils.ProgressCallback() {
-                                    @Override
-                                    public void onProgress(final int progress) {
-                                        mHandler.post(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                mView.updateProgress(progress, "");
-                                            }
-                                        });
-                                    }
-
-                                    @Override
-                                    public void onCompeleted(boolean isSuccessed, String msg) {
-                                        if (isSuccessed) {
-                                            mHandler.post(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    try {
-                                                        stopUpdate(true, "");
-                                                        RecoverySystem.installPackage(mContext, new File
-                                                                (cacheFilePath));
-                                                    } catch (IOException e) {
-                                                        e.printStackTrace();
-                                                        stopUpdate(false, "");
-                                                    }
-                                                }
-                                            });
-                                        } else {
-                                            stopUpdate(false, mContext.getString(R.string.copy_file_error));
-                                        }
-                                    }
-                                });
+                    public void onProgress(final int progress) {
+                        mView.updateProgress(progress, "");
                     }
-                }).start();
+
+                    @Override
+                    public void onCompeleted(boolean isSuccessed, String msg) {
+                        if (isSuccessed) {
+                            try {
+                                mView.updateCompleted(true, "");
+                                RecoverySystem.installPackage(mContext, new File(cacheFilePath));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                mView.updateCompleted(false, e.getMessage());
+                            }
+                        } else {
+                            mView.updateCompleted(false, msg);
+                        }
+                    }
+                });
                 return;
             }
         }
-        stopUpdate(false, mContext.getString(R.string.no_file));
-    }
-
-    void stopUpdate(final boolean isSuccess, final String msg) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mView.updateCompleted(isSuccess, msg);
-            }
-        });
+        mView.updateCompleted(false, mContext.getString(R.string.no_file));
     }
 }

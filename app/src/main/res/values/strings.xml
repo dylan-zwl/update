@@ -16,6 +16,7 @@
     <string name="mcu">MCU</string>
     <string name="os">OS</string>
     <string name="va">VA</string>
+    <string name="restore_factory">恢复出厂设置</string>
     <string name="version"> 版本号: V%1$s </string>
 
     <string name="va_copy">复制</string>
