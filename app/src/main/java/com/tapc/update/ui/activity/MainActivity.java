@@ -8,13 +8,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.FrameLayout;
 
 import com.tapc.update.R;
-import com.tapc.update.application.Config;
 import com.tapc.update.application.TapcApp;
 import com.tapc.update.service.MenuServie;
 import com.tapc.update.ui.fragment.InstallAppFragment;
@@ -23,16 +20,10 @@ import com.tapc.update.ui.fragment.UpdateAppFragment;
 import com.tapc.update.ui.fragment.UpdateOsFragment;
 import com.tapc.update.ui.fragment.VaCopyFragment;
 import com.tapc.update.ui.view.FunctionItem;
-import com.tapc.update.utils.XmlUtils;
-
-import java.io.IOException;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-
-import static com.tapc.update.application.Config.isCoverInstall;
 
 public class MainActivity extends FragmentActivity {
     @BindView(R.id.func_app)
@@ -62,28 +53,6 @@ public class MainActivity extends FragmentActivity {
         ButterKnife.bind(this);
 
         initView();
-
-        try {
-            Map<String, String> configMap = XmlUtils.getXmlMap(getResources().getAssets().open("update_config.xml"));
-            if (configMap != null) {
-                Log.d("update_config.xml", configMap.toString());
-            }
-            String updateAppMode = configMap.get("update_app_mode");
-            if (!TextUtils.isEmpty(updateAppMode) && updateAppMode.equals(1)) {
-                isCoverInstall = true;
-            }
-
-            String vaOrginPath = configMap.get("va_origin_path");
-            if (!TextUtils.isEmpty(vaOrginPath)) {
-                Config.VA_ORIGIN_PATH = vaOrginPath;
-            }
-            String vaTargetPath = configMap.get("va_target_path");
-            if (!TextUtils.isEmpty(vaTargetPath)) {
-                Config.VA_TARGET_PATH = vaTargetPath;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void initView() {

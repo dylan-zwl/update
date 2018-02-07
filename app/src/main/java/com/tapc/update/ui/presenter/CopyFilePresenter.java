@@ -86,6 +86,11 @@ public class CopyFilePresenter {
         return true;
     }
 
+    /**
+     * 功能描述 : 获取va复制路径
+     *
+     * @param :
+     */
     public static String getVaOriginPath(String path) {
         String filePath = path;
         String vaFileName = FileUtil.getFilename(filePath, new FilenameFilter() {

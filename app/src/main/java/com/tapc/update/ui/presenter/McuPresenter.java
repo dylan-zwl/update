@@ -73,8 +73,8 @@ public class McuPresenter implements UpdateConttract.UpdatePresenter {
                 });
                 try {
                     boolean result = countDownLatch.await(180, TimeUnit.SECONDS);
-                    if (!result) {
-                        mView.updateCompleted(false,  mContext.getString(R.string.no_file));
+                    if (result) {
+                        mView.updateCompleted(false, mContext.getString(R.string.time_out));
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

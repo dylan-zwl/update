@@ -21,6 +21,7 @@ public class Config {
     public static String SAVEFILE_TARGET_PATH = "";
     public static String SAVEFILE_ORIGIN__PATH = "";
     public static String INSTALL_APP_PATH = "";
+    public static final String SAVEFILE_NAME = "tapc/";
 
     public static final String UPDATE_APP_NAME = "update_app";
     public static final String UPDATE_OS_NAME = "update.zip";
@@ -50,7 +51,7 @@ public class Config {
             MOUNTED_PATH = mountedPath;
         }
 
-        String savefile = "tapc/";
+        String savefile = SAVEFILE_NAME;
         SAVEFILE_TARGET_PATH = IN_SD_FILE_PATH + savefile;
         SAVEFILE_ORIGIN__PATH = MOUNTED_PATH + savefile;
 

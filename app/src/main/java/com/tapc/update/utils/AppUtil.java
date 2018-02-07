@@ -86,7 +86,7 @@ public class AppUtil {
             }, PackageManager.INSTALL_REPLACE_EXISTING, file.getAbsolutePath());
             try {
                 boolean result = countDownLatch.await(180, TimeUnit.SECONDS);
-                if (!result) {
+                if (result) {
                     listener.onCompleted(false, "time out");
                 }
             } catch (InterruptedException e) {
@@ -136,7 +136,7 @@ public class AppUtil {
             }, 0);
             try {
                 boolean result = countDownLatch.await(180, TimeUnit.SECONDS);
-                if (!result) {
+                if (result) {
                     listener.onCompleted(false, "time out");
                 }
             } catch (InterruptedException e) {
@@ -165,6 +165,31 @@ public class AppUtil {
             pm.clearApplicationUserData(pakageName, observer);
         } catch (Exception e) {
             Log.d(TAG, "clean " + pakageName + " fail");
+        }
+    }
+
+    public static void clearAppUserData(Context context, String pkgName, final ProgressListener listener) {
+        try {
+            final CountDownLatch countDownLatch = new CountDownLatch(1);
+            PackageManager pm = context.getPackageManager();
+            pm.clearApplicationUserData(pkgName, new IPackageDataObserver.Stub() {
+                @Override
+                public void onRemoveCompleted(String s, boolean b) throws RemoteException {
+                    listener.onCompleted(b, s);
+                    countDownLatch.countDown();
+                }
+            });
+            try {
+                boolean result = countDownLatch.await(180, TimeUnit.SECONDS);
+                if (result) {
+                    listener.onCompleted(false, "time out");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            listener.onCompleted(false, e.getMessage());
         }
     }
 

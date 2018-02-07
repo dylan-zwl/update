@@ -28,9 +28,6 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
     }
 
     public static String initUpdate(Context context, String pkgName, final AppUtil.ProgressListener listener) {
-        //等待device app 退出
-        AppUtil.exitApp(context, pkgName);
-        boolean exitAppResult = exitDeviceApp(context, Config.APP_PACKGGE);
         //app 升级
         String updateFilePath = CopyFilePresenter.startCopyUpdateFile();
         boolean isNeedUpdateApp = false;
@@ -38,9 +35,15 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
             isNeedUpdateApp = true;
         }
 
-        if (!exitAppResult && isNeedUpdateApp) {
-            AppUtil.unInstallApk(context, pkgName, listener);
+        if (isNeedUpdateApp && Config.isCoverInstall) {
+            //等待device app 退出
+            AppUtil.exitApp(context, pkgName);
+            boolean exitAppResult = exitDeviceApp(context, Config.APP_PACKGGE);
+            if (!exitAppResult) {
+//                    AppUtil.unInstallApk(context, pkgName, listener);
+            }
         }
+
         if (isNeedUpdateApp) {
             //升级设备app，自动卸载测试软件
             PackageInfo info = context.getPackageManager().getPackageArchiveInfo(updateFilePath, PackageManager
@@ -96,6 +99,27 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
 
                 //开始升级
                 mView.updateProgress(0, "");
+                if (!Config.isCoverInstall) {
+//                    boolean isRunning = AppUtil.isAppRunning(mContext, installPackageName);
+//                    if (isRunning) {
+//                        AppUtil.unInstallApk(mContext, installPackageName, new AppUtil.ProgressListener() {
+//                            @Override
+//                            public void onCompleted(boolean isSuccessed, String message) {
+//                            }
+//                        });
+//                    } else {
+//                        AppUtil.clearAppUserData(mContext, installPackageName, new IPackageDataObserver.Stub() {
+//                            @Override
+//                            public void onRemoveCompleted(String s, boolean b) throws RemoteException {
+//                            }
+//                        });
+//                    }
+                    AppUtil.unInstallApk(mContext, installPackageName, new AppUtil.ProgressListener() {
+                        @Override
+                        public void onCompleted(boolean isSuccessed, String message) {
+                        }
+                    });
+                }
                 AppUtil.installApk(mContext, file, new AppUtil.ProgressListener() {
                     @Override
                     public void onCompleted(boolean isSuccessed, String message) {
