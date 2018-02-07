@@ -72,7 +72,7 @@ public class UpdateOsFragment extends BaseFragment {
                         }
                     });
                 }
-                mOsPresenter.update(Config.ORIGIN_SAVEFILE_PATH);
+                mOsPresenter.update(Config.SAVEFILE_ORIGIN__PATH);
                 e.onComplete();
             }
         }, new Consumer() {

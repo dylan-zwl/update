@@ -9,7 +9,6 @@ import com.tapc.platform.model.device.controller.MachineController;
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
 import com.tapc.update.ui.presenter.AppPresenter;
-import com.tapc.update.ui.presenter.CopyFilePresenter;
 import com.tapc.update.ui.presenter.McuPresenter;
 import com.tapc.update.ui.presenter.UpdateConttract;
 import com.tapc.update.ui.view.UpdateItem;
@@ -24,6 +23,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+
 
 /**
  * Created by Administrator on 2017/7/10.
@@ -100,7 +100,16 @@ public class UpdateAppFragment extends BaseFragment {
             @Override
             public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
                 e.onNext("start");
-                mUpdateFilePath = CopyFilePresenter.startCopyUpdateFile();
+
+                //app 升级
+                mUpdateFilePath = AppPresenter.initUpdate(mContext, Config.APP_PACKGGE, new AppUtil.ProgressListener() {
+                    @Override
+                    public void onCompleted(boolean isSuccessed, String message) {
+                        ShowInforUtil.send(mContext, getString(R.string.app), getString(R.string.uninstall),
+                                isSuccessed, message);
+                    }
+                });
+
                 switch (mode) {
                     case ONLY_APP:
                         appStartUpdate();

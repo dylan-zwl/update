@@ -3,9 +3,11 @@ package com.tapc.update.ui.presenter;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.tapc.update.R;
+import com.tapc.update.application.Config;
 import com.tapc.update.utils.AppUtil;
 import com.tapc.update.utils.FileUtil;
 
@@ -23,6 +25,38 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
     public AppPresenter(Context context, UpdateConttract.View view) {
         mContext = context;
         mView = view;
+    }
+
+    public static String initUpdate(Context context, String pkgName, final AppUtil.ProgressListener listener) {
+        //等待device app 退出
+        AppUtil.exitApp(context, pkgName);
+        boolean exitAppResult = exitDeviceApp(context, Config.APP_PACKGGE);
+        //app 升级
+        String updateFilePath = CopyFilePresenter.startCopyUpdateFile();
+        boolean isNeedUpdateApp = false;
+        if (!TextUtils.isEmpty(updateFilePath)) {
+            isNeedUpdateApp = true;
+        }
+
+        if (!exitAppResult && isNeedUpdateApp) {
+            AppUtil.unInstallApk(context, pkgName, listener);
+        }
+        if (isNeedUpdateApp) {
+            //升级设备app，自动卸载测试软件
+            PackageInfo info = context.getPackageManager().getPackageArchiveInfo(updateFilePath, PackageManager
+                    .GET_ACTIVITIES);
+            if (info != null && info.packageName.equals(Config.APP_PACKGGE)) {
+                if (AppUtil.isAppInstalled(context, Config.TEST_APP_PACKGGE)) {
+                    AppUtil.unInstallApk(context, Config.TEST_APP_PACKGGE, new AppUtil.ProgressListener() {
+                        @Override
+                        public void onCompleted(boolean isSuccessed, String message) {
+
+                        }
+                    });
+                }
+            }
+        }
+        return updateFilePath;
     }
 
     @Override
@@ -53,7 +87,7 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
                 if (!TextUtils.isEmpty(installPackageName)) {
                     PackageManager pm = mContext.getPackageManager();
                     PackageInfo info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
-                    if (info == null || (!info.packageName.equals("com.tapc.test") && !info.packageName.equals
+                    if (info == null || (!info.packageName.equals(Config.TEST_APP_PACKGGE) && !info.packageName.equals
                             (installPackageName))) {
                         mView.updateCompleted(false, mContext.getString(R.string.file_Illegal));
                         return;
@@ -72,5 +106,18 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
             }
         }
         mView.updateCompleted(false, mContext.getString(R.string.no_file));
+    }
+
+    public static boolean exitDeviceApp(final Context context, final String pkgName) {
+        boolean isResult = false;
+        int time = 8;
+        do {
+            if (!AppUtil.isAppRunning(context, pkgName)) {
+                isResult = true;
+                break;
+            }
+            SystemClock.sleep(1000);
+        } while ((time--) > 0);
+        return isResult;
     }
 }

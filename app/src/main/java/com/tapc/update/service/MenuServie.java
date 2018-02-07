@@ -3,13 +3,10 @@ package com.tapc.update.service;
 import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 
-import com.tapc.update.broadcast.MediaMountedReceiver;
 import com.tapc.update.service.binder.LocalBinder;
 import com.tapc.update.ui.entity.MenuInfo;
 import com.tapc.update.ui.widget.MenuBar;
@@ -22,11 +19,8 @@ import com.tapc.update.ui.widget.UpdateProgress;
 
 public class MenuServie extends Service {
     private LocalBinder mBinder;
-    private static MenuBar mMenuBar;
+    private MenuBar mMenuBar;
     private UpdateProgress mUpdateProgress;
-    private WindowManager mWindowManager;
-    private Handler mHandler = new Handler();
-    private MediaMountedReceiver mReceiver;
 
     @Override
     public void onCreate() {
@@ -52,9 +46,6 @@ public class MenuServie extends Service {
         super.onDestroy();
         mMenuBar.dismiss();
         mUpdateProgress.dismiss();
-        if (mReceiver != null) {
-            unregisterReceiver(mReceiver);
-        }
     }
 
 
@@ -74,7 +65,7 @@ public class MenuServie extends Service {
 
     public void setMenuBarVisibility(boolean visibility) {
         if (visibility) {
-            getMenuBar().setVisibility(View.VISIBLE);
+            mMenuBar.setVisibility(View.VISIBLE);
             mMenuBar.show();
             mUpdateProgress.addViewToWindow();
         } else {

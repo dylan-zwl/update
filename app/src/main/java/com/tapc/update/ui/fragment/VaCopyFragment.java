@@ -32,7 +32,6 @@ import com.tapc.update.utils.RxjavaUtils;
 import com.tapc.update.utils.ShowInforUtil;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -89,23 +88,8 @@ public class VaCopyFragment extends BaseFragment {
     }
 
     private void initVaPath() {
-        String filePath = Config.ORIGIN_SAVEFILE_PATH;
-        String vaFileName = FileUtil.getFilename(filePath, new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if (name.startsWith(".va") || name.endsWith("va")) {
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        if (TextUtils.isEmpty(vaFileName)) {
-            vaFileName = ".va";
-        }
-
-        mOriginPath = filePath + vaFileName;
-        mTargetPath = Config.TARGET_SAVEFILE_PATH + vaFileName;
+        mOriginPath = Config.VA_ORIGIN_PATH;
+        mTargetPath = Config.VA_TARGET_PATH;
         mVaOriginPath.setRightTx(mOriginPath);
         mVaTargetPath.setRightTx(mTargetPath);
     }
@@ -193,6 +177,7 @@ public class VaCopyFragment extends BaseFragment {
         super.onDestroyView();
         RxjavaUtils.dispose(mDisposable);
         mDisposable = null;
+        stopPlay();
     }
 
     /**
@@ -273,10 +258,7 @@ public class VaCopyFragment extends BaseFragment {
     private VaPlayer mPlayer;
 
     private void startPlay(PlayEntity playEntity) {
-        if (mPlayer != null) {
-            mPlayer.stop();
-            mPlayer = null;
-        }
+        stopPlay();
         mPlayer = new VaPlayer(mSurfaceView.getHolder());
         mPlayer.init();
         mPlayer.setBackMusicVisibility(false);
@@ -308,6 +290,13 @@ public class VaCopyFragment extends BaseFragment {
         });
         mPlayer.start(playEntity);
         mPlayBtn.setBackgroundResource(R.drawable.btn_va_play_n);
+    }
+
+    public void stopPlay() {
+        if (mPlayer != null) {
+            mPlayer.stop();
+            mPlayer = null;
+        }
     }
 
     @OnClick(R.id.va_play_status)

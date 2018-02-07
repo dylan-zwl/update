@@ -56,8 +56,6 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
     private List<Boolean> mUpdateStatusList;
 
     private String mUpdateFilePath;
-    boolean isCopySuccessed = false;
-
     private AppPresenter mAppPresenter;
     private McuPresenter mMcuPresenter;
     private InstallPresenter mInstallPresenter;
@@ -69,7 +67,6 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
 
     @Override
     public void initView() {
-        AppUtil.exitApp(mContext, Config.APP_PACKGGE);
         mContext = this;
         mStringBuilder = new StringBuilder();
         mHandler = new Handler();
@@ -87,12 +84,17 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                 mUpdateStatusList = new ArrayList<Boolean>();
 
                 //app 升级
-                mUpdateFilePath = CopyFilePresenter.startCopyUpdateFile();
+                mUpdateFilePath = AppPresenter.initUpdate(mContext, Config.APP_PACKGGE, new AppUtil.ProgressListener() {
+                    @Override
+                    public void onCompleted(boolean isSuccessed, String message) {
+                        addInforShow(getString(R.string.app), getString(R.string.uninstall), isSuccessed, message);
+                    }
+                });
                 appstartUpdateThead();
                 mcustartUpdateThead();
 
                 //第三方应用安装
-                String appPath = Config.TARGET_SAVEFILE_PATH + "/third_app";
+                String appPath = Config.SAVEFILE_TARGET_PATH + "/third_app";
                 List<AppInfoEntity> list = mInstallPresenter.getAppList(appPath);
                 if (list != null && list.size() > 0) {
                     for (final AppInfoEntity appInfoEntity : list) {
@@ -107,9 +109,8 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                     }
                 }
 
-                String va = "va";
-                String originFile = Config.ORIGIN_SAVEFILE_PATH + va;
-                String targetFile = Config.TARGET_SAVEFILE_PATH + va;
+                String originFile = Config.VA_ORIGIN_PATH;
+                String targetFile = Config.VA_TARGET_PATH;
                 File file = new File(originFile);
                 if (file.exists()) {
                     if (!check(originFile, targetFile)) {

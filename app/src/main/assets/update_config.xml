@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    //APP 默认0 先卸载后安装 ， 1 覆盖安装
+    <update_app_mode>0</update_app_mode>
+
+    //va 源文件路径,null使用默认
+    <va_origin_path></va_origin_path>
+    //va 目标文件路径，null使用默认
+    <va_target_path>/mnt/internal_sd/.va</va_target_path>
+</resources>

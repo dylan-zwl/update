@@ -16,6 +16,7 @@ import android.os.RemoteException;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.tapc.update.application.Config;
 import com.tapc.update.ui.entity.AppInfoEntity;
 
 import java.io.File;
@@ -222,6 +223,24 @@ public class AppUtil {
         return false;
     }
 
+    public static boolean isAppRunning(Context context, String pkgName) {
+        boolean result = false;
+        try {
+            ActivityManager manager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+            List<ActivityManager.RunningTaskInfo> runningTasks = manager.getRunningTasks(Integer.MAX_VALUE);
+            for (ActivityManager.RunningTaskInfo amTask : runningTasks) {
+                if (pkgName.equals(amTask.baseActivity.getPackageName())) {
+                    result = true;
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, pkgName + " is running " + result);
+        return result;
+    }
+
     public static ArrayList<AppInfoEntity> getAllAppInfo(Context context, boolean isShowSystemApp) {
         ArrayList<AppInfoEntity> mlistAppInfo = new ArrayList<AppInfoEntity>();
         PackageManager pm = context.getPackageManager();
@@ -235,14 +254,13 @@ public class AppUtil {
                 } else {
                     isSystemApp = true;
                 }
-
-                if (isShowSystemApp == false && isSystemApp || applicationInfo.packageName.equals(context
-                        .getPackageName())) {
+                String pakageName = applicationInfo.packageName;
+                if (isShowSystemApp == false && isSystemApp || pakageName.equals(context.getPackageName()) ||
+                        pakageName.equals(Config.APP_PACKGGE)) {
                     continue;
                 }
 
                 AppInfoEntity appInfo = new AppInfoEntity();
-                String pakageName = applicationInfo.packageName;
                 String appLabel = (String) applicationInfo.loadLabel(pm);
                 Drawable icon = applicationInfo.loadIcon(pm);
                 Intent launchIntent = new Intent();

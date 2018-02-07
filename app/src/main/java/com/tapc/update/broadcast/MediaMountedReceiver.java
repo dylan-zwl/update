@@ -21,9 +21,15 @@ public class MediaMountedReceiver extends BroadcastReceiver {
             if (TextUtils.isEmpty(path) || new File(path).exists() == false) {
                 return;
             }
+
+            File updateFile = new File(path + "/tapc");
+            if (!updateFile.exists() || updateFile.list() == null || updateFile.list().length <= 0) {
+                return;
+            }
+
             Config.MOUNTED_PATH = path;
             Config.initConfig(path);
-            String manualPath = Config.MOUNTED_PATH + "/" + Config.TARGET_SAVEFILE_PATH + "manual";
+            String manualPath = Config.MOUNTED_PATH + "/" + Config.SAVEFILE_TARGET_PATH + "manual";
             if (!IntentUtil.isApplicationBroughtToBackground(context)) {
                 return;
             }

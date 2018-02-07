@@ -8,6 +8,8 @@ package com.tapc.update.application;
 import android.os.Environment;
 import android.text.TextUtils;
 
+import com.tapc.update.ui.presenter.CopyFilePresenter;
+
 import java.io.File;
 
 public class Config {
@@ -16,24 +18,27 @@ public class Config {
     public static String UDISK_FILE_PATH;
 
     public static String MOUNTED_PATH = "/mnt/external_sd/";
-    public static String TARGET_SAVEFILE_PATH = "";
-    public static String ORIGIN_SAVEFILE_PATH = "";
+    public static String SAVEFILE_TARGET_PATH = "";
+    public static String SAVEFILE_ORIGIN__PATH = "";
     public static String INSTALL_APP_PATH = "";
 
     public static final String UPDATE_APP_NAME = "update_app";
     public static final String UPDATE_OS_NAME = "update.zip";
 
     public static final String APP_PACKGGE = "com.tapc.platform";
+    public static final String TEST_APP_PACKGGE = "com.tapc.test";
+
+    public static boolean isCoverInstall = false;
+    public static String VA_TARGET_PATH = "";
+    public static String VA_ORIGIN_PATH = "";
 
     public static void initConfig(String mountedPath) {
         if (new File("/dev/ttyS3").exists()) {
             //rk3188
-            IN_SD_FILE_PATH = "/mnt/internal_sd/";
             EX_SD_FILE_PATH = "/mnt/external_sd/";
             UDISK_FILE_PATH = "/mnt/usb_storage/";
         } else {
             //8935
-            IN_SD_FILE_PATH = "/storage/sdcard0/";
             EX_SD_FILE_PATH = "/storage/sdcard1/";
             UDISK_FILE_PATH = "/storage/usb0/";
         }
@@ -46,9 +51,16 @@ public class Config {
         }
 
         String savefile = "tapc/";
-        TARGET_SAVEFILE_PATH = IN_SD_FILE_PATH + savefile;
-        ORIGIN_SAVEFILE_PATH = MOUNTED_PATH + savefile;
+        SAVEFILE_TARGET_PATH = IN_SD_FILE_PATH + savefile;
+        SAVEFILE_ORIGIN__PATH = MOUNTED_PATH + savefile;
 
-        INSTALL_APP_PATH = ORIGIN_SAVEFILE_PATH + "third_app/";
+        if (TextUtils.isEmpty(VA_ORIGIN_PATH)) {
+            VA_ORIGIN_PATH = CopyFilePresenter.getVaOriginPath(SAVEFILE_ORIGIN__PATH);
+        }
+        if (TextUtils.isEmpty(VA_TARGET_PATH)) {
+            VA_TARGET_PATH = Config.SAVEFILE_TARGET_PATH + ".va";
+        }
+
+        INSTALL_APP_PATH = SAVEFILE_ORIGIN__PATH + "third_app/";
     }
 }

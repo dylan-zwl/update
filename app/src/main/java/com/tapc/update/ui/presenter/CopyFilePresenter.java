@@ -7,6 +7,7 @@ import com.tapc.update.application.Config;
 import com.tapc.update.utils.FileUtil;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * Created by Administrator on 2018/2/1.
@@ -18,8 +19,8 @@ public class CopyFilePresenter {
      * 功能描述 : 复制升级文件
      */
     public static String startCopyUpdateFile() {
-        String originFile = Config.ORIGIN_SAVEFILE_PATH + Config.UPDATE_APP_NAME + ".zip";
-        String updateFilePath = Config.TARGET_SAVEFILE_PATH + Config.UPDATE_APP_NAME;
+        String originFile = Config.SAVEFILE_ORIGIN__PATH + Config.UPDATE_APP_NAME + ".zip";
+        String updateFilePath = Config.SAVEFILE_TARGET_PATH + Config.UPDATE_APP_NAME;
         boolean isCopySuccessed = copyUpdateFile(originFile, updateFilePath);
         if (isCopySuccessed) {
             return updateFilePath;
@@ -83,5 +84,23 @@ public class CopyFilePresenter {
             }
         }
         return true;
+    }
+
+    public static String getVaOriginPath(String path) {
+        String filePath = path;
+        String vaFileName = FileUtil.getFilename(filePath, new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (name.startsWith(".va") || name.endsWith("va")) {
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        if (TextUtils.isEmpty(vaFileName)) {
+            vaFileName = "va";
+        }
+        return filePath + vaFileName;
     }
 }
