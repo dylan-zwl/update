@@ -86,7 +86,7 @@ public class AppUtil {
             }, PackageManager.INSTALL_REPLACE_EXISTING, file.getAbsolutePath());
             try {
                 boolean result = countDownLatch.await(180, TimeUnit.SECONDS);
-                if (result) {
+                if (!result) {
                     listener.onCompleted(false, "time out");
                 }
             } catch (InterruptedException e) {
@@ -136,7 +136,7 @@ public class AppUtil {
             }, 0);
             try {
                 boolean result = countDownLatch.await(180, TimeUnit.SECONDS);
-                if (result) {
+                if (!result) {
                     listener.onCompleted(false, "time out");
                 }
             } catch (InterruptedException e) {
@@ -181,7 +181,7 @@ public class AppUtil {
             });
             try {
                 boolean result = countDownLatch.await(180, TimeUnit.SECONDS);
-                if (result) {
+                if (!result) {
                     listener.onCompleted(false, "time out");
                 }
             } catch (InterruptedException e) {
