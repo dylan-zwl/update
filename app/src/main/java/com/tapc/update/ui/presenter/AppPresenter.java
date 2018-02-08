@@ -38,26 +38,10 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
         if (isNeedUpdateApp && Config.isCoverInstall) {
             //等待device app 退出
             AppUtil.exitApp(context, pkgName);
-            boolean exitAppResult = exitDeviceApp(context, Config.APP_PACKGGE);
-            if (!exitAppResult) {
-//                    AppUtil.unInstallApk(context, pkgName, listener);
-            }
-        }
-
-        if (isNeedUpdateApp) {
-            //升级设备app，自动卸载测试软件
-            PackageInfo info = context.getPackageManager().getPackageArchiveInfo(updateFilePath, PackageManager
-                    .GET_ACTIVITIES);
-            if (info != null && info.packageName.equals(Config.APP_PACKGGE)) {
-                if (AppUtil.isAppInstalled(context, Config.TEST_APP_PACKGGE)) {
-                    AppUtil.unInstallApk(context, Config.TEST_APP_PACKGGE, new AppUtil.ProgressListener() {
-                        @Override
-                        public void onCompleted(boolean isSuccessed, String message) {
-
-                        }
-                    });
-                }
-            }
+//            boolean exitAppResult = exitDeviceApp(context, Config.APP_PACKGGE);
+//            if (!exitAppResult) {
+//                AppUtil.unInstallApk(context, pkgName, listener);
+//            }
         }
         return updateFilePath;
     }
@@ -79,6 +63,7 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
         updateInfor.setUpdateType(UpdateInfor.UpdateType.LOCAL);
         updateInfor.setFileName(appFileName);
         updateInfor.setPath(filePath);
+        updateInfor.setPackageName(Config.APP_PACKGGE);
 
         String fileName = updateInfor.getFileName();
         if (!TextUtils.isEmpty(fileName)) {
@@ -99,12 +84,25 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
 
                 //开始升级
                 mView.updateProgress(0, "");
-                if (!Config.isCoverInstall) {
+
+                //升级设备app，自动卸载测试软件
+                String testPkgName = Config.TEST_APP_PACKGGE;
+//                if (AppUtil.isAppInstalled(mContext, testPkgName)) {
+                AppUtil.unInstallApk(mContext, testPkgName, new AppUtil.ProgressListener() {
+                    @Override
+                    public void onCompleted(boolean isSuccessed, String message) {
+                    }
+                });
+//                }
+
+                //卸载设备app，覆盖安装不卸载。
+                if (!Config.isCoverInstall && !TextUtils.isEmpty(installPackageName)) {
 //                    boolean isRunning = AppUtil.isAppRunning(mContext, installPackageName);
 //                    if (isRunning) {
 //                        AppUtil.unInstallApk(mContext, installPackageName, new AppUtil.ProgressListener() {
 //                            @Override
 //                            public void onCompleted(boolean isSuccessed, String message) {
+//                                Log.d("App",)
 //                            }
 //                        });
 //                    } else {
@@ -114,6 +112,7 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
 //                            }
 //                        });
 //                    }
+
                     AppUtil.unInstallApk(mContext, installPackageName, new AppUtil.ProgressListener() {
                         @Override
                         public void onCompleted(boolean isSuccessed, String message) {

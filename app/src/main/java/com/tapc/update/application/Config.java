@@ -26,7 +26,7 @@ public class Config {
     public static final String UPDATE_APP_NAME = "update_app";
     public static final String UPDATE_OS_NAME = "update.zip";
 
-    public static final String APP_PACKGGE = "com.tapc.platform";
+    public static String APP_PACKGGE = "com.tapc.platform";
     public static final String TEST_APP_PACKGGE = "com.tapc.test";
 
     public static boolean isCoverInstall = false;

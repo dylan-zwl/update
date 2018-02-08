@@ -78,6 +78,10 @@ public class MediaMountedReceiver extends BroadcastReceiver {
             if (!TextUtils.isEmpty(vaTargetPath)) {
                 Config.VA_TARGET_PATH = vaTargetPath;
             }
+            String packageName = configMap.get("app_package_name");
+            if (!TextUtils.isEmpty(packageName)) {
+                Config.APP_PACKGGE = packageName;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
