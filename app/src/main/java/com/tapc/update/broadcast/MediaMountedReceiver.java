@@ -3,6 +3,7 @@ package com.tapc.update.broadcast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -24,7 +25,8 @@ public class MediaMountedReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (action == Intent.ACTION_MEDIA_MOUNTED) {
             String mountedPath = intent.getData().getPath() + "/";
-            if (TextUtils.isEmpty(mountedPath) || new File(mountedPath).exists() == false) {
+            if (TextUtils.isEmpty(mountedPath) || new File(mountedPath).exists() == false || mountedPath.contains
+                    (Environment.getExternalStorageDirectory().getAbsolutePath())) {
                 return;
             }
 
@@ -34,6 +36,7 @@ public class MediaMountedReceiver extends BroadcastReceiver {
             }
 
             Config.MOUNTED_PATH = mountedPath;
+            Log.d("MediaMountedReceiver", "file path : " + mountedPath);
             Config.initConfig(mountedPath);
 
             initUpdateConfig(context, updateFile.getAbsolutePath() + "/update_config.xml");

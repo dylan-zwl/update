@@ -90,13 +90,16 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                         addInforShow(getString(R.string.app), getString(R.string.uninstall), isSuccessed, message);
                     }
                 });
+                addInforShow(getString(R.string.app), getString(R.string.update), getString(R.string.start));
                 appstartUpdateThead();
+                addInforShow(getString(R.string.mcu), getString(R.string.update), getString(R.string.start));
                 mcustartUpdateThead();
 
                 //第三方应用安装
                 String appPath = Config.SAVEFILE_TARGET_PATH + "/third_app";
                 List<AppInfoEntity> list = mInstallPresenter.getAppList(appPath);
                 if (list != null && list.size() > 0) {
+                    addInforShow(getString(R.string.app), getString(R.string.install), getString(R.string.start));
                     for (final AppInfoEntity appInfoEntity : list) {
                         mInstallPresenter.installApp(appInfoEntity, false, new AppUtil.ProgressListener() {
                             @Override
@@ -114,6 +117,7 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                 File file = new File(originFile);
                 if (file.exists()) {
                     if (!check(originFile, targetFile)) {
+                        addInforShow(getString(R.string.va), getString(R.string.copy), getString(R.string.start));
 
                         long startTime = System.currentTimeMillis();
                         boolean result = new CopyFileUtils().copyFolder(originFile, targetFile, new CopyFileUtils
@@ -218,6 +222,24 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
             }
         });
     }
+
+    private void addInforShow(String title, String updateType, String action) {
+        String info = action + " " + title + " " + updateType;
+        if (mStringBuilder == null) {
+            mStringBuilder = new StringBuilder();
+        }
+        mStringBuilder.append(info + "\n");
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                String text = mStringBuilder.toString();
+                if (text != null) {
+                    mInfor.setText(text);
+                }
+            }
+        });
+    }
+
 
     private void updateProgressUi(final int progress) {
         mHandler.post(new Runnable() {

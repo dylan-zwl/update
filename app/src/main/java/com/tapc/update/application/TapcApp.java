@@ -8,7 +8,7 @@ import android.os.IBinder;
 
 import com.tapc.platform.jni.Driver;
 import com.tapc.platform.model.device.controller.MachineController;
-import com.tapc.update.service.MenuServie;
+import com.tapc.update.service.MenuService;
 import com.tapc.update.service.binder.LocalBinder;
 import com.tapc.update.ui.entity.MenuInfo;
 import com.tapc.update.ui.widget.UpdateProgress;
@@ -16,7 +16,7 @@ import com.tapc.update.utils.IntentUtil;
 
 public class TapcApp extends Application {
     private static TapcApp sTapcApp;
-    private MenuServie mMenuService;
+    private MenuService mMenuService;
 
     @Override
     public void onCreate() {
@@ -33,19 +33,19 @@ public class TapcApp extends Application {
     }
 
     public void startAllService(Context context) {
-        IntentUtil.bindService(context, MenuServie.class, mConnection, Context.BIND_AUTO_CREATE);
+        IntentUtil.bindService(context, MenuService.class, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     public void stopAllService(Context context) {
-        IntentUtil.stopService(context, MenuServie.class);
+        IntentUtil.stopService(context, MenuService.class);
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
         public void onServiceConnected(ComponentName className, IBinder service) {
             LocalBinder binder = (LocalBinder) service;
-            if (className.getClassName().equals(MenuServie.class.getName())) {
-                mMenuService = (MenuServie) binder.getService();
+            if (className.getClassName().equals(MenuService.class.getName())) {
+                mMenuService = (MenuService) binder.getService();
             }
         }
 
@@ -56,13 +56,14 @@ public class TapcApp extends Application {
     private void initMachineCtl() {
         Driver.openUinput(Driver.UINPUT_DEVICE_NAME);
         Driver.initCom("/dev/ttyS3", 115200);
+        Driver.initCom("/dev/ttyS0", 115200);
 
         MachineController controller = MachineController.getInstance();
         controller.initController(this);
         controller.start();
     }
 
-    public MenuServie getService() {
+    public MenuService getService() {
         return mMenuService;
     }
 

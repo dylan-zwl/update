@@ -17,7 +17,7 @@ import com.tapc.update.ui.widget.UpdateProgress;
  * Created by Administrator on 2017/3/17.
  */
 
-public class MenuServie extends Service {
+public class MenuService extends Service {
     private LocalBinder mBinder;
     private MenuBar mMenuBar;
     private UpdateProgress mUpdateProgress;
@@ -25,7 +25,7 @@ public class MenuServie extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("MenuServie", "start");
+        Log.d("MenuService", "start");
     }
 
     @Override

@@ -1,47 +1,49 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:FunctionItem="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#323232"
-                android:orientation="horizontal"
-                android:paddingBottom="38dp"
-                android:paddingLeft="18dp"
-                android:paddingRight="10dp"
-                android:paddingTop="38dp">
+<com.zhy.android.percent.support.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:FunctionItem="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#323232"
+    android:orientation="horizontal">
 
-    <LinearLayout
+    <com.zhy.android.percent.support.PercentLinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_marginBottomPercent="3%h"
+        app:layout_marginLeftPercent="2%w"
+        app:layout_marginRightPercent="1%w"
+        app:layout_marginTopPercent="3%h">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="881"
             android:background="@drawable/bg_function_item"
             android:orientation="vertical"
-            android:paddingLeft="10dp">
+            app:layout_paddingLeftPercent="1%"
+            app:layout_widthPercent="30%w">
 
             <com.tapc.update.ui.view.CustomTextView
                 android:id="@+id/setting_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="24dp"
-                android:layout_marginTop="26dp"
                 android:text="@string/system_maintenance"
                 android:textColor="#B3B3B3"
-                android:textSize="@dimen/tx_size1"/>
+                android:textSize="@dimen/tx_size1"
+                app:layout_marginLeftPercent="8%"
+                app:layout_marginTopPercent="5%"/>
 
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/setting_title"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="24dp"
-                android:layout_marginTop="78dp"
                 android:fadeScrollbars="true"
                 android:orientation="vertical"
                 android:scrollbarFadeDuration="0"
-                android:scrollbars="none">
+                android:scrollbars="none"
+                app:layout_marginBottomPercent="6%"
+                app:layout_marginLeftPercent="6%"
+                app:layout_marginTopPercent="12%">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -103,18 +105,16 @@
                     </com.tapc.update.ui.view.FunctionItem>
                 </LinearLayout>
             </ScrollView>
-        </RelativeLayout>
+        </com.zhy.android.percent.support.PercentRelativeLayout>
 
-        <FrameLayout
+        <com.zhy.android.percent.support.PercentFrameLayout
             android:id="@+id/fragment"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="381"
             android:background="@drawable/bg_frame"
-            android:paddingLeft="20dp"
-            android:paddingRight="23dp"
-            android:paddingTop="38dp"
-            android:visibility="visible">
-        </FrameLayout>
-    </LinearLayout>
-</RelativeLayout>
+            android:visibility="visible"
+            app:layout_paddingPercent="3%"
+            app:layout_widthPercent="70%w">
+        </com.zhy.android.percent.support.PercentFrameLayout>
+    </com.zhy.android.percent.support.PercentLinearLayout>
+</com.zhy.android.percent.support.PercentRelativeLayout>

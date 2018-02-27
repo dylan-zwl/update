@@ -62,4 +62,5 @@
     <string name="file_Illegal">文件不合法</string>
     <string name="no_system_permission">无系统权限</string>
     <string name="check_file">检测文件</string>
+    <string name="start">开始</string>
 </resources>

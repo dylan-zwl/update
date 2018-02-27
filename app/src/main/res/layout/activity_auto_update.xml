@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#3c3c3c">
+<com.zhy.android.percent.support.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3c3c3c">
 
     <com.tapc.update.ui.view.UpdateProgress
         android:id="@+id/auto_update_progress"
@@ -14,22 +16,22 @@
         android:id="@+id/customTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="36dp"
-        android:layout_marginTop="36dp"
         android:text="@string/system_maintenance"
         android:textColor="@color/tx_nomal1"
-        android:textSize="@dimen/tx_title"/>
+        android:textSize="@dimen/tx_title"
+        app:layout_marginLeftPercent="5%"
+        app:layout_marginTopPercent="6%"/>
 
     <LinearLayout
         android:id="@+id/auto_update_exit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="36dp"
-        android:layout_marginTop="36dp"
         android:background="@drawable/btn_exit2"
         android:gravity="center"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:layout_marginRightPercent="5%"
+        app:layout_marginTopPercent="6%">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -46,16 +48,20 @@
     </LinearLayout>
 
     <ScrollView
-        android:layout_width="469dp"
-        android:layout_height="122dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="66dp"
         android:background="@drawable/bg_auto_update_msg"
-        android:paddingBottom="20dp"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
-        android:paddingTop="20dp">
+        app:layout_heightPercent="30%h"
+        app:layout_marginBottomPercent="5%"
+        app:layout_paddingBottomPercent="2%"
+        app:layout_paddingLeftPercent="3%"
+        app:layout_paddingRightPercent="3%"
+        app:layout_paddingTopPercent="2%"
+        app:layout_widthPercent="60%">
 
         <com.tapc.update.ui.view.CustomTextView
             android:id="@+id/auto_update_infor"
@@ -64,4 +70,4 @@
             android:textColor="@color/tx_nomal1"
             android:textSize="@dimen/tx_size3"/>
     </ScrollView>
-</RelativeLayout>
+</com.zhy.android.percent.support.PercentRelativeLayout>

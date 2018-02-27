@@ -13,7 +13,7 @@ import android.widget.FrameLayout;
 
 import com.tapc.update.R;
 import com.tapc.update.application.TapcApp;
-import com.tapc.update.service.MenuServie;
+import com.tapc.update.service.MenuService;
 import com.tapc.update.ui.fragment.InstallAppFragment;
 import com.tapc.update.ui.fragment.UninstallAppFragment;
 import com.tapc.update.ui.fragment.UpdateAppFragment;
@@ -59,12 +59,12 @@ public class MainActivity extends FragmentActivity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                MenuServie menuServie = TapcApp.getInstance().getService();
+                MenuService menuServie = TapcApp.getInstance().getService();
                 if (menuServie != null) {
                     menuServie.setMenuBarVisibility(true);
                 }
             }
-        }, 1000);
+        }, 1200);
 
         mFragmentManager = getSupportFragmentManager();
         setCheckedFunc(Item.APP);

@@ -7,5 +7,12 @@
     <dimen name="tx_size5">12sp</dimen>
     <dimen name="tx_title">40sp</dimen>
 
+    <string name="tx_size_p1">4%w</string>
+    <string name="tx_size_p2">5%</string>
+    <string name="tx_size_p3">6%</string>
+    <string name="tx_size_p4">7%</string>
+    <string name="tx_size_p5">5%</string>
+    <string name="tx_title_p">40sp</string>
+
     <dimen name="menu_w">296dp</dimen>
 </resources>

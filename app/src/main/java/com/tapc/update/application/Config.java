@@ -35,9 +35,15 @@ public class Config {
 
     public static void initConfig(String mountedPath) {
         if (new File("/dev/ttyS3").exists()) {
-            //rk3188
-            EX_SD_FILE_PATH = "/mnt/external_sd/";
-            UDISK_FILE_PATH = "/mnt/usb_storage/";
+            if (new File("/mnt/sd-ext/").exists()) {
+                //s700 s900
+                EX_SD_FILE_PATH = "/mnt/sd-ext/";
+                UDISK_FILE_PATH = "/mnt/uhost/";
+            } else {
+                //rk3188
+                EX_SD_FILE_PATH = "/mnt/external_sd/";
+                UDISK_FILE_PATH = "/mnt/usb_storage/";
+            }
         } else {
             //8935
             EX_SD_FILE_PATH = "/storage/sdcard1/";
@@ -45,8 +51,12 @@ public class Config {
         }
         IN_SD_FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/";
         if (TextUtils.isEmpty(mountedPath)) {
-            MOUNTED_PATH = EX_SD_FILE_PATH;
-            //        MOUNTED_PATH = UDISK_FILE_PATH;
+            File file = new File(UDISK_FILE_PATH);
+            if (file != null && file.exists() && file.list() != null && file.list().length > 0) {
+                MOUNTED_PATH = UDISK_FILE_PATH;
+            } else {
+                MOUNTED_PATH = EX_SD_FILE_PATH;
+            }
         } else {
             MOUNTED_PATH = mountedPath;
         }

@@ -28,6 +28,8 @@ public class UARTController {
     private UARTController() {
         if (!isDeviceExit(DEVICE_NAME)) {
             DEVICE_NAME = "/dev/ttyTCC3";
+        } else if (isDeviceExit("/mnt/sd-ext/")) {
+            DEVICE_NAME = "/dev/ttyS0";
         }
     }
 
