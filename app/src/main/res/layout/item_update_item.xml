@@ -1,48 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:orientation="vertical">
+<com.zhy.android.percent.support.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <RelativeLayout
+    <com.zhy.android.percent.support.PercentRelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        app:layout_heightPercent="8%">
 
-        <com.tapc.update.ui.view.CustomTextView
-            android:id="@+id/update_item_tx"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:button="@drawable/cb_update_app"
-            android:textColor="@color/tx_nomal3"
-            android:textSize="@dimen/tx_size2"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <com.tapc.update.ui.view.CustomTextView
-            android:id="@+id/update_item_right_tx"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:button="@drawable/cb_update_app"
-            android:textColor="@color/tx_nomal3"
-            android:textSize="@dimen/tx_size5"
-            android:visibility="gone"/>
+            <com.tapc.update.ui.view.CustomTextView
+                android:id="@+id/update_item_tx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:button="@drawable/cb_update_app"
+                android:textColor="@color/tx_nomal3"
+                android:textSize="@dimen/tx_size2"/>
 
-        <Button
-            android:id="@+id/update_item_start_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/btn_start2"
-            android:textColor="@color/tx_nomal4"
-            android:textSize="@dimen/tx_size5"/>
-    </RelativeLayout>
+            <com.tapc.update.ui.view.CustomTextView
+                android:id="@+id/update_item_right_tx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:button="@drawable/cb_update_app"
+                android:textColor="@color/tx_nomal3"
+                android:textSize="@dimen/tx_size5"
+                android:visibility="gone"/>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/img_item_line"/>
-</RelativeLayout>
+            <Button
+                android:id="@+id/update_item_start_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/btn_start2"
+                android:textColor="@color/tx_nomal4"
+                android:textSize="@dimen/tx_size5"/>
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/img_item_line"
+            app:layout_heightPercent="4%"/>
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+</com.zhy.android.percent.support.PercentRelativeLayout>

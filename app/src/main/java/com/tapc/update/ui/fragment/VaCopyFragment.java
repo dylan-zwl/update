@@ -162,7 +162,11 @@ public class VaCopyFragment extends BaseFragment {
 
     @OnClick(R.id.va_file_manager)
     void openFileManager() {
-        IntentUtil.startApp(mContext, "com.estrongs.android.pop");
+        try {
+            IntentUtil.startApp(mContext, "com.estrongs.android.pop");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @OnClick(R.id.va_check)

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:UpdateItem="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<com.zhy.android.percent.support.PercentLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:UpdateItem="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -48,88 +50,89 @@
 
     </com.tapc.update.ui.view.UpdateItem>
 
-    <LinearLayout
+    <com.zhy.android.percent.support.PercentRelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="14dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="14dp"
-        android:background="@drawable/bg_vaplayer"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
-        <RelativeLayout
+        <com.zhy.android.percent.support.PercentLinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="512">
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/bg_vaplayer"
+            android:orientation="horizontal"
+            app:layout_heightPercent="80%"
+            app:layout_marginPercent="2%">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/va_play_lv"
-                android:layout_width="match_parent"
+            <com.zhy.android.percent.support.PercentRelativeLayout
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_margin="6dp">
-            </android.support.v7.widget.RecyclerView>
+                app:layout_widthPercent="30%">
 
-            <ImageView
-                android:layout_width="wrap_content"
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/va_play_lv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="6dp">
+                </android.support.v7.widget.RecyclerView>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/bg_va_list_line"/>
+            </com.zhy.android.percent.support.PercentRelativeLayout>
+
+            <com.zhy.android.percent.support.PercentLinearLayout
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:background="@drawable/bg_va_list_line"/>
-        </RelativeLayout>
+                app:layout_paddingPercent="2%"
+                app:layout_widthPercent="70%">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="232"
-            android:paddingBottom="8dp"
-            android:paddingLeft="6dp"
-            android:paddingRight="6dp"
-            android:paddingTop="8dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <SurfaceView
-                    android:id="@+id/va_play_sv"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-                </SurfaceView>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="5dp"
-                    android:gravity="center_vertical">
+                    <SurfaceView
+                        android:id="@+id/va_play_sv"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                    </SurfaceView>
 
-                    <Button
-                        android:id="@+id/va_play_status"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:background="@drawable/btn_va_play_y"/>
-
-                    <TextView
-                        android:id="@+id/va_play_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:text="00:00:00"
-                        android:textColor="@color/tx_nomal1"/>
-
-                    <SeekBar
-                        android:id="@+id/va_play_progress"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:paddingLeft="8dp"
-                        android:paddingRight="8dp"
-                        android:progressDrawable="@drawable/skbar_style_va_play"
-                        android:thumb="@drawable/skbar_tb_va_play"/>
-                </LinearLayout>
-            </RelativeLayout>
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginBottom="5dp"
+                        android:gravity="center_vertical">
+
+                        <Button
+                            android:id="@+id/va_play_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/btn_va_play_y"/>
+
+                        <TextView
+                            android:id="@+id/va_play_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:text="00:00:00"
+                            android:textColor="@color/tx_nomal1"/>
+
+                        <SeekBar
+                            android:id="@+id/va_play_progress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginRight="8dp"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:progressDrawable="@drawable/skbar_style_va_play"
+                            android:thumb="@drawable/skbar_tb_va_play"/>
+                    </LinearLayout>
+                </RelativeLayout>
+            </com.zhy.android.percent.support.PercentLinearLayout>
+        </com.zhy.android.percent.support.PercentLinearLayout>
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+</com.zhy.android.percent.support.PercentLinearLayout>

@@ -82,6 +82,8 @@ public class CopyFilePresenter {
                     return check(originFile + "/" + file[i], targetFile + "/" + file[i]);
                 }
             }
+        } else {
+            return false;
         }
         return true;
     }

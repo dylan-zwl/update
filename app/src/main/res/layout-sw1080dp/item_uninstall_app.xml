@@ -1,14 +1,15 @@
-<RelativeLayout
+<com.zhy.android.percent.support.PercentRelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/uninstall_rl"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <RelativeLayout
+    <com.zhy.android.percent.support.PercentRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="80dp">
 
-        <RelativeLayout
+        <com.zhy.android.percent.support.PercentRelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -25,21 +26,23 @@
 
             <ImageView
                 android:id="@+id/uninstall_app_ic"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"
-                android:layout_toRightOf="@+id/uninstall_chk"/>
+                android:layout_toRightOf="@+id/uninstall_chk"
+                app:layout_heightPercent="80%h"
+                app:layout_marginLeftPercent="4%"
+                app:layout_widthPercent="80%h"/>
 
             <com.tapc.update.ui.view.CustomTextView
                 android:id="@+id/uninstall_app_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="12dp"
                 android:layout_toRightOf="@+id/uninstall_app_ic"
                 android:textColor="@color/tx_nomal3"
-                android:textSize="@dimen/tx_size3"/>
+                android:textSize="@dimen/tx_size3"
+                app:layout_marginLeftPercent="4%"/>
 
             <Button
                 android:id="@+id/uninstall_start_btn"
@@ -57,18 +60,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="50dp"
                 android:layout_toLeftOf="@+id/uninstall_start_btn"
                 android:background="@drawable/btn_start2"
                 android:text="@string/app_open"
                 android:textColor="@color/tx_nomal4"
-                android:textSize="@dimen/tx_size5"/>
-        </RelativeLayout>
+                android:textSize="@dimen/tx_size5"
+                app:layout_marginRightPercent="4%"/>
+        </com.zhy.android.percent.support.PercentRelativeLayout>
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="2dp"
+            android:layout_height="0dp"
             android:layout_alignParentBottom="true"
-            android:background="@drawable/img_item_line"/>
-    </RelativeLayout>
-</RelativeLayout>
+            android:background="@drawable/img_item_line"
+            app:layout_heightPercent="4%"/>
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+</com.zhy.android.percent.support.PercentRelativeLayout>
