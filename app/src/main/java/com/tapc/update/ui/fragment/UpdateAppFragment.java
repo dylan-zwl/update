@@ -39,6 +39,8 @@ public class UpdateAppFragment extends BaseFragment {
     UpdateItem mUpdateItemApp;
     @BindView(R.id.update_mcu)
     UpdateItem mUpdateItemMcu;
+    @BindView(R.id.update_restore)
+    UpdateItem mUpdateItemRestore;
 
     private static final String TAG = UpdateAppFragment.class.getSimpleName();
     private String mUpdateFilePath;
@@ -72,21 +74,28 @@ public class UpdateAppFragment extends BaseFragment {
         }
         mUpdateItemApp.setTitle(getString(R.string.app) + String.format(getString(R.string.version), appVersion));
         mUpdateItemMcu.setTitle(getString(R.string.mcu) + String.format(getString(R.string.version), mcuVersion));
+
+        mUpdateItemRestore.setTitle(getString(R.string.app) + "  " + getString(R.string.mcu));
     }
 
     @OnClick(R.id.func_start_btn)
     void start() {
-        startUpdateThead(Mode.ALL);
+        startUpdateThead(Mode.ALL, true);
     }
 
     @OnClick(R.id.update_app)
     void startUpdateApp() {
-        startUpdateThead(Mode.ONLY_APP);
+        startUpdateThead(Mode.ONLY_APP, true);
     }
 
     @OnClick(R.id.update_mcu)
     void startUpdateMcu() {
-        startUpdateThead(Mode.ONLY_MCU);
+        startUpdateThead(Mode.ONLY_MCU, true);
+    }
+
+    @OnClick(R.id.update_restore)
+    void startRestore() {
+        startUpdateThead(Mode.ALL, false);
     }
 
     private enum Mode {
@@ -95,20 +104,26 @@ public class UpdateAppFragment extends BaseFragment {
         ONLY_MCU
     }
 
-    private void startUpdateThead(final Mode mode) {
+    private void startUpdateThead(final Mode mode, final boolean isCopyFile) {
         mDisposable = RxjavaUtils.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
                 e.onNext("start");
 
                 //app 升级
-                mUpdateFilePath = AppPresenter.initUpdate(mContext, Config.APP_PACKGGE, new AppUtil.ProgressListener() {
-                    @Override
-                    public void onCompleted(boolean isSuccessed, String message) {
-                        ShowInforUtil.send(mContext, getString(R.string.app), getString(R.string.uninstall),
-                                isSuccessed, message);
-                    }
-                });
+                if (isCopyFile) {
+                    mUpdateFilePath = AppPresenter.initUpdate(mContext, Config.APP_PACKGGE, new AppUtil
+                            .ProgressListener() {
+
+                        @Override
+                        public void onCompleted(boolean isSuccessed, String message) {
+                            ShowInforUtil.send(mContext, getString(R.string.app), getString(R.string.uninstall),
+                                    isSuccessed, message);
+                        }
+                    });
+                } else {
+                    mUpdateFilePath = Config.SAVEFILE_TARGET_PATH + Config.UPDATE_APP_NAME;
+                }
 
                 switch (mode) {
                     case ONLY_APP:

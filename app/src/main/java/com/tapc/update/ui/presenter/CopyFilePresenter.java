@@ -73,7 +73,7 @@ public class CopyFilePresenter {
                     File checkFile = new File(targetFile + "/" + (temp.getName()).toString());
                     if (checkFile.exists()) {
                         if (checkFile.length() == temp.length()) {
-                            return true;
+                            continue;
                         }
                     }
                     Log.d("check file fail", "" + checkFile.getAbsoluteFile());

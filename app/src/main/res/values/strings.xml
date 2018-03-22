@@ -49,6 +49,7 @@
 
     <!--infor-->
     <string name="update_infor">更新</string>
+    <string name="not_update_infor">不更新</string>
     <string name="copy">复制</string>
     <string name="download">下载</string>
     <string name="install">安装</string>

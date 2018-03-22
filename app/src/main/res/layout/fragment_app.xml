@@ -28,4 +28,12 @@
         UpdateItem:btn_tx="@string/update">
 
     </com.tapc.update.ui.view.UpdateItem>
+
+    <com.tapc.update.ui.view.UpdateItem
+        android:id="@+id/update_restore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        UpdateItem:btn_tx="@string/app_install_again">
+
+    </com.tapc.update.ui.view.UpdateItem>
 </com.zhy.android.percent.support.PercentLinearLayout>

@@ -85,6 +85,17 @@ public class MediaMountedReceiver extends BroadcastReceiver {
             if (!TextUtils.isEmpty(packageName)) {
                 Config.APP_PACKGGE = packageName;
             }
+
+            String isUpdateApp = configMap.get("update_app");
+            if (!TextUtils.isEmpty(isUpdateApp) && isUpdateApp.equals(0)) {
+                Config.isUpdateApp = false;
+            }
+
+            String isUpdateMcu = configMap.get("update_mcu");
+            if (!TextUtils.isEmpty(isUpdateMcu) && isUpdateMcu.equals(0)) {
+                Config.isUpdateApp = false;
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

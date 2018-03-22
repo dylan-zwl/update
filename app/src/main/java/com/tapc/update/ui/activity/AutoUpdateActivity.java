@@ -90,11 +90,14 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                         addInforShow(getString(R.string.app), getString(R.string.uninstall), isSuccessed, message);
                     }
                 });
-                addInforShow(getString(R.string.app), getString(R.string.update), getString(R.string.start));
-                appstartUpdateThead();
-                addInforShow(getString(R.string.mcu), getString(R.string.update), getString(R.string.start));
-                mcustartUpdateThead();
-
+                if (Config.isUpdateApp) {
+                    addInforShow(getString(R.string.app), getString(R.string.update), getString(R.string.start));
+                    appstartUpdateThead();
+                }
+                if (Config.isUpdateMcu) {
+                    addInforShow(getString(R.string.mcu), getString(R.string.update), getString(R.string.start));
+                    mcustartUpdateThead();
+                }
                 //第三方应用安装
                 String appPath = Config.SAVEFILE_TARGET_PATH + "/third_app";
                 List<AppInfoEntity> list = mInstallPresenter.getAppList(appPath);

@@ -122,7 +122,7 @@ public class VaCopyFragment extends BaseFragment {
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                    long size = getFreeSizes(Config.IN_SD_FILE_PATH);
+                    long size = getFreeSizes(Config.SAVEFILE_TARGET_PATH);
                     if (size < (originFileSize + 100 * 1024)) {
                         ShowInforUtil.send(mContext, "VA", getString(R.string.copy), false, mContext.getString(R.string
                                 .no_free_size));

@@ -83,9 +83,9 @@ public class VaPlayer {
     }
 
     private void releaseMediaPlayer() {
-        if (mVoicePlayer != null) {
-            mVoicePlayer.release();
-            mVoicePlayer = null;
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
         }
     }
 
