@@ -33,7 +33,8 @@ public class Config {
 
     //设备软件和OS文件名：更新源文件需同名。
     public static final String UPDATE_APP_NAME = "update_app";
-    public static final String UPDATE_OS_NAME = "update.zip";
+    public static final String UPDATE_OS_NAME = "update_os.zip";
+    public static String UPDATE_OS_SAVE_PATH = "";
 
     //设备软件包名
     public static String APP_PACKGGE = "com.tapc.platform";
@@ -69,6 +70,7 @@ public class Config {
             UDISK_FILE_PATH = "/storage/usb0/";
         }
         IN_SD_FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/";
+        UPDATE_OS_SAVE_PATH = Environment.getDownloadCacheDirectory().getPath();
         if (TextUtils.isEmpty(mountedPath)) {
             String temp = getUsbPath();
             if (!TextUtils.isEmpty(temp)) {

@@ -105,7 +105,7 @@ public class CopyFileUtils {
     public static boolean copyFile(String originFilePath, String targetFilePath, ProgressCallback callback) {
         boolean result = false;
         try {
-            int bytesum = 0;
+            long bytesum = 0;
             int byteread = 0;
             File originFile = new File(originFilePath);
             if (originFile.exists()) {
@@ -119,7 +119,7 @@ public class CopyFileUtils {
                     e.printStackTrace();
                 }
                 long fileSize = originFile.length();
-                int oldIndex = -1;
+                int oldProgress = -1;
                 InputStream inStream = new FileInputStream(originFile.getAbsoluteFile());
                 FileOutputStream fs = new FileOutputStream(targetFile.getAbsoluteFile());
                 byte[] buffer = new byte[1024 * 4];
@@ -127,8 +127,8 @@ public class CopyFileUtils {
                     bytesum += byteread;
                     fs.write(buffer, 0, byteread);
                     int progress = (int) ((bytesum * 100 / fileSize));
-                    if (progress != oldIndex) {
-                        oldIndex = progress;
+                    if (progress != oldProgress) {
+                        oldProgress = progress;
                         callback.onProgress(progress);
                     }
                 }

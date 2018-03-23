@@ -2,6 +2,7 @@ package com.tapc.update.ui.fragment;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -59,6 +60,7 @@ public class UpdateAppFragment extends BaseFragment {
         mStartUpdate.setText(getString(R.string.a_key_update));
 
         initVersionShow();
+        initClick();
     }
 
     private void initVersionShow() {
@@ -77,6 +79,29 @@ public class UpdateAppFragment extends BaseFragment {
 
         mUpdateItemRestore.setTitle(getString(R.string.app) + "  " + getString(R.string.mcu));
     }
+
+
+    private void initClick() {
+        mUpdateItemApp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startUpdateThead(Mode.ONLY_APP, true);
+            }
+        });
+        mUpdateItemMcu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startUpdateThead(Mode.ONLY_MCU, true);
+            }
+        });
+        mUpdateItemRestore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startUpdateThead(Mode.ALL, false);
+            }
+        });
+    }
+
 
     @OnClick(R.id.func_start_btn)
     void start() {

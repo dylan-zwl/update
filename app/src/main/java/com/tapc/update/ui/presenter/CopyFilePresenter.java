@@ -29,7 +29,10 @@ public class CopyFilePresenter {
     }
 
     /**
-     * 功能描述 : 复制文件
+     * 功能描述 : 复制升级文件,删除原来
+     *
+     * @param originFile : 源文件路径
+     * @param savePath   : 存储路径，原有文件全删除
      */
     public static boolean copyUpdateFile(String originFile, String savePath) {
         try {
@@ -79,7 +82,10 @@ public class CopyFilePresenter {
                     Log.d("check file fail", "" + checkFile.getAbsoluteFile());
                     return false;
                 } else if (temp.isDirectory()) {
-                    return check(originFile + "/" + file[i], targetFile + "/" + file[i]);
+                    boolean result = check(originFile + "/" + file[i], targetFile + "/" + file[i]);
+                    if (!result) {
+                        return false;
+                    }
                 }
             }
         } else {

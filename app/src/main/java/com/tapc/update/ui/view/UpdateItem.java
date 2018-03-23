@@ -63,7 +63,7 @@ public class UpdateItem extends RelativeLayout {
 
     @Override
     public void setOnClickListener(@Nullable OnClickListener l) {
-        super.setOnClickListener(l);
+//        super.setOnClickListener(l);
         mStartBtn.setOnClickListener(l);
     }
 }

@@ -64,7 +64,7 @@ public class MainActivity extends FragmentActivity {
                     menuServie.setMenuBarVisibility(true);
                 }
             }
-        }, 1200);
+        }, 1500);
 
         mFragmentManager = getSupportFragmentManager();
         setCheckedFunc(Item.APP);

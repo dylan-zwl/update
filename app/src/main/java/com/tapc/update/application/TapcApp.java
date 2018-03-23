@@ -22,10 +22,10 @@ public class TapcApp extends Application {
     public void onCreate() {
         super.onCreate();
         sTapcApp = this;
-        Config.initConfig(null);
-        initMachineCtl();
         stopAllService(this);
         startAllService(this);
+        Config.initConfig(null);
+        initMachineCtl();
     }
 
     public static TapcApp getInstance() {
@@ -33,7 +33,8 @@ public class TapcApp extends Application {
     }
 
     public void startAllService(Context context) {
-        IntentUtil.bindService(context, MenuService.class, mConnection, Context.BIND_AUTO_CREATE);
+        IntentUtil.bindService(context, MenuService.class, mConnection, Context.BIND_AUTO_CREATE | Context
+                .BIND_ABOVE_CLIENT);
     }
 
     public void stopAllService(Context context) {

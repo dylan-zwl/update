@@ -64,4 +64,5 @@
     <string name="no_system_permission">无系统权限</string>
     <string name="check_file">检测文件</string>
     <string name="start">开始</string>
+    <string name="os_same">相同OS，无需升级</string>
 </resources>

@@ -3,6 +3,7 @@ package com.tapc.update.ui.activity;
 import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -17,6 +18,7 @@ import com.tapc.update.ui.presenter.AppPresenter;
 import com.tapc.update.ui.presenter.CopyFilePresenter;
 import com.tapc.update.ui.presenter.InstallPresenter;
 import com.tapc.update.ui.presenter.McuPresenter;
+import com.tapc.update.ui.presenter.OsPresenter;
 import com.tapc.update.ui.presenter.UpdateConttract;
 import com.tapc.update.ui.view.UpdateProgress;
 import com.tapc.update.utils.AppUtil;
@@ -83,72 +85,93 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                 e.onNext("start");
                 mUpdateStatusList = new ArrayList<Boolean>();
 
-                //app 升级
-                mUpdateFilePath = AppPresenter.initUpdate(mContext, Config.APP_PACKGGE, new AppUtil.ProgressListener() {
-                    @Override
-                    public void onCompleted(boolean isSuccessed, String message) {
-                        addInforShow(getString(R.string.app), getString(R.string.uninstall), isSuccessed, message);
-                    }
-                });
-                if (Config.isUpdateApp) {
-                    addInforShow(getString(R.string.app), getString(R.string.update), getString(R.string.start));
-                    appstartUpdateThead();
-                }
-                if (Config.isUpdateMcu) {
-                    addInforShow(getString(R.string.mcu), getString(R.string.update), getString(R.string.start));
-                    mcustartUpdateThead();
-                }
-                //第三方应用安装
-                String appPath = Config.SAVEFILE_TARGET_PATH + "/third_app";
-                List<AppInfoEntity> list = mInstallPresenter.getAppList(appPath);
-                if (list != null && list.size() > 0) {
-                    addInforShow(getString(R.string.app), getString(R.string.install), getString(R.string.start));
-                    for (final AppInfoEntity appInfoEntity : list) {
-                        mInstallPresenter.installApp(appInfoEntity, false, new AppUtil.ProgressListener() {
-                            @Override
-                            public void onCompleted(boolean isSuccessed, String message) {
-                                addInforShow(appInfoEntity.getAppLabel(), getString(R.string.install), isSuccessed,
-                                        message);
-                                mUpdateStatusList.add(isSuccessed);
-                            }
-                        });
-                    }
-                }
+                //OS升级  注意：不能与APP同时升级
 
-                String originFile = Config.VA_ORIGIN_PATH;
-                String targetFile = Config.VA_TARGET_PATH;
-                File file = new File(originFile);
-                if (file.exists()) {
-                    if (!check(originFile, targetFile)) {
-                        addInforShow(getString(R.string.va), getString(R.string.copy), getString(R.string.start));
-
-                        long startTime = System.currentTimeMillis();
-                        boolean result = new CopyFileUtils().copyFolder(originFile, targetFile, new CopyFileUtils
-                                .ProgressCallback() {
-                            @Override
-                            public void onProgress(int progress) {
-                                updateProgressUi(progress);
-                            }
-
-                            @Override
-                            public void onCompeleted(boolean isSuccessed, String msg) {
-                                addInforShow(getString(R.string.va), getString(R.string.copy), isSuccessed, msg);
-                            }
-                        });
-                        if (result) {
-                            result = CopyFilePresenter.check(originFile, targetFile);
+                String osFileName = OsPresenter.checkHasOsFile(Config.SAVEFILE_ORIGIN__PATH);
+                if (!TextUtils.isEmpty(osFileName) && OsPresenter.checkNeedUpdate(Config.UPDATE_OS_SAVE_PATH, osFileName)) {
+                    addInforShow(getString(R.string.os), getString(R.string.update), getString(R.string.start));
+                    OsPresenter osPresenter = new OsPresenter(mContext, new UpdateConttract.View() {
+                        @Override
+                        public void updateProgress(int percent, String msg) {
+                            updateProgressUi(percent);
                         }
-                        mUpdateStatusList.add(result);
 
-                        long usetime = (System.currentTimeMillis() - startTime) / 1000;
-                        Log.d("copy progress", "  use time: " + usetime);
-                    } else {
-                        addInforShow(getString(R.string.va), getString(R.string.copy), true, "");
+                        @Override
+                        public void updateCompleted(boolean isSuccess, String msg) {
+                            addInforShow(getString(R.string.os), getString(R.string.copy), isSuccess, msg);
+                        }
+                    });
+                    osPresenter.update(Config.SAVEFILE_ORIGIN__PATH);
+                } else {
+                    //app 升级
+                    mUpdateFilePath = AppPresenter.initUpdate(mContext, Config.APP_PACKGGE, new AppUtil
+                            .ProgressListener() {
+
+                        @Override
+                        public void onCompleted(boolean isSuccessed, String message) {
+                            addInforShow(getString(R.string.app), getString(R.string.uninstall), isSuccessed, message);
+                        }
+                    });
+                    if (Config.isUpdateApp) {
+                        addInforShow(getString(R.string.app), getString(R.string.update), getString(R.string.start));
+                        appstartUpdateThead();
+                    }
+                    if (Config.isUpdateMcu) {
+                        addInforShow(getString(R.string.mcu), getString(R.string.update), getString(R.string.start));
+                        mcustartUpdateThead();
+                    }
+                    //第三方应用安装
+                    String appPath = Config.SAVEFILE_TARGET_PATH + "/third_app";
+                    List<AppInfoEntity> list = mInstallPresenter.getAppList(appPath);
+                    if (list != null && list.size() > 0) {
+                        addInforShow(getString(R.string.app), getString(R.string.install), getString(R.string.start));
+                        for (final AppInfoEntity appInfoEntity : list) {
+                            mInstallPresenter.installApp(appInfoEntity, false, new AppUtil.ProgressListener() {
+                                @Override
+                                public void onCompleted(boolean isSuccessed, String message) {
+                                    addInforShow(appInfoEntity.getAppLabel(), getString(R.string.install), isSuccessed,
+                                            message);
+                                    mUpdateStatusList.add(isSuccessed);
+                                }
+                            });
+                        }
+                    }
+
+                    // va 复制
+                    String originFile = Config.VA_ORIGIN_PATH;
+                    String targetFile = Config.VA_TARGET_PATH;
+                    File file = new File(originFile);
+                    if (file.exists()) {
+                        if (!check(originFile, targetFile)) {
+                            addInforShow(getString(R.string.va), getString(R.string.copy), getString(R.string.start));
+
+                            long startTime = System.currentTimeMillis();
+                            boolean result = new CopyFileUtils().copyFolder(originFile, targetFile, new CopyFileUtils
+                                    .ProgressCallback() {
+                                @Override
+                                public void onProgress(int progress) {
+                                    updateProgressUi(progress);
+                                }
+
+                                @Override
+                                public void onCompeleted(boolean isSuccessed, String msg) {
+                                    addInforShow(getString(R.string.va), getString(R.string.copy), isSuccessed, msg);
+                                }
+                            });
+                            if (result) {
+                                result = CopyFilePresenter.check(originFile, targetFile);
+                            }
+                            mUpdateStatusList.add(result);
+
+                            long usetime = (System.currentTimeMillis() - startTime) / 1000;
+                            Log.d("copy progress", "  use time: " + usetime);
+                        } else {
+                            addInforShow(getString(R.string.va), getString(R.string.copy), true, "");
+                        }
                     }
                 }
 
                 e.onNext("finished");
-
                 e.onComplete();
             }
         }, new Consumer() {

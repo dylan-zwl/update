@@ -1,6 +1,7 @@
 package com.tapc.update.utils;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.tapc.update.R;
 import com.tapc.update.application.TapcApp;
@@ -27,7 +28,10 @@ public class ShowInforUtil {
         if (isSuccess) {
             infor = infor + context.getString(R.string.success);
         } else {
-            infor = infor + context.getString(R.string.failed) + " : " + msg;
+            infor = infor + context.getString(R.string.failed);
+        }
+        if (!TextUtils.isEmpty(msg)) {
+            infor = infor + " : " + msg;
         }
         return infor;
     }

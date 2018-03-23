@@ -43,9 +43,7 @@ public class UninstallAdpater extends BaseRecyclerViewAdapter<UninstallAdpater.V
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         super.onBindViewHolder(holder, position);
         final AppInfoEntity item = mDatas.get(position);
-        holder.checkBox.setChecked(item.isChecked());
-        holder.icon.setImageDrawable(item.getAppIcon());
-        holder.name.setText(item.getAppLabel());
+
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -76,6 +74,10 @@ public class UninstallAdpater extends BaseRecyclerViewAdapter<UninstallAdpater.V
                 }
             }
         });
+
+        holder.icon.setImageDrawable(item.getAppIcon());
+        holder.name.setText(item.getAppLabel());
+        holder.checkBox.setChecked(item.isChecked());
     }
 
     public interface Listener {

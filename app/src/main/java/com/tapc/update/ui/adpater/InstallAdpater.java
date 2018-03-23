@@ -63,10 +63,10 @@ public class InstallAdpater extends BaseRecyclerViewAdapter<InstallAdpater.ViewH
                 mListener.onStart(position);
             }
         });
-        holder.checkBox.setChecked(item.isChecked());
         holder.icon.setImageDrawable(item.getAppIcon());
         holder.name.setText(item.getAppLabel());
         holder.installStatus.setText(item.getInstallStatus());
+        holder.checkBox.setChecked(item.isChecked());
     }
 
     public interface Listener {
