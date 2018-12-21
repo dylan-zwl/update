@@ -87,32 +87,16 @@ public class AppPresenter implements UpdateConttract.UpdatePresenter {
 
                 //升级设备app，自动卸载测试软件
                 String testPkgName = Config.TEST_APP_PACKGGE;
-//                if (AppUtil.isAppInstalled(mContext, testPkgName)) {
-                AppUtil.unInstallApk(mContext, testPkgName, new AppUtil.ProgressListener() {
-                    @Override
-                    public void onCompleted(boolean isSuccessed, String message) {
-                    }
-                });
-//                }
+                if (AppUtil.isAppInstalled(mContext, testPkgName)) {
+                    AppUtil.unInstallApk(mContext, testPkgName, new AppUtil.ProgressListener() {
+                        @Override
+                        public void onCompleted(boolean isSuccessed, String message) {
+                        }
+                    });
+                }
 
                 //卸载设备app，覆盖安装不卸载。
                 if (!Config.isCoverInstall && !TextUtils.isEmpty(installPackageName)) {
-//                    boolean isRunning = AppUtil.isAppRunning(mContext, installPackageName);
-//                    if (isRunning) {
-//                        AppUtil.unInstallApk(mContext, installPackageName, new AppUtil.ProgressListener() {
-//                            @Override
-//                            public void onCompleted(boolean isSuccessed, String message) {
-//                                Log.d("App",)
-//                            }
-//                        });
-//                    } else {
-//                        AppUtil.clearAppUserData(mContext, installPackageName, new IPackageDataObserver.Stub() {
-//                            @Override
-//                            public void onRemoveCompleted(String s, boolean b) throws RemoteException {
-//                            }
-//                        });
-//                    }
-
                     AppUtil.unInstallApk(mContext, installPackageName, new AppUtil.ProgressListener() {
                         @Override
                         public void onCompleted(boolean isSuccessed, String message) {

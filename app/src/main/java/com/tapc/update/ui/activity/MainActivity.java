@@ -19,7 +19,9 @@ import com.tapc.update.ui.fragment.UninstallAppFragment;
 import com.tapc.update.ui.fragment.UpdateAppFragment;
 import com.tapc.update.ui.fragment.UpdateOsFragment;
 import com.tapc.update.ui.fragment.VaCopyFragment;
+import com.tapc.update.ui.fragment.VersionFragment;
 import com.tapc.update.ui.view.FunctionItem;
+import com.tapc.update.ui.widget.MenuBar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,12 +40,12 @@ public class MainActivity extends FragmentActivity {
     FunctionItem mFuncItemUninstall;
     @BindView(R.id.func_setting)
     FunctionItem mFuncItemSetting;
+    @BindView(R.id.func_version)
+    FunctionItem mFuncItemVersion;
     @BindView(R.id.fragment)
     FrameLayout mFragment;
 
     protected FragmentManager mFragmentManager;
-    private Fragment mCurrentfragment;
-
     private Handler mHandler = new Handler();
 
     @Override
@@ -51,7 +53,7 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
-
+        TapcApp.getInstance().startUpdate();
         initView();
     }
 
@@ -62,6 +64,13 @@ public class MainActivity extends FragmentActivity {
                 MenuService menuServie = TapcApp.getInstance().getService();
                 if (menuServie != null) {
                     menuServie.setMenuBarVisibility(true);
+                    menuServie.getMenuBar().setExitListener(new MenuBar.ExitListener() {
+                        @Override
+                        public void exit() {
+                            TapcApp.getInstance().stopUpdate();
+                            MainActivity.this.finish();
+                        }
+                    });
                 }
             }
         }, 1500);
@@ -76,7 +85,8 @@ public class MainActivity extends FragmentActivity {
         INSTALL,
         UNINSTALL,
         OS,
-        SETTING
+        SETTING,
+        VERSION
     }
 
     @OnClick(R.id.func_app)
@@ -109,6 +119,11 @@ public class MainActivity extends FragmentActivity {
         setCheckedFunc(Item.SETTING);
     }
 
+    @OnClick(R.id.func_version)
+    void version() {
+        setCheckedFunc(Item.VERSION);
+    }
+
     private void setCheckedFunc(final Item item) {
         mFuncItemApp.setChecked(false);
         mFuncItemOs.setChecked(false);
@@ -116,6 +131,7 @@ public class MainActivity extends FragmentActivity {
         mFuncItemInstall.setChecked(false);
         mFuncItemUninstall.setChecked(false);
         mFuncItemSetting.setChecked(false);
+        mFuncItemVersion.setChecked(false);
         switch (item) {
             case APP:
                 mFuncItemApp.setChecked(true);
@@ -141,32 +157,17 @@ public class MainActivity extends FragmentActivity {
                 mFuncItemSetting.setChecked(true);
                 startActivity(new Intent(Settings.ACTION_SETTINGS));
                 break;
+            case VERSION:
+                mFuncItemVersion.setChecked(true);
+                replaceFragment(Fragment.instantiate(this, VersionFragment.class.getName()));
+                break;
         }
-//        showFragment(mFragmentList.get(item));
     }
 
     private void replaceFragment(Fragment fragment) {
         FragmentTransaction ft = mFragmentManager.beginTransaction();
         ft.setTransition(FragmentTransaction.TRANSIT_ENTER_MASK);
         ft.replace(R.id.fragment, fragment);
-        ft.commit();
-    }
-
-    private void showFragment(Fragment fragment) {
-        FragmentTransaction ft = mFragmentManager.beginTransaction();
-        if (mCurrentfragment != null) {
-            ft.hide(mCurrentfragment);
-        }
-        Fragment showFragment = mFragmentManager.findFragmentByTag(fragment.getClass().getName());
-        if (showFragment == null) {
-            showFragment = fragment;
-        }
-        if (!showFragment.isAdded()) {
-            ft.add(R.id.fragment, showFragment, fragment.getClass().getName());
-        } else {
-            ft.show(showFragment);
-        }
-        mCurrentfragment = showFragment;
         ft.commit();
     }
 

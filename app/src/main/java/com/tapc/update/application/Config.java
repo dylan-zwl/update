@@ -34,6 +34,7 @@ public class Config {
     //设备软件和OS文件名：更新源文件需同名。
     public static final String UPDATE_APP_NAME = "update_app";
     public static final String UPDATE_OS_NAME = "update_os.zip";
+    public static final String UPDATE_NAME = "update.apk";
     public static String UPDATE_OS_SAVE_PATH = "";
 
     //设备软件包名
@@ -53,21 +54,32 @@ public class Config {
     //是否更新MCU
     public static boolean isUpdateMcu = true;
 
+    public static DeviceType DEVICE_TYPE = DeviceType.RK3188;
+
+    public enum DeviceType {
+        TCC8935,
+        RK3188,
+        S700
+    }
+
     public static void initConfig(String mountedPath) {
         if (new File("/dev/ttyS3").exists()) {
             if (new File("/mnt/sd-ext/").exists()) {
                 //s700 s900
                 EX_SD_FILE_PATH = "/mnt/sd-ext/";
                 UDISK_FILE_PATH = "/mnt/uhost/";
+                DEVICE_TYPE = DeviceType.S700;
             } else {
                 //rk3188
                 EX_SD_FILE_PATH = "/mnt/external_sd/";
                 UDISK_FILE_PATH = "/mnt/usb_storage/";
+                DEVICE_TYPE = DeviceType.RK3188;
             }
         } else {
             //8935
             EX_SD_FILE_PATH = "/storage/sdcard1/";
             UDISK_FILE_PATH = "/storage/usb0/";
+            DEVICE_TYPE = DeviceType.TCC8935;
         }
         IN_SD_FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/";
         UPDATE_OS_SAVE_PATH = Environment.getDownloadCacheDirectory().getPath();
@@ -79,12 +91,6 @@ public class Config {
             } else {
                 MOUNTED_PATH = EX_SD_FILE_PATH;
             }
-//            File file = new File(UDISK_FILE_PATH);
-//            if (file != null && file.exists() && file.list() != null && file.list().length > 0) {
-//                MOUNTED_PATH = UDISK_FILE_PATH;
-//            } else {
-//                MOUNTED_PATH = EX_SD_FILE_PATH;
-//            }
         } else {
             MOUNTED_PATH = mountedPath;
         }

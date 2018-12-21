@@ -1,68 +1,69 @@
 <resources>
     <string name="app_name">update</string>
     <!--功能-->
-    <string name="system_maintenance">系统维护</string>
-    <string name="func_app">应用升级</string>
-    <string name="func_os">OS升级</string>
-    <string name="func_vacopy">VA安装</string>
-    <string name="func_install">应用安装</string>
-    <string name="func_uninstall">应用卸载</string>
-    <string name="func_setting">系统设置</string>
+    <string name="system_maintenance">System maintenance</string>
+    <string name="func_app">APP update</string>
+    <string name="func_os">OS update</string>
+    <string name="func_vacopy">VA</string>
+    <string name="func_install">Install</string>
+    <string name="func_uninstall">Uninstall</string>
+    <string name="func_setting">Setting</string>
+    <string name="func_version">Version</string>
 
     <!--升级-->
-    <string name="update">升级</string>
-    <string name="a_key_update">一键升级</string>
+    <string name="update">Update</string>
+    <string name="a_key_update">One-click</string>
     <string name="app">APP</string>
     <string name="mcu">MCU</string>
     <string name="os">OS</string>
     <string name="va">VA</string>
-    <string name="restore_factory">恢复出厂设置</string>
-    <string name="version"> 版本号: V%1$s </string>
+    <string name="restore_factory">Restore factory</string>
+    <string name="version">version: V%1$s </string>
 
-    <string name="va_copy">复制</string>
-    <string name="va_from_path">源路径</string>
-    <string name="va_target_path">目标路径</string>
-    <string name="va_file_manager">文件管理器</string>
-    <string name="va_file_manager_btn">打开</string>
-    <string name="va_check">VA 检测</string>
-    <string name="va_check_btn">检测</string>
+    <string name="va_copy">Copy</string>
+    <string name="va_from_path">Source path</string>
+    <string name="va_target_path">Target path</string>
+    <string name="va_file_manager">File manager</string>
+    <string name="va_file_manager_btn">Open</string>
+    <string name="va_check">Check VA</string>
+    <string name="va_check_btn">Check</string>
 
     <!--应用-->
-    <string name="a_key_install_app">一键安装</string>
-    <string name="a_key_uninstall_app">一键删除</string>
-    <string name="select_item_all">全选</string>
-    <string name="show_system_app">显示系统软件</string>
-    <string name="app_open">启动</string>
-    <string name="app_install">安装</string>
-    <string name="app_install_again">重装</string>
-    <string name="app_uninstall">卸载</string>
-    <string name="app_installed">已安装</string>
-    <string name="app_install_success">安装成功</string>
-    <string name="app_install_fail">安装失败</string>
-    <string name="app_config">APP配置文件</string>
+    <string name="a_key_install_app">One-click</string>
+    <string name="a_key_uninstall_app">One-click</string>
+    <string name="select_item_all">All</string>
+    <string name="show_system_app">System</string>
+    <string name="app_open">Start</string>
+    <string name="app_install">Install</string>
+    <string name="app_install_again">Reinstall</string>
+    <string name="app_uninstall">Uninstall</string>
+    <string name="app_installed">Installed</string>
+    <string name="app_install_success">Successful installation</string>
+    <string name="app_install_fail">Installation failed</string>
 
     <!--信息栏-->
-    <string name="menu_title">信息</string>
-    <string name="menu_clear">清除</string>
-    <string name="back">返回</string>
-    <string name="exit">退出</string>
+    <string name="menu_title">Information</string>
+    <string name="menu_clear">Clear</string>
+    <string name="back">Back</string>
+    <string name="exit">Exit</string>
 
     <!--infor-->
-    <string name="update_infor">更新</string>
-    <string name="not_update_infor">不更新</string>
-    <string name="copy">复制</string>
-    <string name="download">下载</string>
-    <string name="install">安装</string>
-    <string name="uninstall">卸载</string>
-    <string name="success">成功</string>
-    <string name="failed">失败</string>
-    <string name="no_file">没有文件</string>
-    <string name="time_out">超时</string>
-    <string name="no_free_size">空间不足</string>
-    <string name="copy_file_error">复制文件错误</string>
-    <string name="file_Illegal">文件不合法</string>
-    <string name="no_system_permission">无系统权限</string>
-    <string name="check_file">检测文件</string>
-    <string name="start">开始</string>
-    <string name="os_same">相同OS，无需升级</string>
+    <string name="update_infor">update</string>
+    <string name="not_update_infor">no update</string>
+    <string name="copy">copy</string>
+    <string name="download">download</string>
+    <string name="install">install</string>
+    <string name="uninstall">uninstall</string>
+    <string name="success">successed</string>
+    <string name="failed">failed</string>
+    <string name="no_file">no file</string>
+    <string name="time_out">time out</string>
+    <string name="no_free_size">not enough space</string>
+    <string name="copy_file_error">copy file error</string>
+    <string name="file_Illegal">file error</string>
+    <string name="no_system_permission">no permission</string>
+    <string name="check_file">test file</string>
+    <string name="start">start</string>
+    <string name="os_same">Same OS, no need to upgrade</string>
+    <string name="reboot">If the update is successful,The upgrade software will automatically exit. Please restart the application!</string>
 </resources>

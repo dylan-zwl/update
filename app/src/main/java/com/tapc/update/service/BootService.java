@@ -3,7 +3,6 @@ package com.tapc.update.service;
 import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -41,20 +40,10 @@ public class BootService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        if (mMediaMountedReceiver != null) {
-//            unregisterReceiver(mMediaMountedReceiver);
-//            mMediaMountedReceiver = null;
-//        }
     }
 
 
     @SuppressLint("InlinedApi")
     private void initView() {
-        mMediaMountedReceiver = new MediaMountedReceiver();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_MEDIA_EJECT);
-        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-        filter.addDataScheme("file");
-        registerReceiver(mMediaMountedReceiver, filter);
     }
 }

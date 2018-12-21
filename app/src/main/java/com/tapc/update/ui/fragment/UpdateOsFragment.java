@@ -48,7 +48,8 @@ public class UpdateOsFragment extends BaseFragment {
 
         String osVersion = android.os.Build.DISPLAY;
         if (!TextUtils.isEmpty(osVersion)) {
-            mUpdateItemOS.setTitle(String.format(getString(R.string.os) + getString(R.string.version), osVersion));
+            mUpdateItemOS.setTitle(String.format(getString(R.string.os) + " " + getString(R.string.version),
+                    osVersion));
         }
     }
 

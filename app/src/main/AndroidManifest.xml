@@ -30,20 +30,20 @@
             android:name="com.tapc.update.ui.activity.MainActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape">
-            <!--            <intent-filter>
-                            <action android:name="android.intent.action.MAIN"/>
-                            <category android:name="android.intent.category.LAUNCHER"/>
-                        </intent-filter>-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
 
         <activity
             android:name="com.tapc.update.ui.activity.AutoUpdateActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            <!--   <intent-filter>
+                   <action android:name="android.intent.action.MAIN"/>
+                   <category android:name="android.intent.category.LAUNCHER"/>
+               </intent-filter>-->
         </activity>
 
         <service android:name="com.tapc.update.service.MenuService"/>

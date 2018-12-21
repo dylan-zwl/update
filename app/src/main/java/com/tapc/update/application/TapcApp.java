@@ -3,11 +3,14 @@ package com.tapc.update.application;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
 import com.tapc.platform.jni.Driver;
 import com.tapc.platform.model.device.controller.MachineController;
+import com.tapc.update.broadcast.MediaMountedReceiver;
 import com.tapc.update.service.MenuService;
 import com.tapc.update.service.binder.LocalBinder;
 import com.tapc.update.ui.entity.MenuInfo;
@@ -17,21 +20,56 @@ import com.tapc.update.utils.IntentUtil;
 public class TapcApp extends Application {
     private static TapcApp sTapcApp;
     private MenuService mMenuService;
+    private MediaMountedReceiver mMediaMountedReceiver;
 
     @Override
     public void onCreate() {
         super.onCreate();
         sTapcApp = this;
+        Config.initConfig(null);
         stopAllService(this);
         startAllService(this);
-        Config.initConfig(null);
-        initMachineCtl();
     }
 
     public static TapcApp getInstance() {
         return sTapcApp;
     }
 
+    /**
+     * 开始升级初始化
+     */
+    public void startUpdate() {
+        IntentUtil.sendBroadcast(this, "tapc_start_update", null);
+        initMachineCtl();
+    }
+
+    /**
+     * 停止升级
+     */
+    public void stopUpdate() {
+        MachineController.getInstance().stop();
+        IntentUtil.sendBroadcast(this, "tapc_stop_update", null);
+    }
+
+    private void initMachineCtl() {
+        Driver.openUinput(Driver.UINPUT_DEVICE_NAME);
+        switch (Config.DEVICE_TYPE) {
+            case RK3188:
+                Driver.initCom("/dev/ttyS3", 115200);
+                break;
+            case S700:
+                Driver.initCom("/dev/ttyS0", 115200);
+                break;
+        }
+
+        MachineController controller = MachineController.getInstance();
+        controller.initController(this);
+        controller.start();
+    }
+
+    /**
+     * sevice服务
+     */
     public void startAllService(Context context) {
         IntentUtil.bindService(context, MenuService.class, mConnection, Context.BIND_AUTO_CREATE | Context
                 .BIND_ABOVE_CLIENT);
@@ -54,24 +92,8 @@ public class TapcApp extends Application {
         }
     };
 
-    private void initMachineCtl() {
-        Driver.openUinput(Driver.UINPUT_DEVICE_NAME);
-        Driver.initCom("/dev/ttyS3", 115200);
-        Driver.initCom("/dev/ttyS0", 115200);
-
-        MachineController controller = MachineController.getInstance();
-        controller.initController(this);
-        controller.start();
-    }
-
     public MenuService getService() {
         return mMenuService;
-    }
-
-    public void setMenuBarVisibility(boolean visibility) {
-        if (mMenuService != null) {
-            mMenuService.setMenuBarVisibility(visibility);
-        }
     }
 
     public UpdateProgress getUpdateProgress() {
@@ -84,6 +106,24 @@ public class TapcApp extends Application {
     public void addInfor(MenuInfo.inforType type, String text) {
         if (mMenuService != null) {
             mMenuService.addInfor(type, text);
+        }
+    }
+
+    public void unRegisterMediaMountedReceiver() {
+        if (mMediaMountedReceiver != null) {
+            unregisterReceiver(mMediaMountedReceiver);
+            mMediaMountedReceiver = null;
+        }
+    }
+
+    public void registerMediaMountedReceiver() {
+        if (mMediaMountedReceiver == null) {
+            mMediaMountedReceiver = new MediaMountedReceiver();
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Intent.ACTION_MEDIA_EJECT);
+            filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+            filter.addDataScheme("file");
+            TapcApp.this.registerReceiver(mMediaMountedReceiver, filter);
         }
     }
 }

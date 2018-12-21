@@ -74,8 +74,8 @@ public class UpdateAppFragment extends BaseFragment {
         if (TextUtils.isEmpty(mcuVersion)) {
             mcuVersion = "";
         }
-        mUpdateItemApp.setTitle(getString(R.string.app) + String.format(getString(R.string.version), appVersion));
-        mUpdateItemMcu.setTitle(getString(R.string.mcu) + String.format(getString(R.string.version), mcuVersion));
+        mUpdateItemApp.setTitle(getString(R.string.app) + " " + String.format(getString(R.string.version), appVersion));
+        mUpdateItemMcu.setTitle(getString(R.string.mcu) + " " + String.format(getString(R.string.version), mcuVersion));
 
         mUpdateItemRestore.setTitle(getString(R.string.app) + "  " + getString(R.string.mcu));
     }

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.tapc.platform.jni.Driver;
 import com.tapc.update.R;
 import com.tapc.update.application.Config;
+import com.tapc.update.application.TapcApp;
 import com.tapc.update.ui.base.BaseActivity;
 import com.tapc.update.ui.entity.AppInfoEntity;
 import com.tapc.update.ui.presenter.AppPresenter;
@@ -70,6 +71,9 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
     @Override
     public void initView() {
         mContext = this;
+
+        TapcApp.getInstance().startUpdate();
+
         mStringBuilder = new StringBuilder();
         mHandler = new Handler();
         mProgress.setListener(this);
@@ -83,12 +87,12 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
             @Override
             public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
                 e.onNext("start");
-                mUpdateStatusList = new ArrayList<Boolean>();
+                mUpdateStatusList = new ArrayList<>();
 
                 //OS升级  注意：不能与APP同时升级
-
                 String osFileName = OsPresenter.checkHasOsFile(Config.SAVEFILE_ORIGIN__PATH);
-                if (!TextUtils.isEmpty(osFileName) && OsPresenter.checkNeedUpdate(Config.UPDATE_OS_SAVE_PATH, osFileName)) {
+                if (!TextUtils.isEmpty(osFileName) && OsPresenter.checkNeedUpdate(Config.UPDATE_OS_SAVE_PATH,
+                        osFileName)) {
                     addInforShow(getString(R.string.os), getString(R.string.update), getString(R.string.start));
                     OsPresenter osPresenter = new OsPresenter(mContext, new UpdateConttract.View() {
                         @Override
@@ -294,8 +298,9 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
 
     @OnClick(R.id.auto_update_exit)
     void exit() {
+        TapcApp.getInstance().stopUpdate();
         Driver.home();
-        System.exit(0);
+        finish();
     }
 
     @Override

@@ -1,0 +1,69 @@
+<resources>
+    <string name="app_name">update</string>
+    <!--功能-->
+    <string name="system_maintenance">系统维护</string>
+    <string name="func_app">应用升级</string>
+    <string name="func_os">OS升级</string>
+    <string name="func_vacopy">VA安装</string>
+    <string name="func_install">应用安装</string>
+    <string name="func_uninstall">应用卸载</string>
+    <string name="func_setting">系统设置</string>
+    <string name="func_version">版本</string>
+
+    <!--升级-->
+    <string name="update">升级</string>
+    <string name="a_key_update">一键升级</string>
+    <string name="app">APP</string>
+    <string name="mcu">MCU</string>
+    <string name="os">OS</string>
+    <string name="va">VA</string>
+    <string name="restore_factory">恢复出厂设置</string>
+    <string name="version">版本号: V%1$s </string>
+
+    <string name="va_copy">复制</string>
+    <string name="va_from_path">源路径</string>
+    <string name="va_target_path">目标路径</string>
+    <string name="va_file_manager">文件管理器</string>
+    <string name="va_file_manager_btn">打开</string>
+    <string name="va_check">VA 检测</string>
+    <string name="va_check_btn">检测</string>
+
+    <!--应用-->
+    <string name="a_key_install_app">一键安装</string>
+    <string name="a_key_uninstall_app">一键删除</string>
+    <string name="select_item_all">全选</string>
+    <string name="show_system_app">显示系统软件</string>
+    <string name="app_open">启动</string>
+    <string name="app_install">安装</string>
+    <string name="app_install_again">重装</string>
+    <string name="app_uninstall">卸载</string>
+    <string name="app_installed">已安装</string>
+    <string name="app_install_success">安装成功</string>
+    <string name="app_install_fail">安装失败</string>
+
+    <!--信息栏-->
+    <string name="menu_title">信息</string>
+    <string name="menu_clear">清除</string>
+    <string name="back">返回</string>
+    <string name="exit">退出</string>
+
+    <!--infor-->
+    <string name="update_infor">更新</string>
+    <string name="not_update_infor">不更新</string>
+    <string name="copy">复制</string>
+    <string name="download">下载</string>
+    <string name="install">安装</string>
+    <string name="uninstall">卸载</string>
+    <string name="success">成功</string>
+    <string name="failed">失败</string>
+    <string name="no_file">没有文件</string>
+    <string name="time_out">超时</string>
+    <string name="no_free_size">空间不足</string>
+    <string name="copy_file_error">复制文件错误</string>
+    <string name="file_Illegal">文件不合法</string>
+    <string name="no_system_permission">无系统权限</string>
+    <string name="check_file">检测文件</string>
+    <string name="start">开始</string>
+    <string name="os_same">相同OS，无需升级</string>
+    <string name="reboot">如更新成功，升级软件会自动退出，请重新启动应用！</string>
+</resources>

@@ -61,8 +61,21 @@ public class MenuBar extends BaseSystemView {
 
     @OnClick(R.id.menu_exit)
     void exitOnClick() {
+        dismiss();
+        if (mExitListener != null) {
+            mExitListener.exit();
+        }
         Driver.home();
-        System.exit(0);
+    }
+
+    private ExitListener mExitListener;
+
+    public interface ExitListener {
+        void exit();
+    }
+
+    public void setExitListener(ExitListener exitListener) {
+        mExitListener = exitListener;
     }
 
     @OnClick(R.id.infor_clear)

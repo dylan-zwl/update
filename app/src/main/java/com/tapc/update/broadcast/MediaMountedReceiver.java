@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.tapc.update.application.Config;
+import com.tapc.update.application.TapcApp;
 import com.tapc.update.ui.activity.AutoUpdateActivity;
 import com.tapc.update.ui.activity.MainActivity;
 import com.tapc.update.utils.IntentUtil;
@@ -21,12 +22,14 @@ import java.util.Map;
 
 public class MediaMountedReceiver extends BroadcastReceiver {
 
+
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         if (action == Intent.ACTION_MEDIA_MOUNTED) {
             String mountedPath = intent.getData().getPath() + "/";
             if (TextUtils.isEmpty(mountedPath) || new File(mountedPath).exists() == false || mountedPath.contains
                     (Environment.getExternalStorageDirectory().getAbsolutePath())) {
+                TapcApp.getInstance().registerMediaMountedReceiver();
                 return;
             }
 

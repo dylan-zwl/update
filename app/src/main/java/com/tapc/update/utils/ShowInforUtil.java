@@ -16,9 +16,15 @@ public class ShowInforUtil {
         String infor = title + " " + updateType + " ";
         if (isSuccess) {
             infor = infor + context.getString(R.string.success);
+            if (!TextUtils.isEmpty(msg)) {
+                infor = infor + " : " + msg;
+            }
             TapcApp.getInstance().addInfor(MenuInfo.inforType.INFO, infor);
         } else {
-            infor = infor + context.getString(R.string.failed) + " : " + msg;
+            infor = infor + context.getString(R.string.failed);
+            if (!TextUtils.isEmpty(msg)) {
+                infor = infor + " : " + msg;
+            }
             TapcApp.getInstance().addInfor(MenuInfo.inforType.ERROR, infor);
         }
     }
