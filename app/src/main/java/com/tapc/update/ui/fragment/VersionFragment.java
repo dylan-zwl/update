@@ -65,17 +65,24 @@ public class VersionFragment extends BaseFragment {
                         true, getString(R.string.reboot));
                 File file = new File(path);
                 if (file.exists()) {
-                    AppUtil.installApk(mContext, new File(path), new AppUtil.ProgressListener() {
-                        @Override
-                        public void onCompleted(boolean isSuccessed, String message) {
-                            ShowInforUtil.send(mContext, getString(R.string.app), getString(R.string.install),
-                                    isSuccessed, message);
-                            stopUpdate();
-                        }
-                    });
+                    switch (Config.DEVICE_TYPE) {
+                        case RK3399:
+                            String result = AppUtil.pmInstall(new File(path).getAbsolutePath());
+                            break;
+                        default:
+                            AppUtil.installApk(mContext, new File(path), new AppUtil.ProgressListener() {
+                                @Override
+                                public void onCompleted(boolean isSuccessed, String message) {
+                                    ShowInforUtil.send(mContext, getString(R.string.app), getString(R.string.install),
+                                            isSuccessed, message);
+                                    stopUpdate();
+                                }
+                            });
+                            break;
+                    }
                 } else {
                     ShowInforUtil.send(mContext, getString(R.string.app), getString(R.string.update_infor),
-                            true, getString(R.string.no_file));
+                            false, getString(R.string.no_file));
                     stopUpdate();
                 }
                 e.onComplete();

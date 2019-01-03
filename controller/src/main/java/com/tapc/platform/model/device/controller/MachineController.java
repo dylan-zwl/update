@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.tapc.platform.model.device.controller.uart.Commands;
+import com.tapc.platform.model.device.controller.uart.UARTController;
 
 @SuppressLint("HandlerLeak")
 public final class MachineController {
@@ -74,6 +75,7 @@ public final class MachineController {
         mHardwareStatuscontroller.stop();
         mMachineStatusController.stop();
         mKeyboardController.stop();
+        UARTController.getInstance().stop(true);
     }
 
     /**

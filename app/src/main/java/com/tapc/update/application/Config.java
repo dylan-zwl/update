@@ -59,7 +59,8 @@ public class Config {
     public enum DeviceType {
         TCC8935,
         RK3188,
-        S700
+        S700,
+        RK3399
     }
 
     public static void initConfig(String mountedPath) {
@@ -69,11 +70,16 @@ public class Config {
                 EX_SD_FILE_PATH = "/mnt/sd-ext/";
                 UDISK_FILE_PATH = "/mnt/uhost/";
                 DEVICE_TYPE = DeviceType.S700;
-            } else {
+            } else if (new File("/mnt/external_sd/").exists()) {
                 //rk3188
                 EX_SD_FILE_PATH = "/mnt/external_sd/";
                 UDISK_FILE_PATH = "/mnt/usb_storage/";
                 DEVICE_TYPE = DeviceType.RK3188;
+            } else {
+                //rk3399
+                EX_SD_FILE_PATH = "/storage/sdcard0/";
+                UDISK_FILE_PATH = "/storage/usb0/";
+                DEVICE_TYPE = DeviceType.RK3399;
             }
         } else {
             //8935
@@ -99,13 +105,8 @@ public class Config {
         SAVEFILE_TARGET_PATH = IN_SD_FILE_PATH + savefile;
         SAVEFILE_ORIGIN__PATH = MOUNTED_PATH + savefile;
 
-        if (TextUtils.isEmpty(VA_ORIGIN_PATH)) {
-            VA_ORIGIN_PATH = CopyFilePresenter.getVaOriginPath(SAVEFILE_ORIGIN__PATH);
-        }
-        if (TextUtils.isEmpty(VA_TARGET_PATH)) {
-            VA_TARGET_PATH = Config.SAVEFILE_TARGET_PATH + ".va";
-        }
-
+        VA_ORIGIN_PATH = CopyFilePresenter.getVaOriginPath(SAVEFILE_ORIGIN__PATH);
+        VA_TARGET_PATH = Config.SAVEFILE_TARGET_PATH + ".va";
         INSTALL_APP_PATH = SAVEFILE_ORIGIN__PATH + "third_app/";
     }
 

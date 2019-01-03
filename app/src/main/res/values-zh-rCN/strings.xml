@@ -30,7 +30,7 @@
 
     <!--应用-->
     <string name="a_key_install_app">一键安装</string>
-    <string name="a_key_uninstall_app">一键删除</string>
+    <string name="a_key_uninstall_app">一键卸载</string>
     <string name="select_item_all">全选</string>
     <string name="show_system_app">显示系统软件</string>
     <string name="app_open">启动</string>

@@ -10,6 +10,7 @@ import android.os.IBinder;
 
 import com.tapc.platform.jni.Driver;
 import com.tapc.platform.model.device.controller.MachineController;
+import com.tapc.platform.model.device.controller.uart.UARTController;
 import com.tapc.update.broadcast.MediaMountedReceiver;
 import com.tapc.update.service.MenuService;
 import com.tapc.update.service.binder.LocalBinder;
@@ -49,18 +50,33 @@ public class TapcApp extends Application {
     public void stopUpdate() {
         MachineController.getInstance().stop();
         IntentUtil.sendBroadcast(this, "tapc_stop_update", null);
+        switch (Config.DEVICE_TYPE) {
+            case RK3399:
+                System.exit(0);
+                break;
+        }
     }
 
     private void initMachineCtl() {
         Driver.openUinput(Driver.UINPUT_DEVICE_NAME);
+        String deviceName = "";
         switch (Config.DEVICE_TYPE) {
             case RK3188:
-                Driver.initCom("/dev/ttyS3", 115200);
+                deviceName = "/dev/ttyS3";
+                break;
+            case RK3399:
+                Driver.KEY_EVENT_TYPE = 0;
+                deviceName = "/dev/ttyS1";
                 break;
             case S700:
-                Driver.initCom("/dev/ttyS0", 115200);
+                deviceName = "/dev/ttyS0";
+                break;
+            case TCC8935:
+                deviceName = "/dev/ttyTCC3";
                 break;
         }
+        UARTController.DEVICE_NAME = deviceName;
+        Driver.initCom(deviceName, 115200);
 
         MachineController controller = MachineController.getInstance();
         controller.initController(this);

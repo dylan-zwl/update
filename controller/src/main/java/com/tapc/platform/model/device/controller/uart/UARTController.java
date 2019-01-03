@@ -19,18 +19,13 @@ public class UARTController {
     // 8935
     // private String DEVICE_NAME = "/dev/ttyTCC3";
     // rk3188
-    private String DEVICE_NAME = "/dev/ttyS3";
+    public static String DEVICE_NAME = "/dev/ttyS3";
     private boolean _loopbackMode = false;
     private ArrayBlockingQueue<Byte> _loopbackData = new ArrayBlockingQueue<Byte>(
             255, true);
     private boolean _running = false;
 
     private UARTController() {
-        if (!isDeviceExit(DEVICE_NAME)) {
-            DEVICE_NAME = "/dev/ttyTCC3";
-        } else if (isDeviceExit("/mnt/sd-ext/")) {
-            DEVICE_NAME = "/dev/ttyS0";
-        }
     }
 
     public static UARTController getInstance() {

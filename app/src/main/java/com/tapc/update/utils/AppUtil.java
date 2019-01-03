@@ -19,8 +19,13 @@ import android.util.Log;
 import com.tapc.update.application.Config;
 import com.tapc.update.ui.entity.AppInfoEntity;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -108,6 +113,52 @@ public class AppUtil {
             Log.d(TAG, "install " + file.getName() + " fail");
         }
         return false;
+    }
+
+    /**
+     * 执行具体的静默安装逻辑，需要手机ROOT。
+     *
+     * @param path 要安装的apk文件的路径
+     * @return 安装成功返回true，安装失败返回false。
+     */
+    public static String pmInstall(String path) {
+        StringBuilder result = new StringBuilder();
+        DataOutputStream dataOutputStream = null;
+        BufferedReader errorStream = null;
+        try {
+            // 申请su权限
+            Process process = Runtime.getRuntime().exec("su 548");
+            dataOutputStream = new DataOutputStream(process.getOutputStream());
+            // 执行pm install命令
+            String command = "pm install -r " + path + "\n";
+            dataOutputStream.write(command.getBytes(Charset.forName("utf-8")));
+            dataOutputStream.flush();
+            dataOutputStream.writeBytes("exit\n");
+            dataOutputStream.flush();
+            process.waitFor();
+            errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String msg = "";
+            String line;
+            // 读取命令的执行结果
+            while ((line = errorStream.readLine()) != null) {
+                msg += line;
+            }
+            result.append(msg);
+        } catch (Exception e) {
+            result.append(e.getMessage());
+        } finally {
+            try {
+                if (dataOutputStream != null) {
+                    dataOutputStream.close();
+                }
+                if (errorStream != null) {
+                    errorStream.close();
+                }
+            } catch (IOException e) {
+                result.append(e.getMessage());
+            }
+        }
+        return result.toString();
     }
 
     public static void unInstallApk(Context context, String pkgName) {

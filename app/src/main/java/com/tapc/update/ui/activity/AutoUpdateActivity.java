@@ -45,6 +45,7 @@ import static com.tapc.update.ui.presenter.CopyFilePresenter.check;
  */
 
 public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.Listener {
+    private static final String TAG = AutoUpdateActivity.class.getSimpleName();
     @BindView(R.id.auto_update_infor)
     TextView mInfor;
     @BindView(R.id.auto_update_progress)
@@ -125,7 +126,8 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                         mcustartUpdateThead();
                     }
                     //第三方应用安装
-                    String appPath = Config.SAVEFILE_TARGET_PATH + "/third_app";
+                    String appPath = Config.INSTALL_APP_PATH;
+                    Log.d(TAG, "third_app : " + appPath);
                     List<AppInfoEntity> list = mInstallPresenter.getAppList(appPath);
                     if (list != null && list.size() > 0) {
                         addInforShow(getString(R.string.app), getString(R.string.install), getString(R.string.start));
@@ -145,6 +147,7 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                     String originFile = Config.VA_ORIGIN_PATH;
                     String targetFile = Config.VA_TARGET_PATH;
                     File file = new File(originFile);
+                    Log.d(TAG, "originFile : " + originFile + " targetFile : " + targetFile);
                     if (file.exists()) {
                         if (!check(originFile, targetFile)) {
                             addInforShow(getString(R.string.va), getString(R.string.copy), getString(R.string.start));
