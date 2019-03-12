@@ -52,7 +52,7 @@ public class UninstallAppFragment extends BaseFragment {
         mAllCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mApkInfoList != null) {
+                if (mApkInfoList != null && mApkInfoList.size() > 0) {
                     for (int index = 0; index < mApkInfoList.size(); index++) {
                         mApkInfoList.get(index).setChecked(isChecked);
                     }
@@ -66,14 +66,14 @@ public class UninstallAppFragment extends BaseFragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (mAllLstAppInfo != null) {
-                    if (isChecked && isHasGetSystemApp == false) {
-                        isHasGetSystemApp = true;
-                        mAllLstAppInfo = AppUtil.getAllAppInfo(mContext, true);
+                    isHasGetSystemApp = isChecked;
+                    if (isHasGetSystemApp) {
+                        mAllLstAppInfo = AppUtil.getAllAppInfo(mContext, isHasGetSystemApp);
                     }
-                    mApkInfoList = getShowListApp(mAllLstAppInfo, isChecked);
+                    mApkInfoList = getShowListApp(mAllLstAppInfo, isHasGetSystemApp);
                 }
-                if (mApkInfoList == null || mApkInfoList.isEmpty()) {
-                    return;
+                if (mApkInfoList == null) {
+                    mApkInfoList = new ArrayList<>();
                 }
                 mAdapter.notifyDataSetChanged(mApkInfoList);
             }
@@ -84,30 +84,29 @@ public class UninstallAppFragment extends BaseFragment {
             public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
                 mAllLstAppInfo = AppUtil.getAllAppInfo(mContext, false);
                 mApkInfoList = getShowListApp(mAllLstAppInfo, false);
-                if (mApkInfoList != null && !mApkInfoList.isEmpty()) {
-                    e.onNext("show list");
+                if (mApkInfoList == null) {
+                    mApkInfoList = new ArrayList<>();
                 }
+                e.onNext("show list");
                 e.onComplete();
             }
         }, new Consumer() {
             @Override
             public void accept(@NonNull Object o) throws Exception {
-                if (mUninstallAppLv != null) {
-                    mAdapter = new UninstallAdpater(mApkInfoList);
-                    mAdapter.setListener(new UninstallAdpater.Listener() {
-                        @Override
-                        public void onStart(int position) {
-                            List<AppInfoEntity> list = new ArrayList<AppInfoEntity>();
-                            AppInfoEntity item = mApkInfoList.get(position);
-                            list.add(item);
-                            item.setChecked(true);
-                            notifyChanged();
-                            startUninstallApp(list);
-                        }
-                    });
-                    mUninstallAppLv.setLayoutManager(new LinearLayoutManager(mContext));
-                    mUninstallAppLv.setAdapter(mAdapter);
-                }
+                mAdapter = new UninstallAdpater(mApkInfoList);
+                mAdapter.setListener(new UninstallAdpater.Listener() {
+                    @Override
+                    public void onStart(int position) {
+                        List<AppInfoEntity> list = new ArrayList<AppInfoEntity>();
+                        AppInfoEntity item = mApkInfoList.get(position);
+                        list.add(item);
+                        item.setChecked(true);
+                        notifyChanged();
+                        startUninstallApp(list);
+                    }
+                });
+                mUninstallAppLv.setLayoutManager(new LinearLayoutManager(mContext));
+                mUninstallAppLv.setAdapter(mAdapter);
             }
         }, null);
     }
@@ -189,7 +188,9 @@ public class UninstallAppFragment extends BaseFragment {
      */
     @OnClick(R.id.uninstall_all_app_btn)
     void uninstallAllApp(View v) {
-        startUninstallApp(mApkInfoList);
+        if (mApkInfoList != null && !mApkInfoList.isEmpty()) {
+            startUninstallApp(mApkInfoList);
+        }
     }
 
 

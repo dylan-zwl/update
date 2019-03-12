@@ -1,5 +1,9 @@
 package com.tapc.update.ui.fragment;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.TextView;
@@ -65,6 +69,15 @@ public class VersionFragment extends BaseFragment {
                         true, getString(R.string.reboot));
                 File file = new File(path);
                 if (file.exists()) {
+                    //延时重启应用
+                    final Intent intent = mContext.getPackageManager().getLaunchIntentForPackage(mContext
+                            .getPackageName());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+                    PendingIntent pi = PendingIntent.getActivity(mContext, 0, intent, 0);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5 * 1000, pi);
+
                     switch (Config.DEVICE_TYPE) {
                         case RK3399:
                             String result = AppUtil.pmInstall(new File(path).getAbsolutePath());

@@ -2,6 +2,8 @@
 <resources>
     //APP 默认0 先卸载后安装 ， 1 覆盖安装
     <update_app_mode>0</update_app_mode>
+
+    //设备控制软件包名
     <app_package_name>com.jht.tapc.platform</app_package_name>
 
     //va 源文件路径,null使用默认

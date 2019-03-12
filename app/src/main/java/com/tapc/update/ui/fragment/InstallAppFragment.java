@@ -35,7 +35,7 @@ public class InstallAppFragment extends BaseFragment {
 
     private InstallPresenter mInstallPresenter;
     private InstallAdpater mAdapter;
-    private List<AppInfoEntity> mListApkInfo = new ArrayList<AppInfoEntity>();
+    private List<AppInfoEntity> mListApkInfo = new ArrayList<>();
     private Disposable mDisposable;
 
     @Override
@@ -52,7 +52,7 @@ public class InstallAppFragment extends BaseFragment {
         mAllCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mListApkInfo != null) {
+                if (mListApkInfo != null && !mListApkInfo.isEmpty()) {
                     for (int index = 0; index < mListApkInfo.size(); index++) {
                         mListApkInfo.get(index).setChecked(isChecked);
                     }
@@ -65,7 +65,7 @@ public class InstallAppFragment extends BaseFragment {
             @Override
             public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
                 mListApkInfo = mInstallPresenter.getAppList(Config.INSTALL_APP_PATH);
-                if (mListApkInfo != null && mListApkInfo.size() > 0) {
+                if (mListApkInfo != null) {
                     e.onNext("start show");
                 }
                 e.onComplete();
@@ -77,7 +77,7 @@ public class InstallAppFragment extends BaseFragment {
                 mAdapter.setListener(new InstallAdpater.Listener() {
                     @Override
                     public void onStart(int position) {
-                        List<AppInfoEntity> list = new ArrayList<AppInfoEntity>();
+                        List<AppInfoEntity> list = new ArrayList<>();
                         AppInfoEntity item = mListApkInfo.get(position);
                         list.add(item);
                         item.setChecked(true);
