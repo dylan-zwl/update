@@ -47,7 +47,9 @@
                 style="?android:attr/progressBarStyleLarge"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:indeterminateDrawable="@drawable/loading_update_progress"/>
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="0dp"
+                android:indeterminateDrawable="@drawable/loading_update_progress" />
 
             <Button
                 android:id="@+id/update_again"

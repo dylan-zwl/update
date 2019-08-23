@@ -45,10 +45,10 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.3-alpha', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26+'
+    compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
     compile project(path: ':controller')
@@ -63,5 +63,5 @@ dependencies {
     compile 'com.zhy:percent-support-extends:1.1.1'
     provided files('src/libs/classes-full-3188.jar')
     compile project(path: ':vaplayer')
-    compile 'com.android.support:recyclerview-v7:26+'
+    compile 'com.android.support:recyclerview-v7:26.0.0-alpha1'
 }

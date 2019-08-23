@@ -3,9 +3,10 @@
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.4.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -14,6 +15,7 @@ buildscript {
     allprojects {
         repositories {
             jcenter()
+            maven { url "https://maven.google.com" }
         }
 
 //某些输入文件使用或覆盖了已过时的 API。显示错误
@@ -34,4 +36,8 @@ buildscript {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+repositories {
+    google()
 }
