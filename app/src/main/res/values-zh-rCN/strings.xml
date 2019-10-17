@@ -66,4 +66,7 @@
     <string name="start">开始</string>
     <string name="os_same">相同OS，无需升级</string>
     <string name="reboot">如更新成功，升级软件会自动退出，请重新启动应用！</string>
+
+    <string name="yes">确定</string>
+    <string name="no">取消</string>
 </resources>

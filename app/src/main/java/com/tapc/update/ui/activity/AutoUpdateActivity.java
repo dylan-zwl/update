@@ -1,6 +1,8 @@
 package com.tapc.update.ui.activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -80,7 +82,21 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
         mProgress.setListener(this);
         mInstallPresenter = new InstallPresenter(mContext);
 
-        startUpdateThead();
+        new AlertDialog.Builder(this).setTitle(R.string.update)
+                .setIcon(android.R.drawable.ic_menu_info_details)
+                .setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        exit();
+                    }
+                })
+                .setNegativeButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startUpdateThead();
+                    }
+                })
+                .setCancelable(false).create().show();
     }
 
     private void startUpdateThead() {
@@ -94,7 +110,8 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                 String osFileName = OsPresenter.checkHasOsFile(Config.SAVEFILE_ORIGIN__PATH);
                 if (!TextUtils.isEmpty(osFileName) && OsPresenter.checkNeedUpdate(Config.UPDATE_OS_SAVE_PATH,
                         osFileName)) {
-                    addInforShow(getString(R.string.os), getString(R.string.update), getString(R.string.start));
+                    addInforShow(getString(R.string.os), getString(R.string.update),
+                            getString(R.string.start));
                     OsPresenter osPresenter = new OsPresenter(mContext, new UpdateConttract.View() {
                         @Override
                         public void updateProgress(int percent, String msg) {
@@ -103,26 +120,32 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
 
                         @Override
                         public void updateCompleted(boolean isSuccess, String msg) {
-                            addInforShow(getString(R.string.os), getString(R.string.copy), isSuccess, msg);
+                            addInforShow(getString(R.string.os), getString(R.string.copy),
+                                    isSuccess, msg);
                         }
                     });
                     osPresenter.update(Config.SAVEFILE_ORIGIN__PATH);
                 } else {
                     //app 升级
-                    mUpdateFilePath = AppPresenter.initUpdate(mContext, Config.APP_PACKGGE, new AppUtil
-                            .ProgressListener() {
+                    mUpdateFilePath = AppPresenter.initUpdate(mContext, Config.APP_PACKGGE,
+                            new AppUtil
+                                    .ProgressListener() {
 
-                        @Override
-                        public void onCompleted(boolean isSuccessed, String message) {
-                            addInforShow(getString(R.string.app), getString(R.string.uninstall), isSuccessed, message);
-                        }
-                    });
+                                @Override
+                                public void onCompleted(boolean isSuccessed, String message) {
+                                    addInforShow(getString(R.string.app),
+                                            getString(R.string.uninstall),
+                                            isSuccessed, message);
+                                }
+                            });
                     if (Config.isUpdateApp) {
-                        addInforShow(getString(R.string.app), getString(R.string.update), getString(R.string.start));
+                        addInforShow(getString(R.string.app), getString(R.string.update),
+                                getString(R.string.start));
                         appstartUpdateThead();
                     }
                     if (Config.isUpdateMcu) {
-                        addInforShow(getString(R.string.mcu), getString(R.string.update), getString(R.string.start));
+                        addInforShow(getString(R.string.mcu), getString(R.string.update),
+                                getString(R.string.start));
                         mcustartUpdateThead();
                     }
                     //第三方应用安装
@@ -130,16 +153,20 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                     Log.d(TAG, "third_app : " + appPath);
                     List<AppInfoEntity> list = mInstallPresenter.getAppList(appPath);
                     if (list != null && list.size() > 0) {
-                        addInforShow(getString(R.string.app), getString(R.string.install), getString(R.string.start));
+                        addInforShow(getString(R.string.app), getString(R.string.install),
+                                getString(R.string.start));
                         for (final AppInfoEntity appInfoEntity : list) {
-                            mInstallPresenter.installApp(appInfoEntity, false, new AppUtil.ProgressListener() {
-                                @Override
-                                public void onCompleted(boolean isSuccessed, String message) {
-                                    addInforShow(appInfoEntity.getAppLabel(), getString(R.string.install), isSuccessed,
-                                            message);
-                                    mUpdateStatusList.add(isSuccessed);
-                                }
-                            });
+                            mInstallPresenter.installApp(appInfoEntity, false,
+                                    new AppUtil.ProgressListener() {
+                                        @Override
+                                        public void onCompleted(boolean isSuccessed,
+                                                                String message) {
+                                            addInforShow(appInfoEntity.getAppLabel(),
+                                                    getString(R.string.install), isSuccessed,
+                                                    message);
+                                            mUpdateStatusList.add(isSuccessed);
+                                        }
+                                    });
                         }
                     }
 
@@ -150,21 +177,25 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                     Log.d(TAG, "originFile : " + originFile + " targetFile : " + targetFile);
                     if (file.exists()) {
                         if (!check(originFile, targetFile)) {
-                            addInforShow(getString(R.string.va), getString(R.string.copy), getString(R.string.start));
+                            addInforShow(getString(R.string.va), getString(R.string.copy),
+                                    getString(R.string.start));
 
                             long startTime = System.currentTimeMillis();
-                            boolean result = new CopyFileUtils().copyFolder(originFile, targetFile, new CopyFileUtils
-                                    .ProgressCallback() {
-                                @Override
-                                public void onProgress(int progress) {
-                                    updateProgressUi(progress);
-                                }
+                            boolean result = new CopyFileUtils().copyFolder(originFile,
+                                    targetFile, new CopyFileUtils
+                                            .ProgressCallback() {
+                                        @Override
+                                        public void onProgress(int progress) {
+                                            updateProgressUi(progress);
+                                        }
 
-                                @Override
-                                public void onCompeleted(boolean isSuccessed, String msg) {
-                                    addInforShow(getString(R.string.va), getString(R.string.copy), isSuccessed, msg);
-                                }
-                            });
+                                        @Override
+                                        public void onCompeleted(boolean isSuccessed, String msg) {
+                                            addInforShow(getString(R.string.va),
+                                                    getString(R.string.copy)
+                                                    , isSuccessed, msg);
+                                        }
+                                    });
                             if (result) {
                                 result = CopyFilePresenter.check(originFile, targetFile);
                             }
@@ -173,7 +204,8 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
                             long usetime = (System.currentTimeMillis() - startTime) / 1000;
                             Log.d("copy progress", "  use time: " + usetime);
                         } else {
-                            addInforShow(getString(R.string.va), getString(R.string.copy), true, "");
+                            addInforShow(getString(R.string.va), getString(R.string.copy), true,
+                                    "");
                         }
                     }
                 }
@@ -208,7 +240,8 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
 
                 @Override
                 public void updateCompleted(final boolean isSuccess, final String msg) {
-                    addInforShow(getString(R.string.app), getString(R.string.update), isSuccess, msg);
+                    addInforShow(getString(R.string.app), getString(R.string.update), isSuccess,
+                            msg);
                     mUpdateStatusList.add(isSuccess);
                 }
             });
@@ -226,7 +259,8 @@ public class AutoUpdateActivity extends BaseActivity implements UpdateProgress.L
 
                 @Override
                 public void updateCompleted(boolean isSuccess, String msg) {
-                    addInforShow(getString(R.string.mcu), getString(R.string.update), isSuccess, msg);
+                    addInforShow(getString(R.string.mcu), getString(R.string.update), isSuccess,
+                            msg);
                     mUpdateStatusList.add(isSuccess);
                 }
             });

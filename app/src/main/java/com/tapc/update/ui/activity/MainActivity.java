@@ -12,6 +12,7 @@ import android.view.KeyEvent;
 import android.widget.FrameLayout;
 
 import com.tapc.update.R;
+import com.tapc.update.application.Config;
 import com.tapc.update.application.TapcApp;
 import com.tapc.update.service.MenuService;
 import com.tapc.update.ui.fragment.InstallAppFragment;
@@ -22,6 +23,9 @@ import com.tapc.update.ui.fragment.VaCopyFragment;
 import com.tapc.update.ui.fragment.VersionFragment;
 import com.tapc.update.ui.view.FunctionItem;
 import com.tapc.update.ui.widget.MenuBar;
+import com.tapc.update.utils.IntentUtil;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,6 +55,15 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String manualPath = Config.SAVEFILE_ORIGIN__PATH + "manual";
+        if (!new File(manualPath).exists()) {
+            IntentUtil.startActivity(this, AutoUpdateActivity.class, null,
+                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
         TapcApp.getInstance().startUpdate();

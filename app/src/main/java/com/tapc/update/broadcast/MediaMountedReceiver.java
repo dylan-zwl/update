@@ -43,11 +43,11 @@ public class MediaMountedReceiver extends BroadcastReceiver {
             Config.initConfig(mountedPath);
 
             initUpdateConfig(context, updateFile.getAbsolutePath() + "/update_config.xml");
-            String manualPath = Config.SAVEFILE_ORIGIN__PATH + "manual";
 
             if (!IntentUtil.isApplicationBroughtToBackground(context)) {
                 return;
             }
+            String manualPath = Config.SAVEFILE_ORIGIN__PATH + "manual";
             if (new File(manualPath).exists()) {
                 IntentUtil.startActivity(context, MainActivity.class, null, Intent.FLAG_ACTIVITY_NEW_TASK | Intent
                         .FLAG_ACTIVITY_CLEAR_TOP);

@@ -66,4 +66,7 @@
     <string name="start">start</string>
     <string name="os_same">Same OS, no need to upgrade</string>
     <string name="reboot">If the update is successful,The upgrade software will automatically exit. Please restart the application!</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
